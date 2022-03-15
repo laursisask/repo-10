@@ -7,6 +7,7 @@ import androidx.paging.insertSeparators
 import androidx.paging.map
 import kotlinx.coroutines.flow.map
 import nl.mranderson.rijks.domain.usecase.GetCollection
+import nl.mranderson.rijks.ui.list.ListViewModel.ArtUIModel.AuthorSeparator
 
 class ListViewModel(
     getCollection: GetCollection
@@ -15,15 +16,15 @@ class ListViewModel(
     val artCollectionFlow = getCollection().map { pagingData ->
         pagingData.map { art ->
             ArtUIModel.ArtData(
-                id = art.id,
+                id = art.objectNumber,
                 title = art.title,
                 author = art.author,
                 imageUrl = art.imageUrl
             )
         }.insertSeparators { before, after ->
             when {
-                before == null && after != null -> ArtUIModel.AuthorSeparator(after.author)
-                before != null && after != null && before.author != after.author -> ArtUIModel.AuthorSeparator(
+                before == null && after != null -> AuthorSeparator(after.author)
+                before != null && after != null && before.author != after.author -> AuthorSeparator(
                     after.author
                 )
                 else -> null
@@ -40,5 +41,4 @@ class ListViewModel(
         ) : ArtUIModel()
         class AuthorSeparator(val author: String) : ArtUIModel()
     }
-
 }

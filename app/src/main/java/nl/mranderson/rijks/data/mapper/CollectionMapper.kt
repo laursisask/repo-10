@@ -8,7 +8,6 @@ object CollectionMapper : Mapper<CollectionResponse, List<Art>> {
     override fun map(data: CollectionResponse) = data.run {
         artObjects.map {
             Art(
-                id = it.id,
                 objectNumber = it.objectNumber,
                 title = it.title,
                 author = it.principalOrFirstMaker,
@@ -17,3 +16,4 @@ object CollectionMapper : Mapper<CollectionResponse, List<Art>> {
         }
     }
 }
+

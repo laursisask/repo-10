@@ -6,6 +6,7 @@ import androidx.paging.PagingData
 import kotlinx.coroutines.flow.Flow
 import nl.mranderson.rijks.domain.CollectionRepository
 import nl.mranderson.rijks.domain.model.Art
+import nl.mranderson.rijks.domain.model.ArtDetails
 
 class CollectionRepositoryImpl(
     private val collectionPagingSource: CollectionPagingSource,
@@ -23,13 +24,13 @@ class CollectionRepositoryImpl(
         ).flow
     }
 
-//    override suspend fun getArtDetails(artId : Int): Result<Art> {
-//        return try {
-//            val response = collectionRemoteDataSource.getCollection(page, loadSize)
-//            Result.success(response)
-//        } catch (exception: Exception) {
-//            Result.failure(exception = exception)
-//        }
-//    }
+    override suspend fun getArtDetails(artId: String): Result<ArtDetails> {
+        return try {
+            val response = collectionRemoteDataSource.getArtDetails(artId = artId)
+            Result.success(response)
+        } catch (exception: Exception) {
+            Result.failure(exception = exception)
+        }
+    }
 }
 

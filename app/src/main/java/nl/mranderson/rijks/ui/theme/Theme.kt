@@ -1,5 +1,6 @@
 package nl.mranderson.rijks.ui.theme
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
@@ -18,7 +19,7 @@ private val LightColorScheme = lightColors(
 )
 
 @Composable
-fun RijksTheme(darkTheme: Boolean = true, content: @Composable () -> Unit) {
+fun RijksTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
     val colors = if (darkTheme) {
         DarkColorScheme
     } else {

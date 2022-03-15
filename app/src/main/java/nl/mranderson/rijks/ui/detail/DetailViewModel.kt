@@ -1,0 +1,53 @@
+package nl.mranderson.rijks.ui.detail
+
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.paging.cachedIn
+import androidx.paging.insertSeparators
+import androidx.paging.map
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
+import nl.mranderson.rijks.domain.model.Art
+import nl.mranderson.rijks.domain.model.ArtDetails
+import nl.mranderson.rijks.domain.usecase.GetArtDetails
+import nl.mranderson.rijks.domain.usecase.GetCollection
+import nl.mranderson.rijks.ui.detail.DetailViewModel.ScreenState.Data
+import nl.mranderson.rijks.ui.detail.DetailViewModel.ScreenState.Error
+import nl.mranderson.rijks.ui.detail.DetailViewModel.ScreenState.Loading
+
+class DetailViewModel(
+    private val artId: String,
+    val getArtDetails: GetArtDetails
+) : ViewModel() {
+
+    private val _state = MutableLiveData<ScreenState>()
+    val state: LiveData<ScreenState> = _state
+
+    init {
+        fetchArtDetails()
+    }
+
+    fun onRetryClicked() {
+        fetchArtDetails()
+    }
+
+    private fun fetchArtDetails() {
+        _state.value = Loading
+        viewModelScope.launch {
+            getArtDetails(artId = artId).onSuccess {
+                _state.value = Data(artDetail = it)
+            }.onFailure {
+                _state.value = Error
+            }
+        }
+    }
+
+    sealed class ScreenState {
+        object Loading : ScreenState()
+        class Data(val artDetail: ArtDetails) : ScreenState()
+        object Error : ScreenState()
+    }
+
+}

@@ -1,9 +1,9 @@
 package nl.mranderson.rijks.data
 
-import nl.mranderson.rijks.domain.model.Art
+import nl.mranderson.rijks.domain.model.ArtDetails
 
 interface CollectionDataSource {
 
-    suspend fun getCollection(page : Int, loadSize: Int): List<Art>
+    suspend fun getArtDetails(artId: String): ArtDetails
 
 }

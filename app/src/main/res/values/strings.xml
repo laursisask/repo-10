@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Rijks</string>
+    <string name="dash">-</string>
+    <string name="view_details">Details bekijken</string>
+    <string name="description">Omschrijving</string>
+    <string name="author">Auteur</string>
+    <string name="object_name">Object</string>
+    <string name="global_error_message">Er ging iets mis</string>
+    <string name="global_retry_message">Probeer opnieuw</string>
 </resources>

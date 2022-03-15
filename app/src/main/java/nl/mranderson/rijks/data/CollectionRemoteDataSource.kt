@@ -1,17 +1,17 @@
 package nl.mranderson.rijks.data
 
 import nl.mranderson.rijks.data.api.CollectionApiService
-import nl.mranderson.rijks.data.mapper.CollectionMapper
-import nl.mranderson.rijks.domain.model.Art
+import nl.mranderson.rijks.data.mapper.ArtDetailsMapper
+import nl.mranderson.rijks.domain.model.ArtDetails
 
 class CollectionRemoteDataSource(
     private val collectionApiService: CollectionApiService,
-    private val collectionMapper: CollectionMapper
+    private val artDetailsMapper: ArtDetailsMapper
 ) : CollectionDataSource {
 
-    override suspend fun getCollection(page: Int, loadSize : Int): List<Art> {
-        val response = collectionApiService.getCollection(page, loadSize)
-        return collectionMapper.map(response)
+    override suspend fun getArtDetails(artId: String): ArtDetails {
+        val response = collectionApiService.getArtDetails(artId)
+        return artDetailsMapper.map(response)
     }
 
 }
