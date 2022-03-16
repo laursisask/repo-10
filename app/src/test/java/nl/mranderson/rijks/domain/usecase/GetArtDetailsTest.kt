@@ -1,7 +1,6 @@
 package nl.mranderson.rijks.domain.usecase
 
 import kotlinx.coroutines.test.runTest
-import net.bytebuddy.implementation.bytecode.Throw
 import nl.mranderson.rijks.domain.CollectionRepository
 import nl.mranderson.rijks.domain.model.ArtDetails
 import org.junit.jupiter.api.AfterEach

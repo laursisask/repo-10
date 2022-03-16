@@ -1,10 +1,10 @@
 package nl.mranderson.rijks.data
 
-import CollectionResponse
 import androidx.paging.PagingSource
 import kotlinx.coroutines.test.runTest
 import nl.mranderson.rijks.data.api.CollectionApiService
 import nl.mranderson.rijks.data.mapper.CollectionMapper
+import nl.mranderson.rijks.data.model.CollectionResponse
 import nl.mranderson.rijks.domain.model.Art
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals

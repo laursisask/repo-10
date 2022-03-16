@@ -5,7 +5,6 @@ import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFact
 import java.util.concurrent.TimeUnit
 import kotlinx.serialization.json.Json
 import okhttp3.HttpUrl
-import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import org.koin.android.ext.koin.androidApplication

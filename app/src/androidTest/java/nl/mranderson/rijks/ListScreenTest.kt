@@ -51,7 +51,6 @@ class ListScreenTest {
         }
 
         composeTestRule.onNodeWithText("Rembrandt").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Vermeer").assertIsDisplayed()
         composeTestRule.onNodeWithText("Landschap").performClick()
     }
 }

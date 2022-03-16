@@ -1,7 +1,7 @@
 package nl.mranderson.rijks.data.api
 
-import ArtDetailResponse
-import CollectionResponse
+import nl.mranderson.rijks.data.model.ArtDetailResponse
+import nl.mranderson.rijks.data.model.CollectionResponse
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query

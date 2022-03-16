@@ -1,9 +1,9 @@
 package nl.mranderson.rijks.data
 
-import ArtDetailResponse
 import kotlinx.coroutines.test.runTest
 import nl.mranderson.rijks.data.api.CollectionApiService
 import nl.mranderson.rijks.data.mapper.ArtDetailsMapper
+import nl.mranderson.rijks.data.model.ArtDetailResponse
 import nl.mranderson.rijks.domain.model.ArtDetails
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals

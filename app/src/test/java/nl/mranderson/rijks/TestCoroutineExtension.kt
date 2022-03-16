@@ -15,12 +15,12 @@ import org.junit.jupiter.api.extension.ExtensionContext
 class TestCoroutineExtension constructor(
     private val dispatcher: TestCoroutineDispatcher = TestCoroutineDispatcher()
 ) : BeforeEachCallback, AfterEachCallback, TestCoroutineScope by TestCoroutineScope(dispatcher) {
+
     override fun beforeEach(context: ExtensionContext) {
         Dispatchers.setMain(dispatcher)
     }
 
     override fun afterEach(context: ExtensionContext) {
-        cleanupTestCoroutines()
         Dispatchers.resetMain()
     }
 }

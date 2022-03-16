@@ -1,6 +1,6 @@
 package nl.mranderson.rijks.data.mapper
 
-import CollectionResponse
+import nl.mranderson.rijks.data.model.CollectionResponse
 import nl.mranderson.rijks.domain.model.Art
 
 object CollectionMapper : Mapper<CollectionResponse, List<Art>> {

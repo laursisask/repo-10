@@ -1,8 +1,6 @@
 package nl.mranderson.rijks.data.mapper
 
-import ArtDetailResponse
-import CollectionResponse
-import nl.mranderson.rijks.domain.model.Art
+import nl.mranderson.rijks.data.model.ArtDetailResponse
 import nl.mranderson.rijks.domain.model.ArtDetails
 
 object ArtDetailsMapper : Mapper<ArtDetailResponse, ArtDetails> {

@@ -1,8 +1,8 @@
 package nl.mranderson.rijks.data.mapper
 
-import ArtDetailResponse
-import ArtPieceDetailResponse
-import ImageResponse
+import nl.mranderson.rijks.data.model.ArtDetailResponse
+import nl.mranderson.rijks.data.model.ArtPieceDetailResponse
+import nl.mranderson.rijks.data.model.ImageResponse
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
