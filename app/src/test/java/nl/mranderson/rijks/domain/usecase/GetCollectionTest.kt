@@ -1,8 +1,12 @@
 package nl.mranderson.rijks.domain.usecase
 
+import androidx.paging.PagingData
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.test.runTest
 import nl.mranderson.rijks.domain.CollectionRepository
+import nl.mranderson.rijks.domain.model.Art
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito
@@ -30,10 +34,16 @@ class GetCollectionTest {
     }
 
     @Test
-    fun `Given a valid response, When retrieving the banks, Then it will return the banks`() =
+    fun `When retrieving the collection, Then return paging data`() =
         runTest {
+            // Given
+            val pagingData: Flow<PagingData<Art>> = mock()
+            whenever(collectionRepository.getCollection()).thenReturn(pagingData)
 
-            whenever(collectionRepository.getCollection()).thenReturn(mock())
+            // When
+            val result = getCollection()
 
+            // Then
+            assertEquals(pagingData, result)
         }
 }

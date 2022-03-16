@@ -40,7 +40,6 @@ class ArtDetailsMapperTest {
         )
     }
 
-
     @Test
     fun `Given art title, When art detail is mapped, Then art title is correctly mapped`() {
         // Given

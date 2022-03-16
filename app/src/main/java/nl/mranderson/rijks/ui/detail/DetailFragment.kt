@@ -30,7 +30,7 @@ class DetailFragment : Fragment() {
 
                 val viewModel by viewModel<DetailViewModel>(parameters = {
                     parametersOf(
-                        arguments?.get(ARGUMENTS_ART_ID)
+                        requireArguments().get(ARGUMENTS_ART_ID)
                     )
                 })
 

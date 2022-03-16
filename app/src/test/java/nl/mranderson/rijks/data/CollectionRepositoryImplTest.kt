@@ -1,5 +1,6 @@
 package nl.mranderson.rijks.data
 
+import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.test.runTest
 import nl.mranderson.rijks.domain.model.ArtDetails
 import org.junit.jupiter.api.AfterEach
@@ -12,6 +13,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
+@ExperimentalTime
 class CollectionRepositoryImplTest {
 
     private lateinit var collectionRepository: CollectionRepositoryImpl
@@ -34,7 +36,6 @@ class CollectionRepositoryImplTest {
             collectionRemoteDataSource
         )
     }
-
 
     @Test
     fun `Given an id, When retrieving the details of an art piece, Then return details object`() =
@@ -67,5 +68,5 @@ class CollectionRepositoryImplTest {
             // Then
             assertTrue(result.isFailure)
         }
-
 }
+
