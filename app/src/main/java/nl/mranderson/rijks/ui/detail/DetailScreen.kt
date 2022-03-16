@@ -78,7 +78,10 @@ fun ArtDetail(artDetail: ArtDetails, onBackClicked: () -> Unit) {
                     }
                     Column {
                         ArtTitle(text = artDetail.title)
-                        Chips(titles = artDetail.types, startSpacing = 16.dp, endSpacing = 16.dp)
+                        Chips(
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                            titles = artDetail.types
+                        )
                         ArtProperty(
                             stringResource(
                                 id = R.string.description

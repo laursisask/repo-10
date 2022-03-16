@@ -22,27 +22,13 @@ import nl.mranderson.rijks.ui.theme.Purple40
 @Composable
 fun Chips(
     modifier: Modifier = Modifier,
-    titles: List<String>,
-    startSpacing: Dp = 0.dp,
-    endSpacing: Dp = 0.dp
+    titles: List<String>
 ) {
     LazyRow(modifier = modifier) {
-        if (startSpacing != 0.dp) {
-            item {
-                Spacer(Modifier.width(startSpacing))
-            }
-        }
-
         items(titles) {
             Chip(
                 name = it,
             )
-        }
-
-        if (endSpacing != 0.dp) {
-            item {
-                Spacer(Modifier.width(endSpacing))
-            }
         }
     }
 }

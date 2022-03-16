@@ -21,19 +21,18 @@ class DetailFragment : Fragment() {
         const val ARGUMENTS_ART_ID = "id"
     }
 
+    private val viewModel by viewModel<DetailViewModel>(parameters = {
+        parametersOf(
+            requireArguments().get(ARGUMENTS_ART_ID)
+        )
+    })
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         return ComposeView(requireContext()).apply {
             setContent {
-
-                val viewModel by viewModel<DetailViewModel>(parameters = {
-                    parametersOf(
-                        requireArguments().get(ARGUMENTS_ART_ID)
-                    )
-                })
-
                 val state by viewModel.state.observeAsState(Loading)
 
                 val interaction = object : DetailInteraction {
