@@ -24,7 +24,3 @@ updates:
       - "coreyjonoliver"
     labels:
       - dependencies
-
-
-# push tag
-# create release
