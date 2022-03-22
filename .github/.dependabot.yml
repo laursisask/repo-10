@@ -8,6 +8,14 @@ updates:
       - "coreyjonoliver"
     labels:
       - dependencies
+  - package-ecosystem: docker
+    directory: "/windows/nanoserver-ltsc2022"
+    schedule:
+      interval: daily
+    reviewers:
+      - "coreyjonoliver"
+    labels:
+      - dependencies
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
@@ -16,3 +24,7 @@ updates:
       - "coreyjonoliver"
     labels:
       - dependencies
+
+
+# push tag
+# create release

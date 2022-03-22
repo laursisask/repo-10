@@ -10,7 +10,18 @@ on:
 jobs:
   build:
     name: Build and Test
-    runs-on: windows-2019
+    runs-on: ${{ matrix.os }}
+    strategy:
+      max-parallel: 2
+      matrix:
+        os: [windows-2019, windows-2022]
+        include:
+        - os: windows-2019
+          dockerfile: windows/nanoserver-1809/Dockerfile
+          context: windows
+        - os: windows-2022
+          dockerfile: windows/nanoserver-ltsc2022/Dockerfile
+          context: windows
     steps:
       - name: Checkout current branch (full)
         uses: actions/checkout@v2
@@ -19,5 +30,5 @@ jobs:
 
       - name: Build Docker images
         run: |
-          docker build windows/nanoserver-1809
+          docker build -f ${{ matrix.dockerfile }} ${{ matrix.context }}
 
