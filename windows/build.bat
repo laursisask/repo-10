@@ -2,6 +2,7 @@
 
 setlocal
 set BUILDDIR=C:\build
+set REPO=github.com/gliderlabs/registrator
 set COMMIT_HASH=4322fe00304d6de661865721b073dc5c7e750bd2
 mkdir %BUILDDIR% >NUL 2>&1
 cd %BUILDDIR%

@@ -4,8 +4,12 @@ on:
   pull_request:
     branches: ['**']
   push:
-    branches: ['**']
-    tags: [v*]
+    branches-ignore:
+      - main
+
+concurrency:
+  group: build-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -23,12 +27,12 @@ jobs:
           dockerfile: windows/nanoserver-ltsc2022/Dockerfile
           context: windows
     steps:
-      - name: Checkout current branch (full)
+      - name: Checkout current branch
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
-      - name: Build Docker images
+      - name: Build Docker image
+        id: build_docker_image
         run: |
           docker build -f ${{ matrix.dockerfile }} ${{ matrix.context }}
-
