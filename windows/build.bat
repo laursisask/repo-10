@@ -12,4 +12,4 @@ go mod init local/build
 go get -d -v github.com/gliderlabs/registrator@%COMMIT_HASH%
 for /f "tokens=1" %%a in ('go list -m -f "{{ .Version }}" %REPO%') do set VERSION=%%a
 echo [+] Building
-go build -ldflags "-X main.Version=%VERSION%" -o %BUILDDIR%\registrator.exe github.com/gliderlabs/registrator || exit /b 1
+go build -trimpath -ldflags "-buildid= -X main.Version=%VERSION%" -o %BUILDDIR%\registrator.exe github.com/gliderlabs/registrator || exit /b 1
