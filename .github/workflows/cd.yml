@@ -53,15 +53,25 @@ jobs:
           $rawOsVersion -match '.*\[Version (?<version>\d+\.\d+\.\d+\.\d+)\]'
           $osVersion = $Matches.version
           $version = docker run --rm ${{ env.LOCAL_TAG }} --version
+          $revision = Get-Content "$env:GITHUB_WORKSPACE\revision.txt" | Select -First 1
           Write-Output "::set-output name=${{ matrix.os }}-os-version::${osVersion}"
-          Write-Output "::set-output name=git-tag::${version}-${{ github.run_number }}"
-          Write-Output "::set-output name=manifest-list::dwolla/registrator:$($version.substring(1))-${{ github.run_number }}"
-          Write-Output "::set-output name=docker-tag::dwolla/registrator:$($version.substring(1))-${{ github.run_number }}-${{ matrix.tag_suffix }}"
+          Write-Output "::set-output name=git-tag::${version}-${revision}"
+          Write-Output "::set-output name=manifest-list::dwolla/registrator:$($version.substring(1))-${revision}"
+          Write-Output "::set-output name=docker-tag::dwolla/registrator:$($version.substring(1))-${revision}-${{ matrix.tag_suffix }}"
 
       - name: Push Docker image
         run: |
-          docker tag ${{ env.LOCAL_TAG }} ${{ steps.get-versions.outputs.docker-tag }}
-          docker push ${{ steps.get-versions.outputs.docker-tag }}
+          if (! (docker manifest inspect ${{ steps.get-versions.outputs.docker-tag }}))
+          {
+            Write-Output "Docker image ${{ steps.get-versions.outputs.docker-tag }} does not exist, publishing"
+            docker tag ${{ env.LOCAL_TAG }} ${{ steps.get-versions.outputs.docker-tag }}
+            docker push ${{ steps.get-versions.outputs.docker-tag }}
+          } 
+          else
+          {
+            Write-Output "Docker image ${{ steps.get-versions.outputs.docker-tag }} already exists"
+            exit 1
+          }
 
       # - name: Create tag
       #   uses: actions/github-script@v5
