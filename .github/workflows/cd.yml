@@ -6,7 +6,6 @@ on:
       - main
 
 env:
-  GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
   LOCAL_TAG: dwolla/registrator:local
 
 jobs:
@@ -64,13 +63,13 @@ jobs:
         run: |
           if (! (docker manifest inspect ${{ steps.get-versions.outputs.docker-tag }}))
           {
-            Write-Output "Docker image ${{ steps.get-versions.outputs.docker-tag }} does not exist, publishing"
+            Write-Output "Docker image ${{ steps.get-versions.outputs.docker-tag }} does not exist, publishing."
             docker tag ${{ env.LOCAL_TAG }} ${{ steps.get-versions.outputs.docker-tag }}
             docker push ${{ steps.get-versions.outputs.docker-tag }}
           } 
           else
           {
-            Write-Output "Docker image ${{ steps.get-versions.outputs.docker-tag }} already exists. Please increment revision.txt."
+            Write-Output "Docker image already exists: ${{ steps.get-versions.outputs.docker-tag }}. Please increment revision.txt."
             exit 1
           }
 
@@ -115,9 +114,25 @@ jobs:
         uses: actions/github-script@v5
         with:
           script: |
+            try {
+              const resp = await github.rest.git.getRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: 'refs/tags/${{ needs.build-and-push.outputs.git-tag }}',
+              });
+            } catch (error) {
+                if (error.status === 404) {
+                  return core.setFailed("Tag already exists: ${{ needs.build-and-push.outputs.git-tag }}. Please increment revision.txt.");
+                } else {
+                  throw error;
+                }
+            }
+
             github.rest.git.createRef({
               owner: context.repo.owner,
               repo: context.repo.repo,
               ref: 'refs/tags/${{ needs.build-and-push.outputs.git-tag }}',
               sha: context.sha
             })
+
+            console.log("Git tag ${{ needs.build-and-push.outputs.git-tag }} does not exist, publishing.")

@@ -45,10 +45,44 @@ jobs:
           Write-Output "::set-output name=git-tag::${version}-${revision}"
           Write-Output "::set-output name=docker-tag::dwolla/registrator:$($version.substring(1))-${revision}-${{ matrix.tag_suffix }}"
 
-      - name: Push Docker image
+      - name: Check if Docker tag exists
         run: |
           if (docker manifest inspect ${{ steps.get-versions.outputs.docker-tag }})
           {
-            Write-Output "Docker image ${{ steps.get-versions.outputs.docker-tag }} already exists. Please increment revision.txt."
+            Write-Output "Docker tag already exists: ${{ steps.get-versions.outputs.docker-tag }}. Please increment revision.txt."
             exit 1
           }
+          else
+          {
+            Write-Output "Docker tag ${{ steps.get-versions.outputs.docker-tag }} does not exist."
+          }
+          
+
+          Write-Output "No existing Docker image found."
+
+      - name: Check if git tag exists
+        uses: actions/github-script@v5
+        with:
+          script: |
+            try {
+              const resp = await github.rest.git.getRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: 'refs/tags/${{ needs.build.outputs.git-tag }}',
+              });
+            } catch (error) {
+                if (error.status === 404) {
+                  return core.setFailed("Git tag already exists: ${{ needs.build.outputs.git-tag }}. Please increment revision.txt.");
+                } else {
+                  throw error;
+                }
+            }
+
+            github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: 'refs/tags/${{ needs.build.outputs.git-tag }}',
+              sha: context.sha
+            })
+
+            console.log("Git tag ${{ needs.build.outputs.git-tag }} does not exist.")
