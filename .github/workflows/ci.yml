@@ -68,21 +68,14 @@ jobs:
               const resp = await github.rest.git.getRef({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                ref: 'refs/tags/${{ needs.build.outputs.git-tag }}',
+                ref: 'tags/${{ needs.build.outputs.git-tag }}',
               });
+              return core.setFailed("Git tag already exists: ${{ needs.build.outputs.git-tag }}. Please increment revision.txt.");
             } catch (error) {
-                if (error.status === 404) {
-                  return core.setFailed("Git tag already exists: ${{ needs.build.outputs.git-tag }}. Please increment revision.txt.");
+                  core.info("Git tag ${{ needs.build.outputs.git-tag }} does not exist.")
                 } else {
                   throw error;
                 }
             }
 
-            github.rest.git.createRef({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              ref: 'refs/tags/${{ needs.build.outputs.git-tag }}',
-              sha: context.sha
-            })
-
-            console.log("Git tag ${{ needs.build.outputs.git-tag }} does not exist.")
+            
