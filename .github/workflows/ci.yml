@@ -7,6 +7,9 @@ on:
     branches-ignore:
       - main
 
+env:
+  LOCAL_TAG: dwolla/registrator:local
+
 concurrency:
   group: build-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
@@ -35,7 +38,7 @@ jobs:
       - name: Build Docker image
         id: build_docker_image
         run: |
-          docker build -f ${{ matrix.dockerfile }} ${{ matrix.context }}
+          docker build -t ${{ env.LOCAL_TAG }} -f ${{ matrix.dockerfile }} ${{ matrix.context }}
 
       - name: Get versions
         id: get-versions
