@@ -36,3 +36,19 @@ jobs:
         id: build_docker_image
         run: |
           docker build -f ${{ matrix.dockerfile }} ${{ matrix.context }}
+
+      - name: Get versions
+        id: get-versions
+        run: |
+          $version = docker run --rm ${{ env.LOCAL_TAG }} --version
+          $revision = Get-Content "$env:GITHUB_WORKSPACE\revision.txt" | Select -First 1
+          Write-Output "::set-output name=git-tag::${version}-${revision}"
+          Write-Output "::set-output name=docker-tag::dwolla/registrator:$($version.substring(1))-${revision}-${{ matrix.tag_suffix }}"
+
+      - name: Push Docker image
+        run: |
+          if (docker manifest inspect ${{ steps.get-versions.outputs.docker-tag }})
+          {
+            Write-Output "Docker image ${{ steps.get-versions.outputs.docker-tag }} already exists. Please increment revision.txt."
+            exit 1
+          }
