@@ -61,7 +61,7 @@ jobs:
           Write-Output "No existing Docker image found."
 
       - name: Check if git tag exists
-        uses: actions/github-script@v5
+        uses: actions/github-script@v6
         with:
           script: |
             try {
