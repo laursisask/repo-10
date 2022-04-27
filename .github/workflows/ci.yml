@@ -73,6 +73,7 @@ jobs:
               });
               return core.setFailed("Git tag already exists: ${{ needs.build.outputs.git-tag }}. Please increment revision.txt.");
             } catch (error) {
+                if (error.status === 404) {
                   core.info("Git tag ${{ needs.build.outputs.git-tag }} does not exist.")
                 } else {
                   throw error;
