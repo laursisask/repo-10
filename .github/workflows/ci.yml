@@ -46,7 +46,7 @@ jobs:
           $version = docker run --rm ${{ env.LOCAL_TAG }} --version
           $revision = Get-Content "$env:GITHUB_WORKSPACE\revision.txt" | Select -First 1
           Write-Output "::set-output name=git-tag::${version}-${revision}"
-          Write-Output "::set-output name=docker-tag::dwolla/registrator:$($version.substring(1))-${revision}-${{ matrix.tag_suffix }}"
+          Write-Output "::set-output name=docker-tag::dwolla/registrator:$($version.substring(1))-${revision}"
 
       - name: Check if Docker tag exists
         run: |
@@ -58,10 +58,8 @@ jobs:
           else
           {
             Write-Output "Docker tag ${{ steps.get-versions.outputs.docker-tag }} does not exist."
+            exit 0
           }
-          
-
-          Write-Output "No existing Docker image found."
 
       - name: Check if git tag exists
         uses: actions/github-script@v6
