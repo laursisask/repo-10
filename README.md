@@ -3,4 +3,4 @@
 [![Docker](https://img.shields.io/docker/v/dwolla/registrator?style=flat-square)](https://hub.docker.com/repository/docker/dwolla/registrator)
 [![license](https://img.shields.io/github/license/dwolla/docker-registrator.svg?style=flat-square)](https://github.com/Dwolla/docker-registrator/blob/master/LICENSE.md)
 
-Docker image for running registrator.
+Docker image for running GliderLab's registrator.
