@@ -3,13 +3,9 @@ name: Continous Integration
 on:
   pull_request:
     branches: ['**']
-    paths-ignore:
-      - README.md
   push:
     branches-ignore:
       - main
-    paths-ignore:
-      - README.md
 
 env:
   LOCAL_TAG: dwolla/registrator:local
