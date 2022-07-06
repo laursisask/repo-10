@@ -129,8 +129,8 @@ public class BlocLines implements Iterable<StringLocated> {
 		return new BlocLines(result);
 	}
 
-	public BlocLines() {
-		this(new ArrayList<StringLocated>());
+	public static BlocLines create() {
+		return new BlocLines(new ArrayList<StringLocated>());
 	}
 
 	public BlocLines add(StringLocated s) {

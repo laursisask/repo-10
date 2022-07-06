@@ -52,11 +52,15 @@ public class UImageSvg implements UShape {
 		return SignatureUtils.getMD5Hex(svg);
 	}
 
+	public boolean containsXlink() {
+		return svg.contains("xmlns:xlink=\"http://www.w3.org/1999/xlink\"");
+	}
+
 	public String getSvg(boolean raw) {
 		String result = svg;
-		if (raw) {
+		if (raw)
 			return result;
-		}
+
 		if (result.startsWith("<?xml")) {
 			final int idx = result.indexOf("<svg");
 			result = result.substring(idx);
@@ -68,31 +72,31 @@ public class UImageSvg implements UShape {
 		final String style = extractSvgStyle();
 		if (style != null) {
 			final String background = extractBackground(style);
-			if (background != null) {
+			if (background != null)
 				result = result.replaceFirst("<g>", "<g><rect fill=\"" + background + "\" style=\"" + style + "\" /> ");
-			}
+
 		}
-		if (result.startsWith("<svg>") == false) {
+		if (result.startsWith("<svg>") == false)
 			throw new IllegalArgumentException();
-		}
+
 		return result;
 	}
 
 	private String extractBackground(String style) {
 		final Pattern p = Pattern.compile("background:([^;]+)");
 		final Matcher m = p.matcher(style);
-		if (m.find()) {
+		if (m.find())
 			return m.group(1);
-		}
+
 		return null;
 	}
 
 	private String extractSvgStyle() {
 		final Pattern p = Pattern.compile("(?i)\\<svg[^>]+style=\"([^\">]+)\"");
 		final Matcher m = p.matcher(svg);
-		if (m.find()) {
+		if (m.find())
 			return m.group(1);
-		}
+
 		return null;
 	}
 
@@ -121,12 +125,12 @@ public class UImageSvg implements UShape {
 		throw new IllegalStateException("Cannot find " + name);
 	}
 
-	public int getHeight() {
-		return this.getData("height");
+	public double getHeight() {
+		return this.getData("height") * scale;
 	}
 
-	public int getWidth() {
-		return this.getData("width");
+	public double getWidth() {
+		return this.getData("width") * scale;
 	}
 
 	public double getScale() {

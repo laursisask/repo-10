@@ -42,6 +42,7 @@ import net.sourceforge.plantuml.activitydiagram3.gtile.Gtile;
 import net.sourceforge.plantuml.activitydiagram3.gtile.GtileCircleStart;
 import net.sourceforge.plantuml.command.CommandExecutionResult;
 import net.sourceforge.plantuml.graphic.StringBounder;
+import net.sourceforge.plantuml.graphic.VerticalAlignment;
 import net.sourceforge.plantuml.ugraphic.color.HColorUtils;
 
 public class InstructionEnd extends MonoSwimable implements Instruction {
@@ -61,7 +62,7 @@ public class InstructionEnd extends MonoSwimable implements Instruction {
 	@Override
 	public Ftile createFtile(FtileFactory factory) {
 		Ftile result = factory.end(getSwimlaneIn());
-		result = eventuallyAddNote(factory, result, result.getSwimlaneIn());
+		result = eventuallyAddNote(factory, result, result.getSwimlaneIn(), VerticalAlignment.CENTER);
 		return result;
 	}
 

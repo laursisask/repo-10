@@ -32,10 +32,9 @@
  */
 package net.sourceforge.plantuml.svek.image;
 
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
-
 import net.sourceforge.plantuml.Dimension2DDouble;
 import net.sourceforge.plantuml.ISkinParam;
+import net.sourceforge.plantuml.awt.geom.Dimension2D;
 import net.sourceforge.plantuml.cucadiagram.ILeaf;
 import net.sourceforge.plantuml.graphic.StringBounder;
 import net.sourceforge.plantuml.svek.AbstractEntityImage;
@@ -50,7 +49,7 @@ public class EntityImageGroup extends AbstractEntityImage {
 	public EntityImageGroup(ILeaf entity, ISkinParam skinParam) {
 		super(entity, skinParam);
 		// this.desc = Display.create(StringUtils.getWithNewlines(entity.getDisplay()),
-		// new FontConfiguration(
+		// FontConfiguration.create(
 		// getFont(FontParam.ACTIVITY), HtmlColorUtils.BLACK),
 		// HorizontalAlignment.CENTER);
 	}

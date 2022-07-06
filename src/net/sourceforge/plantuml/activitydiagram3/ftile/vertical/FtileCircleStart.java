@@ -37,7 +37,6 @@ import java.util.Collections;
 import java.util.Set;
 
 import net.sourceforge.plantuml.ISkinParam;
-import net.sourceforge.plantuml.UseStyle;
 import net.sourceforge.plantuml.activitydiagram3.ftile.AbstractFtile;
 import net.sourceforge.plantuml.activitydiagram3.ftile.Ftile;
 import net.sourceforge.plantuml.activitydiagram3.ftile.FtileGeometry;
@@ -64,13 +63,9 @@ public class FtileCircleStart extends AbstractFtile {
 		this.swimlane = swimlane;
 		this.backColor = backColor;
 		this.borderColor = new HColorNone();
-		if (UseStyle.useBetaStyle()) {
-			this.shadowing = style.value(PName.Shadowing).asDouble();
-			this.backColor = style.value(PName.BackGroundColor).asColor(skinParam.getThemeStyle(), getIHtmlColorSet());
-			this.borderColor = style.value(PName.LineColor).asColor(skinParam.getThemeStyle(), getIHtmlColorSet());
-		} else if (skinParam().shadowing(null)) {
-			this.shadowing = 3;
-		}
+		this.shadowing = style.value(PName.Shadowing).asDouble();
+		this.backColor = style.value(PName.BackGroundColor).asColor(skinParam.getThemeStyle(), getIHtmlColorSet());
+		this.borderColor = style.value(PName.LineColor).asColor(skinParam.getThemeStyle(), getIHtmlColorSet());
 	}
 
 	@Override

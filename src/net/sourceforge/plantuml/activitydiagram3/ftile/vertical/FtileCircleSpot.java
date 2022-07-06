@@ -36,11 +36,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
-import net.sourceforge.plantuml.ColorParam;
 import net.sourceforge.plantuml.FontParam;
 import net.sourceforge.plantuml.ISkinParam;
-import net.sourceforge.plantuml.SkinParamUtils;
-import net.sourceforge.plantuml.UseStyle;
 import net.sourceforge.plantuml.activitydiagram3.ftile.AbstractFtile;
 import net.sourceforge.plantuml.activitydiagram3.ftile.Ftile;
 import net.sourceforge.plantuml.activitydiagram3.ftile.FtileGeometry;
@@ -73,10 +70,7 @@ public class FtileCircleSpot extends AbstractFtile {
 		this.spot = spot;
 		this.swimlane = swimlane;
 		this.backColor = backColor;
-		if (UseStyle.useBetaStyle())
-			this.fc = new FontConfiguration(skinParam, FontParam.ACTIVITY, null);
-		else
-			this.fc = new FontConfiguration(skinParam, style);
+		this.fc = FontConfiguration.create(skinParam, FontParam.ACTIVITY, null);
 	}
 
 	@Override
@@ -85,9 +79,9 @@ public class FtileCircleSpot extends AbstractFtile {
 	}
 
 	public Set<Swimlane> getSwimlanes() {
-		if (swimlane == null) {
+		if (swimlane == null)
 			return Collections.emptySet();
-		}
+
 		return Collections.singleton(swimlane);
 	}
 
@@ -102,25 +96,12 @@ public class FtileCircleSpot extends AbstractFtile {
 	public void drawU(UGraphic ug) {
 		final UEllipse circle = new UEllipse(SIZE, SIZE);
 
-		final HColor borderColor;
-		final HColor backColor;
-		double shadow = 0;
-
-		if (UseStyle.useBetaStyle()) {
-			backColor = this.backColor == null
-					? style.value(PName.BackGroundColor).asColor(skinParam().getThemeStyle(), getIHtmlColorSet())
-					: this.backColor;
-			borderColor = style.value(PName.LineColor).asColor(skinParam().getThemeStyle(), getIHtmlColorSet());
-			shadow = style.value(PName.Shadowing).asDouble();
-		} else {
-			borderColor = SkinParamUtils.getColor(skinParam(), null, ColorParam.activityBorder);
-			backColor = this.backColor == null
-					? SkinParamUtils.getColor(skinParam(), null, ColorParam.activityBackground)
-					: this.backColor;
-
-			if (skinParam().shadowing(null))
-				shadow = 3;
-		}
+		final HColor backColor = this.backColor == null
+				? style.value(PName.BackGroundColor).asColor(skinParam().getThemeStyle(), getIHtmlColorSet())
+				: this.backColor;
+		final HColor borderColor = style.value(PName.LineColor).asColor(skinParam().getThemeStyle(),
+				getIHtmlColorSet());
+		final double shadow = style.value(PName.Shadowing).asDouble();
 
 		circle.setDeltaShadow(shadow);
 		ug.apply(borderColor).apply(backColor.bg()).apply(getThickness(style)).draw(circle);

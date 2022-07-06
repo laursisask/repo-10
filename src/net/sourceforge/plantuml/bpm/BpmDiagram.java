@@ -73,7 +73,7 @@ public class BpmDiagram extends UmlDiagram {
 	}
 
 	public BpmDiagram(ThemeStyle style, UmlSource source) {
-		super(style, source, UmlDiagramType.BPM);
+		super(style, source, UmlDiagramType.BPM, null);
 	}
 
 	@Override

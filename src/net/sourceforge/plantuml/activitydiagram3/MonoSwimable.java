@@ -5,8 +5,11 @@
  * (C) Copyright 2009-2023, Arnaud Roques
  *
  * Project Info:  http://plantuml.com
- * 
+ *
  * If you like this project or if you find it useful, you can support us at:
+ *
+ * http://plantuml.com/patreon (only 1$ per month!)
+ * http://plantuml.com/paypal
  *
  * This file is part of PlantUML.
  *
@@ -47,7 +50,9 @@ abstract class MonoSwimable extends WithNote implements Swimable {
 	}
 
 	final public Set<Swimlane> getSwimlanes() {
-		return swimlane == null ? Collections.<Swimlane>emptySet() : Collections.<Swimlane>singleton(swimlane);
+		if (swimlane == null)
+			return Collections.emptySet();
+		return Collections.<Swimlane>singleton(swimlane);
 	}
 
 	final public Swimlane getSwimlaneIn() {

@@ -187,10 +187,17 @@ public class Style {
 	}
 
 	public FontConfiguration getFontConfiguration(ThemeStyle themeStyle, HColorSet set) {
+		return getFontConfiguration(themeStyle, set, null);
+	}
+
+	public FontConfiguration getFontConfiguration(ThemeStyle themeStyle, HColorSet set, Colors colors) {
 		final UFont font = getUFont();
-		final HColor color = value(PName.FontColor).asColor(themeStyle, set);
+		HColor color = colors == null ? null : colors.getColor(ColorType.TEXT);
+		if (color == null)
+			color = value(PName.FontColor).asColor(themeStyle, set);
+
 		final HColor hyperlinkColor = value(PName.HyperLinkColor).asColor(themeStyle, set);
-		return new FontConfiguration(font, color, hyperlinkColor, true);
+		return FontConfiguration.create(font, color, hyperlinkColor, true);
 	}
 
 	public SymbolContext getSymbolContext(ThemeStyle themeStyle, HColorSet set) {

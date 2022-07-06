@@ -273,7 +273,7 @@ public class EpsGraphics {
 
 	public void epsPath(double x, double y, UPath path) {
 		checkCloseDone();
-		if (fillcolor != null) {
+		if (mustApplyFillColor()) {
 			appendColor(fillcolor);
 			append("newpath", true);
 			for (USegment seg : path) {
@@ -326,6 +326,14 @@ public class EpsGraphics {
 
 	}
 
+	private boolean mustApplyFillColor() {
+		if (fillcolor == null)
+			return false;
+		if (fillcolor.getAlpha() == 0)
+			return false;
+		return true;
+	}
+
 	public void epsPolygon(HColorGradient gr, ColorMapper mapper, double... points) {
 		assert points.length % 2 == 0;
 		setFillColor(mapper.toColor(gr.getColor1()));
@@ -337,7 +345,7 @@ public class EpsGraphics {
 		checkCloseDone();
 		double lastX = 0;
 		double lastY = 0;
-		if (fillcolor != null) {
+		if (mustApplyFillColor()) {
 			appendColor(fillcolor);
 			append("newpath", true);
 			for (int i = 0; i < points.length; i += 2) {
@@ -378,7 +386,7 @@ public class EpsGraphics {
 		checkCloseDone();
 		ensureVisible(x, y);
 		ensureVisible(x + width, y + height);
-		if (fillcolor != null) {
+		if (mustApplyFillColor()) {
 			appendColor(fillcolor);
 			epsRectangleInternal(x, y, width, height, rx, ry, true);
 			append("closepath eofill", true);
@@ -538,7 +546,7 @@ public class EpsGraphics {
 			append("gsave", true);
 			append("1 " + formatSimple4(scale) + " scale", true);
 		}
-		if (fillcolor != null) {
+		if (mustApplyFillColor()) {
 			appendColor(fillcolor);
 			append("newpath", true);
 			append(format(x) + " " + format(y / scale) + " " + format(xRadius) + " 0 360 arc", true);

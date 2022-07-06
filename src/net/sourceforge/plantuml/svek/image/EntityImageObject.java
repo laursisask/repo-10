@@ -35,21 +35,18 @@
  */
 package net.sourceforge.plantuml.svek.image;
 
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
+import java.awt.geom.Rectangle2D;
 import java.util.EnumMap;
 import java.util.Map;
 
-import net.sourceforge.plantuml.ColorParam;
 import net.sourceforge.plantuml.CornerParam;
 import net.sourceforge.plantuml.Dimension2DDouble;
 import net.sourceforge.plantuml.FontParam;
 import net.sourceforge.plantuml.Guillemet;
 import net.sourceforge.plantuml.ISkinParam;
 import net.sourceforge.plantuml.LineConfigurable;
-import net.sourceforge.plantuml.LineParam;
-import net.sourceforge.plantuml.SkinParamUtils;
 import net.sourceforge.plantuml.Url;
-import net.sourceforge.plantuml.UseStyle;
+import net.sourceforge.plantuml.awt.geom.Dimension2D;
 import net.sourceforge.plantuml.creole.Stencil;
 import net.sourceforge.plantuml.cucadiagram.Display;
 import net.sourceforge.plantuml.cucadiagram.EntityPortion;
@@ -58,6 +55,7 @@ import net.sourceforge.plantuml.cucadiagram.PortionShower;
 import net.sourceforge.plantuml.cucadiagram.Stereotype;
 import net.sourceforge.plantuml.graphic.FontConfiguration;
 import net.sourceforge.plantuml.graphic.HorizontalAlignment;
+import net.sourceforge.plantuml.graphic.InnerStrategy;
 import net.sourceforge.plantuml.graphic.StringBounder;
 import net.sourceforge.plantuml.graphic.TextBlock;
 import net.sourceforge.plantuml.graphic.TextBlockEmpty;
@@ -99,12 +97,8 @@ public class EntityImageObject extends AbstractEntityImage implements Stencil, W
 		final Stereotype stereotype = entity.getStereotype();
 		this.roundCorner = skinParam.getRoundCorner(CornerParam.DEFAULT, null);
 
-		final FontConfiguration fcHeader;
-		if (UseStyle.useBetaStyle())
-			fcHeader = getStyleHeader().getFontConfiguration(getSkinParam().getThemeStyle(),
-					getSkinParam().getIHtmlColorSet());
-		else
-			fcHeader = new FontConfiguration(getSkinParam(), FontParam.OBJECT, stereotype);
+		final FontConfiguration fcHeader = getStyleHeader().getFontConfiguration(getSkinParam().getThemeStyle(),
+				getSkinParam().getIHtmlColorSet());
 
 		final TextBlock tmp = getUnderlinedName(entity).create(fcHeader, HorizontalAlignment.CENTER, skinParam);
 		this.name = TextBlockUtils.withMargin(tmp, 2, 2);
@@ -113,7 +107,7 @@ public class EntityImageObject extends AbstractEntityImage implements Stencil, W
 			this.stereo = null;
 		else
 			this.stereo = Display.create(stereotype.getLabels(skinParam.guillemet())).create(
-					new FontConfiguration(getSkinParam(), FontParam.OBJECT_STEREOTYPE, stereotype),
+					FontConfiguration.create(getSkinParam(), FontParam.OBJECT_STEREOTYPE, stereotype),
 					HorizontalAlignment.CENTER, skinParam);
 
 		final boolean showFields = portionShower.showPortion(EntityPortion.FIELD, entity);
@@ -168,29 +162,23 @@ public class EntityImageObject extends AbstractEntityImage implements Stencil, W
 		final double heightTotal = dimTotal.getHeight();
 		final Shadowable rect = new URectangle(widthTotal, heightTotal).rounded(roundCorner);
 
-		final HColor borderColor;
-		final UStroke stroke;
 		HColor backcolor = getEntity().getColors().getColor(ColorType.BACK);
+		HColor headerBackcolor = getEntity().getColors().getColor(ColorType.HEADER);
 
-		if (UseStyle.useBetaStyle()) {
-			final Style style = getStyle();
-			borderColor = style.value(PName.LineColor).asColor(getSkinParam().getThemeStyle(),
+		final Style style = getStyle();
+		final HColor borderColor = style.value(PName.LineColor).asColor(getSkinParam().getThemeStyle(),
+				getSkinParam().getIHtmlColorSet());
+
+		if (headerBackcolor == null)
+			headerBackcolor = backcolor == null ? getStyleHeader().value(PName.BackGroundColor)
+					.asColor(getSkinParam().getThemeStyle(), getSkinParam().getIHtmlColorSet()) : backcolor;
+
+		if (backcolor == null)
+			backcolor = style.value(PName.BackGroundColor).asColor(getSkinParam().getThemeStyle(),
 					getSkinParam().getIHtmlColorSet());
-			if (backcolor == null)
-				backcolor = style.value(PName.BackGroundColor).asColor(getSkinParam().getThemeStyle(),
-						getSkinParam().getIHtmlColorSet());
-			rect.setDeltaShadow(style.value(PName.Shadowing).asDouble());
-			stroke = style.getStroke();
 
-		} else {
-			if (getSkinParam().shadowing(getEntity().getStereotype()))
-				rect.setDeltaShadow(4);
-			borderColor = SkinParamUtils.getColor(getSkinParam(), getStereo(), ColorParam.objectBorder);
-			if (backcolor == null)
-				backcolor = SkinParamUtils.getColor(getSkinParam(), getStereo(), ColorParam.objectBackground);
-			stroke = getStroke();
-
-		}
+		rect.setDeltaShadow(style.value(PName.Shadowing).asDouble());
+		final UStroke stroke = style.getStroke();
 
 		ug = ug.apply(borderColor).apply(backcolor.bg());
 
@@ -203,11 +191,13 @@ public class EntityImageObject extends AbstractEntityImage implements Stencil, W
 		ug.startGroup(typeIDent);
 		ug.apply(stroke).draw(rect);
 
-		final ULayoutGroup header = new ULayoutGroup(new PlacementStrategyY1Y2(ug.getStringBounder()));
-		if (stereo != null)
-			header.add(stereo);
+		if (roundCorner == 0 && headerBackcolor != null && backcolor.equals(headerBackcolor) == false) {
+			final Shadowable rect2 = new URectangle(widthTotal, dimTitle.getHeight());
+			final UGraphic ugHeader = ug.apply(headerBackcolor.bg());
+			ugHeader.apply(stroke).draw(rect2);
+		}
 
-		header.add(name);
+		final ULayoutGroup header = getLayout(stringBounder);
 		header.drawU(ug, dimTotal.getWidth(), dimTitle.getHeight());
 
 		final UGraphic ug2 = UGraphicStencil.create(ug, this, stroke);
@@ -219,15 +209,13 @@ public class EntityImageObject extends AbstractEntityImage implements Stencil, W
 		ug.closeGroup();
 	}
 
-	private UStroke getStroke() {
-		UStroke stroke = lineConfig.getColors().getSpecificLineStroke();
-		if (stroke == null)
-			stroke = getSkinParam().getThickness(LineParam.objectBorder, getStereo());
+	private ULayoutGroup getLayout(final StringBounder stringBounder) {
+		final ULayoutGroup header = new ULayoutGroup(new PlacementStrategyY1Y2(stringBounder));
+		if (stereo != null)
+			header.add(stereo);
 
-		if (stroke == null)
-			stroke = new UStroke(1.5);
-
-		return stroke;
+		header.add(name);
+		return header;
 	}
 
 	private double getMethodOrFieldHeight(final Dimension2D dim) {
@@ -274,6 +262,13 @@ public class EntityImageObject extends AbstractEntityImage implements Stencil, W
 		if (fields instanceof WithPorts)
 			return ((WithPorts) fields).getPorts(stringBounder).translateY(dimHeader.getHeight());
 		return new Ports();
+	}
+
+	@Override
+	public Rectangle2D getInnerPosition(String member, StringBounder stringBounder, InnerStrategy strategy) {
+		final Dimension2D dimTitle = getTitleDimension(stringBounder);
+		final UTranslate translate = UTranslate.dy(dimTitle.getHeight());
+		return translate.apply(fields.getInnerPosition(member, stringBounder, strategy));
 	}
 
 }

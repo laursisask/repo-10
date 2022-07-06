@@ -36,10 +36,6 @@ public class HSpace extends AbstractEvent implements Event {
 
 	private final int pixel;
 
-	public HSpace() {
-		this(25);
-	}
-
 	public HSpace(int pixel) {
 		this.pixel = pixel;
 	}

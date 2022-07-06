@@ -35,7 +35,7 @@ package net.sourceforge.plantuml.classdiagram.command;
 import net.sourceforge.plantuml.LineLocation;
 import net.sourceforge.plantuml.Url;
 import net.sourceforge.plantuml.UrlBuilder;
-import net.sourceforge.plantuml.UrlBuilder.ModeUrl;
+import net.sourceforge.plantuml.UrlMode;
 import net.sourceforge.plantuml.classdiagram.AbstractEntityDiagram;
 import net.sourceforge.plantuml.command.CommandExecutionResult;
 import net.sourceforge.plantuml.command.SingleLineCommand2;
@@ -84,7 +84,7 @@ public class CommandUrl extends SingleLineCommand2<AbstractEntityDiagram> {
 			return CommandExecutionResult.error(code + " does not exist");
 		}
 		// final IEntity entity = diagram.getOrCreateLeaf(code, null);
-		final UrlBuilder urlBuilder = new UrlBuilder(diagram.getSkinParam().getValue("topurl"), ModeUrl.STRICT);
+		final UrlBuilder urlBuilder = new UrlBuilder(diagram.getSkinParam().getValue("topurl"), UrlMode.STRICT);
 		final Url url = urlBuilder.getUrl(urlString);
 		entity.addUrl(url);
 		return CommandExecutionResult.ok();

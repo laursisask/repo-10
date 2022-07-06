@@ -50,6 +50,7 @@ import net.sourceforge.plantuml.activitydiagram3.gtile.GtileRepeat;
 import net.sourceforge.plantuml.command.CommandExecutionResult;
 import net.sourceforge.plantuml.cucadiagram.Display;
 import net.sourceforge.plantuml.graphic.StringBounder;
+import net.sourceforge.plantuml.graphic.VerticalAlignment;
 import net.sourceforge.plantuml.graphic.color.Colors;
 import net.sourceforge.plantuml.sequencediagram.NotePosition;
 import net.sourceforge.plantuml.sequencediagram.NoteType;
@@ -162,7 +163,7 @@ public class InstructionRepeat extends AbstractInstruction implements Instructio
 
 		Ftile result = factory.activity(backward, swimlaneBackward, boxStyle, Colors.empty(), null);
 		if (backwardNotes.size() > 0)
-			result = factory.addNote(result, swimlaneBackward, backwardNotes);
+			result = factory.addNote(result, swimlaneBackward, backwardNotes, VerticalAlignment.CENTER);
 
 		return result;
 	}
@@ -201,7 +202,7 @@ public class InstructionRepeat extends AbstractInstruction implements Instructio
 		if (Display.isNull(backward))
 			return repeatList.addNote(note, position, type, colors, swimlaneNote);
 
-		this.backwardNotes.add(new PositionedNote(note, position, type, colors, swimlaneNote));
+		this.backwardNotes.add(new PositionedNote(note, position, type, swimlaneNote, colors));
 		return true;
 
 	}

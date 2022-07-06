@@ -83,8 +83,8 @@ public class FromSkinparamToStyle {
 		addMagic(SName.database);
 		addMagic(SName.entity);
 
-		addConFont("header", SName.header);
-		addConFont("footer", SName.footer);
+		addConFont("header", SName.document, SName.header);
+		addConFont("footer", SName.document, SName.footer);
 
 		addConvert("defaultFontSize", PName.FontSize, SName.element);
 
@@ -144,6 +144,7 @@ public class FromSkinparamToStyle {
 		addConvert("arrowThickness", PName.LineThickness, SName.arrow);
 		addConvert("arrowColor", PName.LineColor, SName.arrow);
 		addConvert("arrowStyle", PName.LineStyle, SName.arrow);
+		addConvert("arrowHeadColor", PName.HeadColor, SName.arrow);
 
 		addConvert("defaulttextalignment", PName.HorizontalAlignment, SName.root);
 		addConvert("defaultFontName", PName.FontName, SName.root);
@@ -172,11 +173,12 @@ public class FromSkinparamToStyle {
 
 		addConvert("BackgroundColor", PName.BackGroundColor, SName.document);
 
-		addConvert("classBackgroundColor", PName.BackGroundColor, SName.class_);
-		addConvert("classBorderColor", PName.LineColor, SName.class_);
-		addConFont("class", SName.class_);
-		addConFont("classAttribute", SName.class_);
-		addConvert("classBorderThickness", PName.LineThickness, SName.class_);
+		addConvert("classBackgroundColor", PName.BackGroundColor, SName.element, SName.class_);
+		addConvert("classBorderColor", PName.LineColor, SName.element, SName.class_);
+		addConFont("class", SName.element, SName.class_);
+		addConFont("classAttribute", SName.element, SName.class_);
+		addConvert("classBorderThickness", PName.LineThickness, SName.element, SName.class_);
+		addConvert("classHeaderBackgroundColor", PName.BackGroundColor, SName.element, SName.class_, SName.header);
 
 		addConvert("objectBackgroundColor", PName.BackGroundColor, SName.object);
 		addConvert("objectBorderColor", PName.LineColor, SName.object);
@@ -208,6 +210,22 @@ public class FromSkinparamToStyle {
 		addMagic(SName.storage);
 		addMagic(SName.usecase);
 		addMagic(SName.map);
+		addMagic(SName.archimate);
+
+		addConvert("IconPrivateColor", PName.LineColor, SName.visibilityIcon, SName.private_);
+		addConvert("IconPrivateBackgroundColor", PName.BackGroundColor, SName.visibilityIcon, SName.private_);
+		addConvert("IconPackageColor", PName.LineColor, SName.visibilityIcon, SName.package_);
+		addConvert("IconPackageBackgroundColor", PName.BackGroundColor, SName.visibilityIcon, SName.package_);
+		addConvert("IconProtectedColor", PName.LineColor, SName.visibilityIcon, SName.protected_);
+		addConvert("IconProtectedBackgroundColor", PName.BackGroundColor, SName.visibilityIcon, SName.protected_);
+		addConvert("IconPublicColor", PName.LineColor, SName.visibilityIcon, SName.public_);
+		addConvert("IconPublicBackgroundColor", PName.BackGroundColor, SName.visibilityIcon, SName.public_);
+
+//		addConvert("nodeStereotypeFontSize", PName.FontSize, SName.node, SName.stereotype);
+//		addConvert("sequenceStereotypeFontSize", PName.FontSize, SName.stereotype);
+//		addConvert("sequenceStereotypeFontStyle", PName.FontStyle, SName.stereotype);
+//		addConvert("sequenceStereotypeFontColor", PName.FontColor, SName.stereotype);
+//		addConvert("sequenceStereotypeFontName", PName.FontName, SName.stereotype);
 
 	}
 
@@ -219,8 +237,14 @@ public class FromSkinparamToStyle {
 		addConvert(cleanName + "RoundCorner", PName.RoundCorner, sname);
 		addConvert(cleanName + "DiagonalCorner", PName.DiagonalCorner, sname);
 		addConvert(cleanName + "BorderStyle", PName.LineStyle, sname);
-		addConvert(cleanName + "StereotypeFontColor", PName.FontColor, SName.stereotype, sname);
 		addConFont(cleanName, sname);
+		addConvert(cleanName + "Shadowing", PName.Shadowing, sname);
+
+		addConvert(cleanName + "StereotypeFontSize", PName.FontSize, SName.stereotype, sname);
+		addConvert(cleanName + "StereotypeFontStyle", PName.FontStyle, SName.stereotype, sname);
+		addConvert(cleanName + "StereotypeFontColor", PName.FontColor, SName.stereotype, sname);
+		addConvert(cleanName + "StereotypeFontName", PName.FontName, SName.stereotype, sname);
+
 	}
 
 	private final List<Style> styles = new ArrayList<>();
@@ -232,7 +256,7 @@ public class FromSkinparamToStyle {
 		if (key.contains("<<")) {
 			final StringTokenizer st = new StringTokenizer(key, "<>");
 			this.key = st.nextToken();
-			this.stereo = st.nextToken();
+			this.stereo = st.hasMoreTokens() ? st.nextToken().trim() : null;
 		} else {
 			this.key = key;
 			this.stereo = null;
@@ -241,6 +265,12 @@ public class FromSkinparamToStyle {
 	}
 
 	public void convertNow(String value, final AutomaticCounter counter) {
+		if (key.endsWith("shadowing")) {
+			if (value.equalsIgnoreCase("false"))
+				value = "0";
+			else if (value.equalsIgnoreCase("true"))
+				value = "3";
+		}
 		if (value.equalsIgnoreCase("right:right"))
 			value = "right";
 		if (value.equalsIgnoreCase("dotted"))
@@ -292,6 +322,9 @@ public class FromSkinparamToStyle {
 		} else if (read.startsWith("line.dashed")) {
 			for (Data data : datas)
 				addStyle(PName.LineStyle, ValueImpl.regular("7;7", counter), data.styleNames);
+		} else if (read.toLowerCase().contains("bold")) {
+			for (Data data : datas)
+				addStyle(PName.LineThickness, ValueImpl.regular("2", counter), data.styleNames);
 		}
 	}
 

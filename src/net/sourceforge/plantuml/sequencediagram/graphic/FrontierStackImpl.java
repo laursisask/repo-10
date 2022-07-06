@@ -62,7 +62,7 @@ class FrontierStackImpl implements FrontierStack {
 	final private List<Stack> all;
 
 	public FrontierStackImpl(double freeY, int rangeEnd) {
-		final Stack s = new Stack(new FrontierComplex(freeY, rangeEnd));
+		final Stack s = new Stack(FrontierComplex.create(freeY, rangeEnd));
 		all = Collections.singletonList(s);
 	}
 

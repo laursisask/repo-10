@@ -36,7 +36,6 @@
  */
 package net.sourceforge.plantuml.svek.image;
 
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
 import java.util.Collection;
 import java.util.EnumMap;
 import java.util.HashSet;
@@ -47,9 +46,8 @@ import java.util.Set;
 import net.sourceforge.plantuml.Dimension2DDouble;
 import net.sourceforge.plantuml.Guillemet;
 import net.sourceforge.plantuml.ISkinParam;
-import net.sourceforge.plantuml.SkinParamUtils;
 import net.sourceforge.plantuml.Url;
-import net.sourceforge.plantuml.UseStyle;
+import net.sourceforge.plantuml.awt.geom.Dimension2D;
 import net.sourceforge.plantuml.cucadiagram.BodyFactory;
 import net.sourceforge.plantuml.cucadiagram.Display;
 import net.sourceforge.plantuml.cucadiagram.EntityPortion;
@@ -60,7 +58,6 @@ import net.sourceforge.plantuml.cucadiagram.PortionShower;
 import net.sourceforge.plantuml.cucadiagram.Stereotype;
 import net.sourceforge.plantuml.graphic.FontConfiguration;
 import net.sourceforge.plantuml.graphic.HorizontalAlignment;
-import net.sourceforge.plantuml.graphic.SkinParameter;
 import net.sourceforge.plantuml.graphic.StringBounder;
 import net.sourceforge.plantuml.graphic.SymbolContext;
 import net.sourceforge.plantuml.graphic.TextBlock;
@@ -116,7 +113,6 @@ public class EntityImageDescription extends AbstractEntityImage {
 		this.fixCircleLabelOverlapping = getSkinParam().fixCircleLabelOverlapping();
 
 		this.links = links;
-		final Stereotype stereotype = entity.getStereotype();
 		USymbol symbol = getUSymbol(entity);
 		if (symbol == USymbols.FOLDER)
 			this.shapeType = ShapeType.FOLDER;
@@ -133,51 +129,31 @@ public class EntityImageDescription extends AbstractEntityImage {
 		this.url = entity.getUrl99();
 
 		final Colors colors = entity.getColors();
+
+		final StyleSignatureBasic tmp = StyleSignatureBasic.of(SName.root, SName.element, styleName, symbol.getSName());
+		final Stereotype stereotype = entity.getStereotype();
+		final Style style = tmp.withTOBECHANGED(stereotype).getMergedStyle(getSkinParam().getCurrentStyleBuilder())
+				.eventuallyOverride(colors);
+
+		final Style styleStereo = tmp.forStereotypeItself(stereotype)
+				.getMergedStyle(getSkinParam().getCurrentStyleBuilder());
+		final HColor forecolor = style.value(PName.LineColor).asColor(getSkinParam().getThemeStyle(),
+				getSkinParam().getIHtmlColorSet());
+
 		HColor backcolor = colors.getColor(ColorType.BACK);
-		final HColor forecolor;
-		final double roundCorner;
-		final double diagonalCorner;
-		final double deltaShadow;
-		final UStroke stroke;
-		final FontConfiguration fcTitle;
-		final FontConfiguration fcStereo;
-
-		Style style = null;
-		final HorizontalAlignment defaultAlign;
-		if (UseStyle.useBetaStyle()) {
-			final StyleSignatureBasic tmp = StyleSignatureBasic.of(SName.root, SName.element, styleName,
-					symbol.getSkinParameter().getStyleName());
-			style = tmp.withTOBECHANGED(stereotype).getMergedStyle(getSkinParam().getCurrentStyleBuilder());
-			style = style.eventuallyOverride(colors);
-			final Style styleStereo = tmp.forStereotypeItself(stereotype)
-					.getMergedStyle(getSkinParam().getCurrentStyleBuilder());
-			forecolor = style.value(PName.LineColor).asColor(getSkinParam().getThemeStyle(),
+		if (backcolor == null)
+			backcolor = style.value(PName.BackGroundColor).asColor(getSkinParam().getThemeStyle(),
 					getSkinParam().getIHtmlColorSet());
-			if (backcolor == null)
-				backcolor = style.value(PName.BackGroundColor).asColor(getSkinParam().getThemeStyle(),
-						getSkinParam().getIHtmlColorSet());
 
-			roundCorner = style.value(PName.RoundCorner).asDouble();
-			diagonalCorner = style.value(PName.DiagonalCorner).asDouble();
-			deltaShadow = style.value(PName.Shadowing).asDouble();
-			stroke = style.getStroke(colors);
-			fcTitle = style.getFontConfiguration(getSkinParam().getThemeStyle(), getSkinParam().getIHtmlColorSet());
-			fcStereo = styleStereo.getFontConfiguration(getSkinParam().getThemeStyle(),
-					getSkinParam().getIHtmlColorSet());
-			defaultAlign = style.getHorizontalAlignment();
-		} else {
-			forecolor = SkinParamUtils.getColor(getSkinParam(), stereotype, symbol.getColorParamBorder());
-			if (backcolor == null)
-				backcolor = SkinParamUtils.getColor(getSkinParam(), getStereo(), symbol.getColorParamBack());
-
-			roundCorner = symbol.getSkinParameter().getRoundCorner(getSkinParam(), stereotype);
-			diagonalCorner = symbol.getSkinParameter().getDiagonalCorner(getSkinParam(), stereotype);
-			deltaShadow = getSkinParam().shadowing2(getEntity().getStereotype(), symbol.getSkinParameter()) ? 3 : 0;
-			stroke = colors.muteStroke(symbol.getSkinParameter().getStroke(getSkinParam(), stereotype));
-			fcTitle = new FontConfiguration(getSkinParam(), symbol.getFontParam(), stereotype);
-			fcStereo = new FontConfiguration(getSkinParam(), symbol.getFontParamStereotype(), stereotype);
-			defaultAlign = HorizontalAlignment.LEFT;
-		}
+		final double roundCorner = style.value(PName.RoundCorner).asDouble();
+		final double diagonalCorner = style.value(PName.DiagonalCorner).asDouble();
+		final double deltaShadow = style.value(PName.Shadowing).asDouble();
+		final UStroke stroke = style.getStroke(colors);
+		final FontConfiguration fcTitle = style.getFontConfiguration(getSkinParam().getThemeStyle(),
+				getSkinParam().getIHtmlColorSet());
+		final FontConfiguration fcStereo = styleStereo.getFontConfiguration(getSkinParam().getThemeStyle(),
+				getSkinParam().getIHtmlColorSet());
+		final HorizontalAlignment defaultAlign = style.getHorizontalAlignment();
 
 		assert getStereo() == stereotype;
 
@@ -185,13 +161,13 @@ public class EntityImageDescription extends AbstractEntityImage {
 				diagonalCorner);
 
 		final Display codeDisplay = Display.getWithNewlines(entity.getCodeGetName());
-		if ((entity.getDisplay().equals(codeDisplay) && symbol.getSkinParameter() == SkinParameter.PACKAGE)
+		if ((entity.getDisplay().equals(codeDisplay) && symbol.getSName() == SName.package_)
 				|| entity.getDisplay().isWhite()) {
 			desc = TextBlockUtils.empty(getSkinParam().minClassWidth(), 0);
 		} else {
 			final HorizontalAlignment align = getSkinParam().getDefaultTextAlignment(defaultAlign);
-			desc = BodyFactory.create3(entity.getDisplay(), symbol.getFontParam(), getSkinParam(), align, fcTitle,
-					getSkinParam().wrapWidth(), style);
+			desc = BodyFactory.create3(entity.getDisplay(), getSkinParam(), align, fcTitle, getSkinParam().wrapWidth(),
+					style);
 		}
 
 		stereo = TextBlockUtils.empty(0, 0);
@@ -204,7 +180,7 @@ public class EntityImageDescription extends AbstractEntityImage {
 					HorizontalAlignment.CENTER, getSkinParam());
 
 		name = BodyFactory.create2(getSkinParam().getDefaultTextAlignment(HorizontalAlignment.CENTER), codeDisplay,
-				symbol.getFontParam(), getSkinParam(), stereotype, entity, style);
+				getSkinParam(), stereotype, entity, style);
 
 		if (hideText)
 			asSmall = symbol.asSmall(TextBlockUtils.empty(0, 0), TextBlockUtils.empty(0, 0), TextBlockUtils.empty(0, 0),

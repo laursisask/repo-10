@@ -35,6 +35,7 @@ package net.sourceforge.plantuml.api;
 import net.sourceforge.plantuml.awt.geom.Dimension2D;
 
 import net.sourceforge.plantuml.CMapData;
+import net.sourceforge.plantuml.annotation.HaxeIgnored;
 
 public class ImageDataComplex extends ImageDataAbstract {
 
@@ -42,6 +43,7 @@ public class ImageDataComplex extends ImageDataAbstract {
 	private final String warningOrError;
 
 	@SuppressWarnings("unused")  // available publicly so retained for backwards compatibility
+	@HaxeIgnored
 	public ImageDataComplex(Dimension2D info, CMapData cmap, String warningOrError) {
 		super(info);
 		this.cmap = cmap;

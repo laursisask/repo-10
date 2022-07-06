@@ -67,9 +67,10 @@ public class BodierSimple implements Bodier {
 	}
 
 	@Override
-	public void addFieldOrMethod(String s) throws NoSuchColorException {
+	public boolean addFieldOrMethod(String s) throws NoSuchColorException {
 		final Display display = Display.getWithNewlines2(s);
 		rawBody.addAll(display.asList());
+		return true;
 	}
 
 	@Override
@@ -95,8 +96,8 @@ public class BodierSimple implements Bodier {
 	@Override
 	public TextBlock getBody(FontParam fontParam, ISkinParam skinParam, boolean showMethods, boolean showFields,
 			Stereotype stereotype, Style style, FontConfiguration fontConfiguration) {
-		return BodyFactory.create1(skinParam.getDefaultTextAlignment(HorizontalAlignment.LEFT), rawBody, fontParam,
-				skinParam, stereotype, leaf, style);
+		return BodyFactory.create1(skinParam.getDefaultTextAlignment(HorizontalAlignment.LEFT), rawBody, skinParam,
+				stereotype, leaf, style);
 	}
 
 }

@@ -108,7 +108,7 @@ public class AtomImg extends AbstractAtom implements Atom {
 			try {
 				final byte bytes[] = Base64Coder.decode(data);
 				final String tmp = new String(bytes);
-				return new AtomImgSvg(new TileImageSvg(tmp));
+				return new AtomImgSvg(new TileImageSvg(tmp, scale));
 			} catch (Exception e) {
 				return AtomTextUtils.createLegacy("ERROR " + e.toString(), fc);
 			}
@@ -117,38 +117,38 @@ public class AtomImg extends AbstractAtom implements Atom {
 		try {
 			// Check if valid URL
 			if (src.startsWith("http:") || src.startsWith("https:")) {
-				if (src.endsWith(".svg")) {
+				if (src.endsWith(".svg")) 
 					return buildSvgFromUrl(src, fc, SURL.create(src), scale, url);
-				}
+				
 				return buildRasterFromUrl(src, fc, SURL.create(src), scale, url);
 			}
 			final SFile f = FileSystem.getInstance().getFile(src);
 			if (f.exists() == false) {
-				if (SecurityUtils.getSecurityProfile() == SecurityProfile.UNSECURE) {
+				if (SecurityUtils.getSecurityProfile() == SecurityProfile.UNSECURE) 
 					return AtomTextUtils.createLegacy("(File not found: " + f.getPrintablePath() + ")", fc);
-				}
+				
 				return AtomTextUtils.createLegacy("(Cannot decode)", fc);
 			}
 			if (f.getName().endsWith(".svg")) {
 				final String tmp = FileUtils.readSvg(f);
-				if (tmp == null) {
+				if (tmp == null) 
 					return AtomTextUtils.createLegacy("(Cannot decode)", fc);
-				}
-				return new AtomImgSvg(new TileImageSvg(tmp));
+				
+				return new AtomImgSvg(new TileImageSvg(tmp, scale));
 			}
 			final BufferedImage read = f.readRasterImageFromFile();
 			if (read == null) {
-				if (SecurityUtils.getSecurityProfile() == SecurityProfile.UNSECURE) {
+				if (SecurityUtils.getSecurityProfile() == SecurityProfile.UNSECURE) 
 					return AtomTextUtils.createLegacy("(Cannot decode: " + f.getPrintablePath() + ")", fc);
-				}
+				
 				return AtomTextUtils.createLegacy("(Cannot decode)", fc);
 			}
 			return new AtomImg(f.readRasterImageFromFile(), scale, url, src);
 		} catch (IOException e) {
 			e.printStackTrace();
-			if (SecurityUtils.getSecurityProfile() == SecurityProfile.UNSECURE) {
+			if (SecurityUtils.getSecurityProfile() == SecurityProfile.UNSECURE) 
 				return AtomTextUtils.createLegacy("ERROR " + e.toString(), fc);
-			}
+			
 			return AtomTextUtils.createLegacy("ERROR", fc);
 		}
 	}
@@ -183,7 +183,7 @@ public class AtomImg extends AbstractAtom implements Atom {
 		if (read == null) {
 			return AtomTextUtils.createLegacy("(Cannot decode SVG: " + text + ")", fc);
 		}
-		return new AtomImgSvg(new TileImageSvg(new String(read, UTF_8)));
+		return new AtomImgSvg(new TileImageSvg(new String(read, UTF_8), scale));
 	}
 
 	// End

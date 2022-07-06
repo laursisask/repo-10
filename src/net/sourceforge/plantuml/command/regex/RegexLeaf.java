@@ -41,6 +41,7 @@ import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 
 import net.sourceforge.plantuml.StringLocated;
+import net.sourceforge.plantuml.annotation.HaxeIgnored;
 
 public class RegexLeaf implements IRegex {
 
@@ -51,8 +52,14 @@ public class RegexLeaf implements IRegex {
 
 	private int count = -1;
 
+	@HaxeIgnored
 	public RegexLeaf(String regex) {
 		this(null, regex);
+	}
+
+	public RegexLeaf(String name, String regex) {
+		this.pattern = regex;
+		this.name = name;
 	}
 
 	public static RegexLeaf spaceZeroOrMore() {
@@ -69,11 +76,6 @@ public class RegexLeaf implements IRegex {
 
 	public static RegexLeaf end() {
 		return END;
-	}
-
-	public RegexLeaf(String name, String regex) {
-		this.pattern = regex;
-		this.name = name;
 	}
 
 	@Override

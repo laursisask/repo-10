@@ -33,14 +33,11 @@
 package net.sourceforge.plantuml.svek.image;
 
 import net.sourceforge.plantuml.AlignmentParam;
-import net.sourceforge.plantuml.ColorParam;
 import net.sourceforge.plantuml.Dimension2DDouble;
 import net.sourceforge.plantuml.FontParam;
 import net.sourceforge.plantuml.Guillemet;
 import net.sourceforge.plantuml.ISkinParam;
-import net.sourceforge.plantuml.SkinParamUtils;
 import net.sourceforge.plantuml.Url;
-import net.sourceforge.plantuml.UseStyle;
 import net.sourceforge.plantuml.activitydiagram3.ftile.EntityImageLegend;
 import net.sourceforge.plantuml.awt.geom.Dimension2D;
 import net.sourceforge.plantuml.cucadiagram.Display;
@@ -55,18 +52,15 @@ import net.sourceforge.plantuml.graphic.HorizontalAlignment;
 import net.sourceforge.plantuml.graphic.StringBounder;
 import net.sourceforge.plantuml.graphic.TextBlock;
 import net.sourceforge.plantuml.graphic.TextBlockUtils;
-import net.sourceforge.plantuml.graphic.USymbols;
 import net.sourceforge.plantuml.graphic.color.ColorType;
 import net.sourceforge.plantuml.graphic.color.Colors;
-import net.sourceforge.plantuml.style.StyleSignature;
 import net.sourceforge.plantuml.style.PName;
 import net.sourceforge.plantuml.style.SName;
 import net.sourceforge.plantuml.style.Style;
+import net.sourceforge.plantuml.style.StyleSignature;
 import net.sourceforge.plantuml.style.StyleSignatureBasic;
 import net.sourceforge.plantuml.svek.AbstractEntityImage;
-import net.sourceforge.plantuml.svek.Cluster;
 import net.sourceforge.plantuml.svek.ClusterDecoration;
-import net.sourceforge.plantuml.svek.GeneralImageBuilder;
 import net.sourceforge.plantuml.svek.ShapeType;
 import net.sourceforge.plantuml.ugraphic.UGraphic;
 import net.sourceforge.plantuml.ugraphic.UStroke;
@@ -103,38 +97,25 @@ public class EntityImageEmptyPackage extends AbstractEntityImage {
 		final Colors colors = entity.getColors();
 		final HColor specificBackColor = colors.getColor(ColorType.BACK);
 		this.stereotype = entity.getStereotype();
-		final FontConfiguration titleFontConfiguration;
-		final HorizontalAlignment titleHorizontalAlignment;
 		this.url = entity.getUrl99();
 
-		if (UseStyle.useBetaStyle()) {
-			Style style = getStyle();
-			style = style.eventuallyOverride(colors);
-			this.borderColor = style.value(PName.LineColor).asColor(getSkinParam().getThemeStyle(),
+		Style style = getStyle();
+		style = style.eventuallyOverride(colors);
+		this.borderColor = style.value(PName.LineColor).asColor(getSkinParam().getThemeStyle(),
+				getSkinParam().getIHtmlColorSet());
+		this.shadowing = style.value(PName.Shadowing).asDouble();
+		this.stroke = style.getStroke(colors);
+		this.roundCorner = style.value(PName.RoundCorner).asDouble();
+		this.diagonalCorner = style.value(PName.DiagonalCorner).asDouble();
+		if (specificBackColor == null)
+			this.back = style.value(PName.BackGroundColor).asColor(getSkinParam().getThemeStyle(),
 					getSkinParam().getIHtmlColorSet());
-			this.shadowing = style.value(PName.Shadowing).asDouble();
-			this.stroke = style.getStroke(colors);
-			this.roundCorner = style.value(PName.RoundCorner).asDouble();
-			this.diagonalCorner = style.value(PName.DiagonalCorner).asDouble();
-			if (specificBackColor == null) {
-				this.back = style.value(PName.BackGroundColor).asColor(getSkinParam().getThemeStyle(),
-						getSkinParam().getIHtmlColorSet());
-			} else {
-				this.back = specificBackColor;
-			}
-			titleFontConfiguration = style.getFontConfiguration(getSkinParam().getThemeStyle(),
-					getSkinParam().getIHtmlColorSet());
-			titleHorizontalAlignment = style.getHorizontalAlignment();
-		} else {
-			this.diagonalCorner = 0;
-			this.borderColor = SkinParamUtils.getColor(getSkinParam(), getStereo(), ColorParam.packageBorder);
-			this.shadowing = getSkinParam().shadowing(getEntity().getStereotype()) ? 3 : 0;
-			this.stroke = GeneralImageBuilder.getForcedStroke(getEntity().getStereotype(), getSkinParam());
-			this.roundCorner = 0;
-			this.back = Cluster.getBackColor(specificBackColor, skinParam, stereotype, sname, USymbols.PACKAGE);
-			titleFontConfiguration = new FontConfiguration(getSkinParam(), FontParam.PACKAGE, stereotype);
-			titleHorizontalAlignment = HorizontalAlignment.CENTER;
-		}
+		else
+			this.back = specificBackColor;
+
+		final FontConfiguration titleFontConfiguration = style.getFontConfiguration(getSkinParam().getThemeStyle(),
+				getSkinParam().getIHtmlColorSet());
+		final HorizontalAlignment titleHorizontalAlignment = style.getHorizontalAlignment();
 
 		this.desc = entity.getDisplay().create(titleFontConfiguration, titleHorizontalAlignment, skinParam);
 
@@ -144,14 +125,13 @@ public class EntityImageEmptyPackage extends AbstractEntityImage {
 			stereoBlock = legendBlock;
 		} else {
 			if (stereotype == null || stereotype.getLabel(Guillemet.DOUBLE_COMPARATOR) == null
-					|| portionShower.showPortion(EntityPortion.STEREOTYPE, entity) == false) {
+					|| portionShower.showPortion(EntityPortion.STEREOTYPE, entity) == false)
 				stereoBlock = TextBlockUtils.empty(0, 0);
-			} else {
+			else
 				stereoBlock = TextBlockUtils.withMargin(Display.create(stereotype.getLabels(skinParam.guillemet()))
-						.create(new FontConfiguration(getSkinParam(), FontParam.PACKAGE_STEREOTYPE, stereotype),
+						.create(FontConfiguration.create(getSkinParam(), FontParam.PACKAGE_STEREOTYPE, stereotype),
 								titleHorizontalAlignment, skinParam),
 						1, 0);
-			}
 		}
 
 	}
@@ -165,9 +145,8 @@ public class EntityImageEmptyPackage extends AbstractEntityImage {
 	}
 
 	final public void drawU(UGraphic ug) {
-		if (url != null) {
+		if (url != null)
 			ug.startUrl(url);
-		}
 
 		final StringBounder stringBounder = ug.getStringBounder();
 		final Dimension2D dimTotal = calculateDimension(stringBounder);
@@ -185,9 +164,8 @@ public class EntityImageEmptyPackage extends AbstractEntityImage {
 		decoration.drawU(ug, back, borderColor, shadowing, roundCorner, horizontalAlignment, stereotypeAlignment,
 				diagonalCorner);
 
-		if (url != null) {
+		if (url != null)
 			ug.closeUrl();
-		}
 
 	}
 

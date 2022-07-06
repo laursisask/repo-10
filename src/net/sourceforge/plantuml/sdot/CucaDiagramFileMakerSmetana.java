@@ -357,7 +357,7 @@ public class CucaDiagramFileMakerSmetana implements CucaDiagramFileMaker {
 		}
 
 		final FontParam fontParam = FontParam.PACKAGE_STEREOTYPE;
-		return Display.create(stereos).create(new FontConfiguration(diagram.getSkinParam(), fontParam, stereotype),
+		return Display.create(stereos).create(FontConfiguration.create(diagram.getSkinParam(), fontParam, stereotype),
 				HorizontalAlignment.CENTER, diagram.getSkinParam());
 	}
 
@@ -497,7 +497,7 @@ public class CucaDiagramFileMakerSmetana implements CucaDiagramFileMaker {
 	private TextBlock getLabel(Link link) {
 		final double marginLabel = 1; // startUid.equals(endUid) ? 6 : 1;
 		ISkinParam skinParam = diagram.getSkinParam();
-		final FontConfiguration labelFont = new FontConfiguration(skinParam, FontParam.ARROW, null);
+		final FontConfiguration labelFont = FontConfiguration.create(skinParam, FontParam.ARROW, null);
 		final TextBlock label = link.getLabel().create(labelFont,
 				skinParam.getDefaultTextAlignment(HorizontalAlignment.CENTER), skinParam);
 		if (TextBlockUtils.isEmpty(label, stringBounder)) {
@@ -513,7 +513,7 @@ public class CucaDiagramFileMakerSmetana implements CucaDiagramFileMaker {
 		}
 		final double marginLabel = 1; // startUid.equals(endUid) ? 6 : 1;
 		ISkinParam skinParam = diagram.getSkinParam();
-		final FontConfiguration labelFont = new FontConfiguration(skinParam, FontParam.ARROW, null);
+		final FontConfiguration labelFont = FontConfiguration.create(skinParam, FontParam.ARROW, null);
 		final TextBlock label = Display.getWithNewlines(tmp).create(labelFont,
 				skinParam.getDefaultTextAlignment(HorizontalAlignment.CENTER), skinParam);
 		if (TextBlockUtils.isEmpty(label, stringBounder)) {

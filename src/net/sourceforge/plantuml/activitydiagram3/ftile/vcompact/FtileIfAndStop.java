@@ -32,7 +32,6 @@
  */
 package net.sourceforge.plantuml.activitydiagram3.ftile.vcompact;
 
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,10 +39,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import net.sourceforge.plantuml.FontParam;
 import net.sourceforge.plantuml.ISkinParam;
 import net.sourceforge.plantuml.LineBreakStrategy;
-import net.sourceforge.plantuml.UseStyle;
 import net.sourceforge.plantuml.activitydiagram3.Branch;
 import net.sourceforge.plantuml.activitydiagram3.ftile.AbstractConnection;
 import net.sourceforge.plantuml.activitydiagram3.ftile.AbstractFtile;
@@ -58,6 +55,7 @@ import net.sourceforge.plantuml.activitydiagram3.ftile.Snake;
 import net.sourceforge.plantuml.activitydiagram3.ftile.Swimlane;
 import net.sourceforge.plantuml.activitydiagram3.ftile.vertical.FtileDiamond;
 import net.sourceforge.plantuml.activitydiagram3.ftile.vertical.FtileDiamondInside;
+import net.sourceforge.plantuml.awt.geom.Dimension2D;
 import net.sourceforge.plantuml.creole.CreoleMode;
 import net.sourceforge.plantuml.creole.Parser;
 import net.sourceforge.plantuml.creole.Sheet;
@@ -120,16 +118,9 @@ class FtileIfAndStop extends AbstractFtile {
 
 		final Ftile stopFtile = ftileFactory.stop(swimlane);
 
-		final UStroke thickness;
-		final FontConfiguration fcTest;
-		if (UseStyle.useBetaStyle()) {
-			final Style style = StyleSignatureBasic.activityDiamond().getMergedStyle(skinParam.getCurrentStyleBuilder());
-			thickness = tileNonStop.getThickness(style);
-			fcTest = new FontConfiguration(skinParam, style);
-		} else {
-			thickness = tileNonStop.getThickness(null);
-			fcTest = new FontConfiguration(skinParam, FontParam.ACTIVITY_DIAMOND, null);
-		}
+		final Style style = StyleSignatureBasic.activityDiamond().getMergedStyle(skinParam.getCurrentStyleBuilder());
+		final UStroke thickness = tileNonStop.getThickness(style);
+		final FontConfiguration fcTest = FontConfiguration.create(skinParam, style);
 
 		final Sheet sheet = Parser
 				.build(fcTest, skinParam.getDefaultTextAlignment(HorizontalAlignment.LEFT), skinParam, CreoleMode.FULL)

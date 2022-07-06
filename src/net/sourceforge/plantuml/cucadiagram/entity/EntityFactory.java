@@ -44,9 +44,7 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 
-import net.sourceforge.plantuml.ColorParam;
 import net.sourceforge.plantuml.ISkinParam;
-import net.sourceforge.plantuml.UseStyle;
 import net.sourceforge.plantuml.creole.CreoleMode;
 import net.sourceforge.plantuml.cucadiagram.Bodier;
 import net.sourceforge.plantuml.cucadiagram.BodierJSon;
@@ -66,9 +64,7 @@ import net.sourceforge.plantuml.cucadiagram.LeafType;
 import net.sourceforge.plantuml.cucadiagram.Link;
 import net.sourceforge.plantuml.cucadiagram.SuperGroup;
 import net.sourceforge.plantuml.graphic.USymbol;
-import net.sourceforge.plantuml.graphic.color.ColorType;
 import net.sourceforge.plantuml.skin.VisibilityModifier;
-import net.sourceforge.plantuml.ugraphic.color.HColor;
 
 public final class EntityFactory {
 
@@ -123,20 +119,20 @@ public final class EntityFactory {
 		folder.setUSymbol(symbol);
 		folder.setStereotype(g.getStereotype());
 		folder.setColors(g.getColors());
-		if (g.getUrl99() != null) {
+		if (g.getUrl99() != null) 
 			folder.addUrl(g.getUrl99());
-		}
-		if (UseStyle.useBetaStyle()) {
-			// System.err.println("Backcolor ?");
-		} else {
-			if (g.getColors().getColor(ColorType.BACK) == null) {
-				final ColorParam param = symbol == null ? ColorParam.packageBackground : symbol.getColorParamBack();
-				final HColor c1 = skinParam.getHtmlColor(param, g.getStereotype(), false);
-				folder.setSpecificColorTOBEREMOVED(ColorType.BACK, c1 == null ? skinParam.getBackgroundColor() : c1);
-			} else {
-				folder.setSpecificColorTOBEREMOVED(ColorType.BACK, g.getColors().getColor(ColorType.BACK));
-			}
-		}
+		
+//		if (UseStyle.useBetaStyle()) {
+//			// System.err.println("Backcolor ?");
+//		} else {
+//			if (g.getColors().getColor(ColorType.BACK) == null) {
+//				final ColorParam param = symbol == null ? ColorParam.packageBackground : symbol.getColorParamBack();
+//				final HColor c1 = skinParam.getHtmlColor(param, g.getStereotype(), false);
+//				folder.setSpecificColorTOBEREMOVED(ColorType.BACK, c1 == null ? skinParam.getBackgroundColor() : c1);
+//			} else {
+//				folder.setSpecificColorTOBEREMOVED(ColorType.BACK, g.getColors().getColor(ColorType.BACK));
+//			}
+//		}
 		emptyGroupsAsNode.put(g, folder);
 		return folder;
 	}

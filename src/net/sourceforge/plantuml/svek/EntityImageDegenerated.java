@@ -35,11 +35,10 @@
  */
 package net.sourceforge.plantuml.svek;
 
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
 import java.awt.geom.Rectangle2D;
 
 import net.sourceforge.plantuml.Dimension2DDouble;
-import net.sourceforge.plantuml.UseStyle;
+import net.sourceforge.plantuml.awt.geom.Dimension2D;
 import net.sourceforge.plantuml.graphic.InnerStrategy;
 import net.sourceforge.plantuml.graphic.StringBounder;
 import net.sourceforge.plantuml.ugraphic.MinMax;
@@ -84,10 +83,9 @@ public class EntityImageDegenerated implements IEntityImage {
 
 	public void drawU(UGraphic ug) {
 		orig.drawU(ug.apply(new UTranslate(delta, delta)));
-		if (UseStyle.useBetaStyle()) {
-			final Dimension2D dim = calculateDimension(ug.getStringBounder());
-			ug.apply(new UTranslate(dim.getWidth() - delta, dim.getHeight() - delta)).draw(new UEmpty(delta, delta));
-		}
+
+		final Dimension2D dim = calculateDimension(ug.getStringBounder());
+		ug.apply(new UTranslate(dim.getWidth() - delta, dim.getHeight() - delta)).draw(new UEmpty(delta, delta));
 
 	}
 

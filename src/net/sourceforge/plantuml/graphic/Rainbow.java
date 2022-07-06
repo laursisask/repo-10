@@ -37,20 +37,19 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-import net.sourceforge.plantuml.ColorParam;
 import net.sourceforge.plantuml.ISkinParam;
-import net.sourceforge.plantuml.UseStyle;
 import net.sourceforge.plantuml.api.ThemeStyle;
-import net.sourceforge.plantuml.skin.rose.Rose;
 import net.sourceforge.plantuml.style.PName;
 import net.sourceforge.plantuml.style.Style;
+import net.sourceforge.plantuml.style.Value;
+import net.sourceforge.plantuml.style.ValueNull;
+import net.sourceforge.plantuml.ugraphic.color.ColorUtils;
 import net.sourceforge.plantuml.ugraphic.color.HColor;
 import net.sourceforge.plantuml.ugraphic.color.HColorSet;
+import net.sourceforge.plantuml.ugraphic.color.HColorUtils;
 import net.sourceforge.plantuml.ugraphic.color.NoSuchColorException;
 
 public class Rainbow {
-
-	private final static Rose rose = new Rose();
 
 	private final List<HtmlColorAndStyle> colors = new ArrayList<>();
 	private final int colorArrowSeparationSpace;
@@ -69,31 +68,34 @@ public class Rainbow {
 	}
 
 	public static Rainbow fromColor(HColor arrowColor, HColor arrowHeadColor) {
-		if (arrowColor == null) {
+		if (arrowColor == null)
 			return Rainbow.none();
-		}
+
 		return Rainbow.build(new HtmlColorAndStyle(arrowColor, arrowHeadColor));
 	}
 
 	@Deprecated
 	public static Rainbow build(ISkinParam skinParam) {
-		if (UseStyle.useBetaStyle()) {
-			throw new IllegalStateException();
-		}
-		final HColor arrow = rose.getHtmlColor(skinParam, ColorParam.arrow);
-		final HColor arrowHead = rose.getHtmlColor(skinParam, null, ColorParam.arrowHead, ColorParam.arrow);
-		return fromColor(arrow, arrowHead);
+		throw new IllegalStateException();
 	}
 
 	public static Rainbow build(Style style, HColorSet set, ThemeStyle themeStyle) {
 		final HColor color = style.value(PName.LineColor).asColor(themeStyle, set);
-		return fromColor(color, null);
+		final Value head = style.value(PName.HeadColor);
+		HColor colorHead;
+		if (head instanceof ValueNull)
+			colorHead = color;
+		else
+			colorHead = head.asColor(themeStyle, set);
+		if (colorHead == null)
+			colorHead = HColorUtils.transparent();
+		return fromColor(color, colorHead);
 	}
 
 	public Rainbow withDefault(Rainbow defaultColor) {
-		if (this.size() == 0) {
+		if (this.size() == 0)
 			return defaultColor;
-		}
+
 		return this;
 	}
 
@@ -105,22 +107,21 @@ public class Rainbow {
 
 	public static Rainbow build(ISkinParam skinParam, String colorString, int colorArrowSeparationSpace)
 			throws NoSuchColorException {
-		if (colorString == null) {
+		if (colorString == null)
 			return Rainbow.none();
-		}
+
 		final Rainbow result = new Rainbow(colorArrowSeparationSpace);
-		for (String s : colorString.split(";")) {
+		for (String s : colorString.split(";"))
 			result.colors.add(HtmlColorAndStyle.build(skinParam, s));
-		}
+
 		return result;
 	}
 
 	public boolean isInvisible() {
-		for (HtmlColorAndStyle style : colors) {
-			if (style.getStyle().isInvisible()) {
+		for (HtmlColorAndStyle style : colors)
+			if (style.getStyle().isInvisible())
 				return true;
-			}
-		}
+
 		return false;
 	}
 

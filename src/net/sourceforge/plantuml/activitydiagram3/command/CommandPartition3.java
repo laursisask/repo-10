@@ -32,10 +32,8 @@
  */
 package net.sourceforge.plantuml.activitydiagram3.command;
 
-import net.sourceforge.plantuml.ColorParam;
 import net.sourceforge.plantuml.LineLocation;
 import net.sourceforge.plantuml.StringUtils;
-import net.sourceforge.plantuml.UseStyle;
 import net.sourceforge.plantuml.activitydiagram3.ActivityDiagram3;
 import net.sourceforge.plantuml.command.CommandExecutionResult;
 import net.sourceforge.plantuml.command.SingleLineCommand2;
@@ -86,30 +84,16 @@ public class CommandPartition3 extends SingleLineCommand2<ActivityDiagram3> {
 	}
 
 	private USymbol getUSymbol(String type) {
-		if ("card".equalsIgnoreCase(type)) {
+		if ("card".equalsIgnoreCase(type))
 			return USymbols.CARD;
-		}
-		if ("package".equalsIgnoreCase(type)) {
+
+		if ("package".equalsIgnoreCase(type))
 			return USymbols.PACKAGE;
-		}
-		if ("rectangle".equalsIgnoreCase(type)) {
+
+		if ("rectangle".equalsIgnoreCase(type))
 			return USymbols.RECTANGLE;
-		}
+
 		return USymbols.FRAME;
-	}
-
-	private ColorParam getColorParamBorder(final USymbol symbol) {
-		if (symbol == USymbols.FRAME) {
-			return ColorParam.partitionBorder;
-		}
-		return symbol.getColorParamBorder();
-	}
-
-	private ColorParam getColorParamBack(final USymbol symbol) {
-		if (symbol == USymbols.FRAME) {
-			return ColorParam.partitionBackground;
-		}
-		return symbol.getColorParamBack();
 	}
 
 	private static ColorParser color(String id) {
@@ -135,39 +119,19 @@ public class CommandPartition3 extends SingleLineCommand2<ActivityDiagram3> {
 		final String stereo = arg.get("STEREO", 0);
 		final Stereotype stereotype = stereo == null ? null : Stereotype.build(stereo);
 
-		HColor backColor;
 		// Warning : titleColor unused in FTileGroupW
-		HColor titleColor;
-		HColor borderColor;
-		double roundCorner;
 
-		if (UseStyle.useBetaStyle()) {
-			final Style stylePartition = getDefaultStyleDefinitionPartition(symbol).withTOBECHANGED(stereotype)
-					.getMergedStyle(diagram.getSkinParam().getCurrentStyleBuilder());
-			borderColor = stylePartition.value(PName.LineColor).asColor(diagram.getSkinParam().getThemeStyle(),
+		final Style stylePartition = getDefaultStyleDefinitionPartition(symbol).withTOBECHANGED(stereotype)
+				.getMergedStyle(diagram.getSkinParam().getCurrentStyleBuilder());
+		final HColor borderColor = stylePartition.value(PName.LineColor).asColor(diagram.getSkinParam().getThemeStyle(),
+				diagram.getSkinParam().getIHtmlColorSet());
+		HColor backColor = colors.getColor(ColorType.BACK);
+		if (backColor == null)
+			backColor = stylePartition.value(PName.BackGroundColor).asColor(diagram.getSkinParam().getThemeStyle(),
 					diagram.getSkinParam().getIHtmlColorSet());
-			backColor = colors.getColor(ColorType.BACK);
-			if (backColor == null)
-				backColor = stylePartition.value(PName.BackGroundColor).asColor(diagram.getSkinParam().getThemeStyle(),
-						diagram.getSkinParam().getIHtmlColorSet());
 
-			titleColor = HColorUtils.BLUE;// stylePartition.value(PName.FontColor).asColor(diagram.getSkinParam().getIHtmlColorSet());
-			roundCorner = stylePartition.value(PName.RoundCorner).asDouble();
-		} else {
-			final HColor backColorInSkinparam = diagram.getSkinParam().getHtmlColor(getColorParamBack(symbol),
-					stereotype, false);
-			if (backColorInSkinparam == null)
-				backColor = colors.getColor(ColorType.BACK);
-			else
-				backColor = backColorInSkinparam;
-
-			titleColor = colors.getColor(ColorType.HEADER);
-
-			borderColor = diagram.getSkinParam().getHtmlColor(getColorParamBorder(symbol), stereotype, false);
-			if (borderColor == null)
-				borderColor = HColorUtils.BLACK;
-			roundCorner = symbol.getSkinParameter().getRoundCorner(diagram.getSkinParam(), stereotype);
-		}
+		final HColor titleColor = HColorUtils.BLUE;// stylePartition.value(PName.FontColor).asColor(diagram.getSkinParam().getIHtmlColorSet());
+		final double roundCorner = stylePartition.value(PName.RoundCorner).asDouble();
 
 		diagram.startGroup(Display.getWithNewlines(partitionTitle), backColor, titleColor, borderColor, symbol,
 				roundCorner);

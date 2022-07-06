@@ -35,18 +35,15 @@
  */
 package net.sourceforge.plantuml.activitydiagram3.gtile;
 
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
 import java.util.Set;
 
 import net.sourceforge.plantuml.AlignmentParam;
-import net.sourceforge.plantuml.ColorParam;
 import net.sourceforge.plantuml.Dimension2DDouble;
-import net.sourceforge.plantuml.FontParam;
 import net.sourceforge.plantuml.ISkinParam;
 import net.sourceforge.plantuml.LineBreakStrategy;
-import net.sourceforge.plantuml.UseStyle;
 import net.sourceforge.plantuml.activitydiagram3.PositionedNote;
 import net.sourceforge.plantuml.activitydiagram3.ftile.Swimlane;
+import net.sourceforge.plantuml.awt.geom.Dimension2D;
 import net.sourceforge.plantuml.creole.CreoleMode;
 import net.sourceforge.plantuml.creole.Parser;
 import net.sourceforge.plantuml.creole.Sheet;
@@ -59,7 +56,6 @@ import net.sourceforge.plantuml.graphic.StringBounder;
 import net.sourceforge.plantuml.graphic.TextBlock;
 import net.sourceforge.plantuml.sequencediagram.NotePosition;
 import net.sourceforge.plantuml.sequencediagram.NoteType;
-import net.sourceforge.plantuml.skin.rose.Rose;
 import net.sourceforge.plantuml.style.PName;
 import net.sourceforge.plantuml.style.SName;
 import net.sourceforge.plantuml.style.Style;
@@ -111,32 +107,15 @@ public class GtileWithNoteOpale extends AbstractGtile implements Stencil, Stylea
 		if (note.getType() == NoteType.FLOATING_NOTE)
 			withLink = false;
 
-		final Rose rose = new Rose();
-
-		final HColor noteBackgroundColor;
-		final HColor borderColor;
-		final FontConfiguration fc;
-
-		final double shadowing;
-		final LineBreakStrategy wrapWidth;
-		UStroke stroke = new UStroke();
-		if (UseStyle.useBetaStyle()) {
-			final Style style = getStyleSignature().getMergedStyle(skinParam.getCurrentStyleBuilder())
-					.eventuallyOverride(note.getColors());
-			noteBackgroundColor = style.value(PName.BackGroundColor).asColor(skinParam.getThemeStyle(),
-					getIHtmlColorSet());
-			borderColor = style.value(PName.LineColor).asColor(skinParam.getThemeStyle(), getIHtmlColorSet());
-			fc = style.getFontConfiguration(skinParam.getThemeStyle(), getIHtmlColorSet());
-			shadowing = style.value(PName.Shadowing).asDouble();
-			wrapWidth = style.wrapWidth();
-			stroke = style.getStroke();
-		} else {
-			noteBackgroundColor = rose.getHtmlColor(skinParam, ColorParam.noteBackground);
-			borderColor = rose.getHtmlColor(skinParam, ColorParam.noteBorder);
-			fc = new FontConfiguration(skinParam, FontParam.NOTE, null);
-			shadowing = skinParam.shadowing(null) ? 4 : 0;
-			wrapWidth = skinParam.wrapWidth();
-		}
+		final Style style = getStyleSignature().getMergedStyle(skinParam.getCurrentStyleBuilder())
+				.eventuallyOverride(note.getColors());
+		final HColor noteBackgroundColor = style.value(PName.BackGroundColor).asColor(skinParam.getThemeStyle(),
+				getIHtmlColorSet());
+		final HColor borderColor = style.value(PName.LineColor).asColor(skinParam.getThemeStyle(), getIHtmlColorSet());
+		final FontConfiguration fc = style.getFontConfiguration(skinParam.getThemeStyle(), getIHtmlColorSet());
+		final double shadowing = style.value(PName.Shadowing).asDouble();
+		final LineBreakStrategy wrapWidth = style.wrapWidth();
+		final UStroke stroke = style.getStroke();
 
 		final HorizontalAlignment align = skinParam.getHorizontalAlignment(AlignmentParam.noteTextAlignment, null,
 				false, null);

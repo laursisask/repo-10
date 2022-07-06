@@ -45,7 +45,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.sourceforge.plantuml.BaseFile;
-import net.sourceforge.plantuml.ColorParam;
 import net.sourceforge.plantuml.Dimension2DDouble;
 import net.sourceforge.plantuml.FontParam;
 import net.sourceforge.plantuml.Guillemet;
@@ -54,12 +53,9 @@ import net.sourceforge.plantuml.LineParam;
 import net.sourceforge.plantuml.Log;
 import net.sourceforge.plantuml.OptionFlags;
 import net.sourceforge.plantuml.Pragma;
-import net.sourceforge.plantuml.SkinParamForecolored;
 import net.sourceforge.plantuml.SkinParamSameClassWidth;
-import net.sourceforge.plantuml.SkinParamUtils;
 import net.sourceforge.plantuml.StringUtils;
 import net.sourceforge.plantuml.UmlDiagramType;
-import net.sourceforge.plantuml.UseStyle;
 import net.sourceforge.plantuml.activitydiagram3.ftile.EntityImageLegend;
 import net.sourceforge.plantuml.awt.geom.Dimension2D;
 import net.sourceforge.plantuml.core.UmlSource;
@@ -99,10 +95,10 @@ import net.sourceforge.plantuml.graphic.USymbol;
 import net.sourceforge.plantuml.graphic.USymbolHexagon;
 import net.sourceforge.plantuml.graphic.USymbolInterface;
 import net.sourceforge.plantuml.graphic.USymbols;
-import net.sourceforge.plantuml.style.StyleSignature;
 import net.sourceforge.plantuml.style.PName;
 import net.sourceforge.plantuml.style.SName;
 import net.sourceforge.plantuml.style.Style;
+import net.sourceforge.plantuml.style.StyleSignature;
 import net.sourceforge.plantuml.style.StyleSignatureBasic;
 import net.sourceforge.plantuml.svek.image.EntityImageActivity;
 import net.sourceforge.plantuml.svek.image.EntityImageArcCircle;
@@ -151,69 +147,61 @@ public final class GeneralImageBuilder {
 	private static IEntityImage createEntityImageBlockInternal(ILeaf leaf, ISkinParam skinParam,
 			boolean isHideEmptyDescriptionForState, PortionShower portionShower, Bibliotekon bibliotekon,
 			GraphvizVersion graphvizVersion, UmlDiagramType umlDiagramType, Collection<Link> links) {
-		if (leaf.isRemoved()) {
+		if (leaf.isRemoved())
 			throw new IllegalStateException();
-		}
+
 		if (leaf.getLeafType().isLikeClass()) {
 			final EntityImageClass entityImageClass = new EntityImageClass(graphvizVersion, (ILeaf) leaf, skinParam,
 					portionShower);
 			final Neighborhood neighborhood = leaf.getNeighborhood();
-			if (neighborhood != null) {
+			if (neighborhood != null)
 				return new EntityImageProtected(entityImageClass, 20, neighborhood, bibliotekon);
-			}
+
 			return entityImageClass;
 		}
-		if (leaf.getLeafType() == LeafType.NOTE) {
+		if (leaf.getLeafType() == LeafType.NOTE)
 			return new EntityImageNote(leaf, skinParam, umlDiagramType);
-		}
-		if (leaf.getLeafType() == LeafType.ACTIVITY) {
+
+		if (leaf.getLeafType() == LeafType.ACTIVITY)
 			return new EntityImageActivity(leaf, skinParam, bibliotekon);
-		}
+
 		if ((leaf.getLeafType() == LeafType.PORT) || (leaf.getLeafType() == LeafType.PORTIN)
 				|| (leaf.getLeafType() == LeafType.PORTOUT)) {
 			final Cluster parent = bibliotekon.getCluster(leaf.getParentContainer());
 			return new EntityImagePort(leaf, skinParam, parent, bibliotekon, umlDiagramType.getStyleName());
 		}
+
 		if (leaf.getLeafType() == LeafType.STATE) {
 			if (leaf.getEntityPosition() != EntityPosition.NORMAL) {
 				final Cluster stateParent = bibliotekon.getCluster(leaf.getParentContainer());
 				return new EntityImageStateBorder(leaf, skinParam, stateParent, bibliotekon,
 						umlDiagramType.getStyleName());
 			}
-			if (isHideEmptyDescriptionForState && leaf.getBodier().getRawBody().size() == 0) {
+			if (isHideEmptyDescriptionForState && leaf.getBodier().getRawBody().size() == 0)
 				return new EntityImageStateEmptyDescription(leaf, skinParam);
-			}
+
 			if (leaf.getStereotype() != null
-					&& "<<sdlreceive>>".equals(leaf.getStereotype().getLabel(Guillemet.DOUBLE_COMPARATOR))) {
+					&& "<<sdlreceive>>".equals(leaf.getStereotype().getLabel(Guillemet.DOUBLE_COMPARATOR)))
 				return new EntityImageState2(leaf, skinParam, umlDiagramType.getStyleName());
-			}
+
 			return new EntityImageState(leaf, skinParam);
 
 		}
-		if (leaf.getLeafType() == LeafType.CIRCLE_START) {
-			ColorParam param = ColorParam.activityStart;
-			if (umlDiagramType == UmlDiagramType.STATE) {
-				param = ColorParam.stateStart;
-			}
-			return new EntityImageCircleStart(leaf, skinParam, param);
-		}
-		if (leaf.getLeafType() == LeafType.CIRCLE_END) {
-			ColorParam param = ColorParam.activityEnd;
-			if (umlDiagramType == UmlDiagramType.STATE) {
-				param = ColorParam.stateEnd;
-			}
-			return new EntityImageCircleEnd(leaf, skinParam, param);
-		}
-		if (leaf.getLeafType() == LeafType.BRANCH || leaf.getLeafType() == LeafType.STATE_CHOICE) {
+		if (leaf.getLeafType() == LeafType.CIRCLE_START)
+			return new EntityImageCircleStart(leaf, skinParam);
+
+		if (leaf.getLeafType() == LeafType.CIRCLE_END)
+			return new EntityImageCircleEnd(leaf, skinParam);
+
+		if (leaf.getLeafType() == LeafType.BRANCH || leaf.getLeafType() == LeafType.STATE_CHOICE)
 			return new EntityImageBranch(leaf, skinParam);
-		}
-		if (leaf.getLeafType() == LeafType.LOLLIPOP_FULL || leaf.getLeafType() == LeafType.LOLLIPOP_HALF) {
+
+		if (leaf.getLeafType() == LeafType.LOLLIPOP_FULL || leaf.getLeafType() == LeafType.LOLLIPOP_HALF)
 			return new EntityImageLollipopInterface(leaf, skinParam, umlDiagramType.getStyleName());
-		}
-		if (leaf.getLeafType() == LeafType.CIRCLE) {
+
+		if (leaf.getLeafType() == LeafType.CIRCLE)
 			return new EntityImageDescription(leaf, skinParam, portionShower, links, umlDiagramType.getStyleName(),
 					bibliotekon);
-		}
 
 		if (leaf.getLeafType() == LeafType.DESCRIPTION) {
 			if (OptionFlags.USE_INTERFACE_EYE1 && leaf.getUSymbol() instanceof USymbolInterface) {
@@ -225,79 +213,76 @@ public final class GeneralImageBuilder {
 						bibliotekon);
 			}
 		}
-		if (leaf.getLeafType() == LeafType.USECASE) {
+		if (leaf.getLeafType() == LeafType.USECASE)
 			return new EntityImageUseCase(leaf, skinParam, portionShower);
-		}
-		if (leaf.getLeafType() == LeafType.USECASE_BUSINESS) {
+
+		if (leaf.getLeafType() == LeafType.USECASE_BUSINESS)
 			return new EntityImageUseCase(leaf, skinParam, portionShower);
-		}
+
 		// if (leaf.getEntityType() == LeafType.CIRCLE_INTERFACE) {
 		// return new EntityImageCircleInterface(leaf, skinParam);
 		// }
-		if (leaf.getLeafType() == LeafType.OBJECT) {
+		if (leaf.getLeafType() == LeafType.OBJECT)
 			return new EntityImageObject(leaf, skinParam, portionShower);
-		}
-		if (leaf.getLeafType() == LeafType.MAP) {
+
+		if (leaf.getLeafType() == LeafType.MAP)
 			return new EntityImageMap(leaf, skinParam, portionShower);
-		}
-		if (leaf.getLeafType() == LeafType.JSON) {
+
+		if (leaf.getLeafType() == LeafType.JSON)
 			return new EntityImageJson(leaf, skinParam, portionShower);
-		}
-		if (leaf.getLeafType() == LeafType.SYNCHRO_BAR || leaf.getLeafType() == LeafType.STATE_FORK_JOIN) {
+
+		if (leaf.getLeafType() == LeafType.SYNCHRO_BAR || leaf.getLeafType() == LeafType.STATE_FORK_JOIN)
 			return new EntityImageSynchroBar(leaf, skinParam, umlDiagramType.getStyleName());
-		}
-		if (leaf.getLeafType() == LeafType.ARC_CIRCLE) {
+
+		if (leaf.getLeafType() == LeafType.ARC_CIRCLE)
 			return new EntityImageArcCircle(leaf, skinParam);
-		}
-		if (leaf.getLeafType() == LeafType.POINT_FOR_ASSOCIATION) {
+
+		if (leaf.getLeafType() == LeafType.POINT_FOR_ASSOCIATION)
 			return new EntityImageAssociationPoint(leaf, skinParam);
-		}
-		if (leaf.isGroup()) {
+
+		if (leaf.isGroup())
 			return new EntityImageGroup(leaf, skinParam);
-		}
+
 		if (leaf.getLeafType() == LeafType.EMPTY_PACKAGE) {
-			if (leaf.getUSymbol() != null) {
-				final HColor black = SkinParamUtils.getColor(skinParam, leaf.getStereotype(),
-						leaf.getUSymbol().getColorParamBorder());
-				return new EntityImageDescription(leaf, new SkinParamForecolored(skinParam, black), portionShower,
-						links, umlDiagramType.getStyleName(), bibliotekon);
-			}
+			if (leaf.getUSymbol() != null)
+				return new EntityImageDescription(leaf, skinParam, portionShower, links, umlDiagramType.getStyleName(),
+						bibliotekon);
+
 			return new EntityImageEmptyPackage(leaf, skinParam, portionShower, umlDiagramType.getStyleName());
 		}
-		if (leaf.getLeafType() == LeafType.ASSOCIATION) {
+		if (leaf.getLeafType() == LeafType.ASSOCIATION)
 			return new EntityImageAssociation(leaf, skinParam, umlDiagramType.getStyleName());
-		}
-		if (leaf.getLeafType() == LeafType.PSEUDO_STATE) {
-			return new EntityImagePseudoState(leaf, skinParam, umlDiagramType.getStyleName());
-		}
-		if (leaf.getLeafType() == LeafType.DEEP_HISTORY) {
-			return new EntityImageDeepHistory(leaf, skinParam, umlDiagramType.getStyleName());
-		}
 
-		if (leaf.getLeafType() == LeafType.TIPS) {
+		if (leaf.getLeafType() == LeafType.PSEUDO_STATE)
+			return new EntityImagePseudoState(leaf, skinParam, umlDiagramType.getStyleName());
+
+		if (leaf.getLeafType() == LeafType.DEEP_HISTORY)
+			return new EntityImageDeepHistory(leaf, skinParam, umlDiagramType.getStyleName());
+
+		if (leaf.getLeafType() == LeafType.TIPS)
 			return new EntityImageTips(leaf, skinParam, bibliotekon, umlDiagramType);
-		}
+
 		// TODO Clean
 		if (leaf.getLeafType() == LeafType.DOMAIN && leaf.getStereotype() != null
-				&& leaf.getStereotype().isMachineOrSpecification()) {
+				&& leaf.getStereotype().isMachineOrSpecification())
 			return new EntityImageMachine(leaf, skinParam);
-		} else if (leaf.getLeafType() == LeafType.DOMAIN && leaf.getStereotype() != null
-				&& leaf.getStereotype().isDesignedOrSolved()) {
+		else if (leaf.getLeafType() == LeafType.DOMAIN && leaf.getStereotype() != null
+				&& leaf.getStereotype().isDesignedOrSolved())
 			return new EntityImageDesignedDomain(leaf, skinParam);
-		} else if (leaf.getLeafType() == LeafType.REQUIREMENT) {
+		else if (leaf.getLeafType() == LeafType.REQUIREMENT)
 			return new EntityImageRequirement(leaf, skinParam);
-		} else if (leaf.getLeafType() == LeafType.DOMAIN && leaf.getStereotype() != null
-				&& leaf.getStereotype().isLexicalOrGiven()) {
+		else if (leaf.getLeafType() == LeafType.DOMAIN && leaf.getStereotype() != null
+				&& leaf.getStereotype().isLexicalOrGiven())
 			return new EntityImageDomain(leaf, skinParam, 'X');
-		} else if (leaf.getLeafType() == LeafType.DOMAIN && leaf.getStereotype() != null
-				&& leaf.getStereotype().isCausal()) {
+		else if (leaf.getLeafType() == LeafType.DOMAIN && leaf.getStereotype() != null
+				&& leaf.getStereotype().isCausal())
 			return new EntityImageDomain(leaf, skinParam, 'C');
-		} else if (leaf.getLeafType() == LeafType.DOMAIN && leaf.getStereotype() != null
-				&& leaf.getStereotype().isBiddableOrUncertain()) {
+		else if (leaf.getLeafType() == LeafType.DOMAIN && leaf.getStereotype() != null
+				&& leaf.getStereotype().isBiddableOrUncertain())
 			return new EntityImageDomain(leaf, skinParam, 'B');
-		} else if (leaf.getLeafType() == LeafType.DOMAIN) {
+		else if (leaf.getLeafType() == LeafType.DOMAIN)
 			return new EntityImageDomain(leaf, skinParam, 'P');
-		} else
+		else
 			throw new UnsupportedOperationException(leaf.getLeafType().toString());
 	}
 
@@ -394,13 +379,10 @@ public final class GeneralImageBuilder {
 
 	// Duplicate SvekResult / GeneralImageBuilder
 	private HColor getBackcolor() {
-		if (UseStyle.useBetaStyle()) {
-			final Style style = StyleSignatureBasic.of(SName.root, SName.document)
-					.getMergedStyle(dotData.getSkinParam().getCurrentStyleBuilder());
-			return style.value(PName.BackGroundColor).asColor(dotData.getSkinParam().getThemeStyle(),
-					dotData.getSkinParam().getIHtmlColorSet());
-		}
-		return dotData.getSkinParam().getBackgroundColor();
+		final Style style = StyleSignatureBasic.of(SName.root, SName.document)
+				.getMergedStyle(dotData.getSkinParam().getCurrentStyleBuilder());
+		return style.value(PName.BackGroundColor).asColor(dotData.getSkinParam().getThemeStyle(),
+				dotData.getSkinParam().getIHtmlColorSet());
 	}
 
 	public IEntityImage buildImage(BaseFile basefile, String dotStrings[]) {
@@ -460,7 +442,7 @@ public final class GeneralImageBuilder {
 			return error(dotStringFactory.getDotExe());
 
 		if (basefile == null && isSvekTrace())
-			basefile = new BaseFile();
+			basefile = new BaseFile(null);
 
 		final String svg;
 		try {
@@ -486,15 +468,8 @@ public final class GeneralImageBuilder {
 	}
 
 	private FontConfiguration getFontForLink(Link link, final ISkinParam skinParam) {
-		final FontConfiguration labelFont;
-		if (UseStyle.useBetaStyle()) {
-			final Style style = getDefaultStyleDefinitionArrow(link.getStereotype())
-					.getMergedStyle(link.getStyleBuilder());
-			labelFont = style.getFontConfiguration(skinParam.getThemeStyle(), skinParam.getIHtmlColorSet());
-		} else {
-			labelFont = new FontConfiguration(skinParam, FontParam.ARROW, null);
-		}
-		return labelFont;
+		final Style style = getDefaultStyleDefinitionArrow(link.getStereotype()).getMergedStyle(link.getStyleBuilder());
+		return style.getFontConfiguration(skinParam.getThemeStyle(), skinParam.getIHtmlColorSet());
 	}
 
 	private boolean isSvekTrace() {
@@ -674,9 +649,9 @@ public final class GeneralImageBuilder {
 
 		final FontConfiguration fontConfiguration;
 		if (style == null)
-			fontConfiguration = new FontConfiguration(skinParam, FontParam.STATE_ATTRIBUTE, null);
+			fontConfiguration = FontConfiguration.create(skinParam, FontParam.STATE_ATTRIBUTE, null);
 		else
-			fontConfiguration = new FontConfiguration(skinParam, style);
+			fontConfiguration = FontConfiguration.create(skinParam, style);
 
 		Display display = null;
 		for (CharSequence s : details)
@@ -700,24 +675,26 @@ public final class GeneralImageBuilder {
 			return TextBlockUtils.empty(0, 0);
 
 		final ISkinParam skinParam = dotData.getSkinParam();
-		final FontConfiguration fontConfiguration;
-		if (UseStyle.useBetaStyle()) {
-			final SName sname = dotData.getUmlDiagramType().getStyleName();
-			final StyleSignatureBasic signature;
-			final USymbol uSymbol = g.getUSymbol();
-			if (uSymbol == USymbols.RECTANGLE)
-				signature = StyleSignatureBasic.of(SName.root, SName.element, sname, uSymbol.getSName(), SName.title);
-			else
-				signature = StyleSignatureBasic.of(SName.root, SName.element, sname, SName.title);
 
-			final Style style = signature //
-					.withTOBECHANGED(g.getStereotype()) //
-					.with(g.getStereostyles()) //
-					.getMergedStyle(skinParam.getCurrentStyleBuilder());
+		final SName sname = dotData.getUmlDiagramType().getStyleName();
+		final StyleSignatureBasic signature;
+		final USymbol uSymbol = g.getUSymbol();
+		if (g.getGroupType() == GroupType.STATE)
+			signature = StyleSignatureBasic.of(SName.root, SName.element, SName.stateDiagram, SName.state,
+					SName.header);
+		else if (uSymbol == USymbols.RECTANGLE)
+			signature = StyleSignatureBasic.of(SName.root, SName.element, sname, uSymbol.getSName(), SName.title);
+		else
+			signature = StyleSignatureBasic.of(SName.root, SName.element, sname, SName.title);
 
-			fontConfiguration = style.getFontConfiguration(skinParam.getThemeStyle(), skinParam.getIHtmlColorSet());
-		} else
-			fontConfiguration = g.getFontConfigurationForTitle(skinParam);
+		final Style style = signature //
+				.withTOBECHANGED(g.getStereotype()) //
+				.with(g.getStereostyles()) //
+				.getMergedStyle(skinParam.getCurrentStyleBuilder());
+
+		final FontConfiguration fontConfiguration = style.getFontConfiguration(skinParam.getThemeStyle(),
+				skinParam.getIHtmlColorSet());
+
 		final HorizontalAlignment alignment = HorizontalAlignment.CENTER;
 		return label.create(fontConfiguration, alignment, dotData.getSkinParam());
 	}
@@ -754,20 +731,14 @@ public final class GeneralImageBuilder {
 		if (show == false)
 			return TextBlockUtils.empty(0, 0);
 
-		if (UseStyle.useBetaStyle()) {
-			final Style style = Cluster
-					.getDefaultStyleDefinition(dotData.getUmlDiagramType().getStyleName(), g.getUSymbol())
-					.forStereotypeItself(g.getStereotype())
-					.getMergedStyle(dotData.getSkinParam().getCurrentStyleBuilder());
+		final Style style = Cluster
+				.getDefaultStyleDefinition(dotData.getUmlDiagramType().getStyleName(), g.getUSymbol())
+				.forStereotypeItself(g.getStereotype()).getMergedStyle(dotData.getSkinParam().getCurrentStyleBuilder());
 
-			final FontConfiguration fontConfiguration = style.getFontConfiguration(
-					dotData.getSkinParam().getThemeStyle(), dotData.getSkinParam().getIHtmlColorSet());
-			return Display.create(stereos).create(fontConfiguration, HorizontalAlignment.CENTER,
-					dotData.getSkinParam());
-		}
-		final FontParam fontParam = FontParam.PACKAGE_STEREOTYPE;
-		return Display.create(stereos).create(new FontConfiguration(dotData.getSkinParam(), fontParam, stereotype),
-				HorizontalAlignment.CENTER, dotData.getSkinParam());
+		final FontConfiguration fontConfiguration = style.getFontConfiguration(dotData.getSkinParam().getThemeStyle(),
+				dotData.getSkinParam().getIHtmlColorSet());
+		return Display.create(stereos).create(fontConfiguration, HorizontalAlignment.CENTER, dotData.getSkinParam());
+
 	}
 
 	public String getWarningOrError(int warningOrError) {

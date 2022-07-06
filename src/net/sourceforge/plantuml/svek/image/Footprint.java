@@ -34,11 +34,11 @@ package net.sourceforge.plantuml.svek.image;
 
 import static net.sourceforge.plantuml.utils.ObjectUtils.instanceOfAny;
 
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sourceforge.plantuml.awt.geom.Dimension2D;
 import net.sourceforge.plantuml.graphic.StringBounder;
 import net.sourceforge.plantuml.graphic.UDrawable;
 import net.sourceforge.plantuml.ugraphic.UBackground;
@@ -73,15 +73,18 @@ public class Footprint {
 		private final List<Point2D.Double> all;
 
 		public MyUGraphic() {
-			super(stringBounder);
+			super(stringBounder, new UTranslate());
 			this.all = new ArrayList<>();
 		}
 
 		private MyUGraphic(MyUGraphic other, UChange change) {
-			super(other, change);
-			if (!instanceOfAny(change, UBackground.class, HColor.class, UStroke.class, UTranslate.class)) {
+			// super(other, change);
+			super(other.getStringBounder(),
+					change instanceof UTranslate ? other.getTranslate().compose((UTranslate) change)
+							: other.getTranslate());
+			if (!instanceOfAny(change, UBackground.class, HColor.class, UStroke.class, UTranslate.class))
 				throw new UnsupportedOperationException(change.getClass().toString());
-			}
+
 			this.all = other.all;
 		}
 

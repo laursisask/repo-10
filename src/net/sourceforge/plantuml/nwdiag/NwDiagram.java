@@ -95,7 +95,7 @@ public class NwDiagram extends UmlDiagram {
 	}
 
 	public NwDiagram(ThemeStyle style, UmlSource source) {
-		super(style, source, UmlDiagramType.NWDIAG);
+		super(style, source, UmlDiagramType.NWDIAG, null);
 	}
 
 	public void init() {
@@ -103,32 +103,18 @@ public class NwDiagram extends UmlDiagram {
 	}
 
 	private Network lastNetwork() {
-		if (networks.size() == 0) {
+		if (networks.size() == 0)
 			return null;
-		}
+
 		return networks.get(networks.size() - 1);
-	}
-
-	private Network stackedNetwork() {
-		for (NStackable element : stack)
-			if (element instanceof Network)
-				return (Network) element;
-		return null;
-	}
-
-	private NwGroup stakedGroup() {
-		for (NStackable element : stack)
-			if (element instanceof NwGroup)
-				return (NwGroup) element;
-		return null;
 	}
 
 	private final List<NStackable> stack = new ArrayList<NStackable>();
 
 	public CommandExecutionResult openGroup(String name) {
-		if (initDone == false) {
+		if (initDone == false)
 			return errorNoInit();
-		}
+
 		for (NStackable element : stack)
 			if (element instanceof NwGroup)
 				return CommandExecutionResult.error("Cannot nest group");
@@ -141,9 +127,9 @@ public class NwDiagram extends UmlDiagram {
 	}
 
 	public CommandExecutionResult openNetwork(String name) {
-		if (initDone == false) {
+		if (initDone == false)
 			return errorNoInit();
-		}
+
 		for (NStackable element : stack)
 			if (element instanceof Network)
 				return CommandExecutionResult.error("Cannot nest network");
@@ -153,9 +139,9 @@ public class NwDiagram extends UmlDiagram {
 	}
 
 	public CommandExecutionResult closeSomething() {
-		if (initDone == false) {
+		if (initDone == false)
 			return errorNoInit();
-		}
+
 		if (stack.size() > 0)
 			stack.remove(0);
 		this.currentGroup = null;
@@ -169,20 +155,20 @@ public class NwDiagram extends UmlDiagram {
 	}
 
 	public CommandExecutionResult link(String name1, String name2) {
-		if (initDone == false) {
+		if (initDone == false)
 			return errorNoInit();
-		}
+
 		final NServer server2;
 		if (lastNetwork() == null) {
 			createNetwork(name1);
-			server2 = new NServer(name2);
+			server2 = NServer.create(name2);
 		} else {
 			final NServer server1 = servers.get(name1);
 			final Network network1 = createNetwork("");
 			network1.goInvisible();
-			if (server1 != null) {
+			if (server1 != null)
 				server1.connectTo(lastNetwork());
-			}
+
 			server2 = new NServer(name2, server1.getBar());
 		}
 		servers.put(name2, server2);
@@ -192,27 +178,31 @@ public class NwDiagram extends UmlDiagram {
 	}
 
 	public CommandExecutionResult addElement(String name, String definition) {
-		if (initDone == false) {
+		if (initDone == false)
 			return errorNoInit();
-		}
+
 		if (currentGroup != null) {
+			if (alreadyInSomeGroup(name))
+				return CommandExecutionResult.error("Element already in another group.");
+
 			currentGroup.addName(name);
 		}
+
 		NServer server = null;
 		if (lastNetwork() == null) {
-			if (currentGroup != null) {
+			if (currentGroup != null)
 				return CommandExecutionResult.ok();
-			}
+
 			assert currentGroup == null;
 			final Network network1 = createNetwork("");
 			network1.goInvisible();
-			server = new NServer(name);
+			server = NServer.create(name);
 			servers.put(name, server);
 			server.doNotPrintFirstLink();
 		} else {
 			server = servers.get(name);
 			if (server == null) {
-				server = new NServer(name);
+				server = NServer.create(name);
 				servers.put(name, server);
 			}
 		}
@@ -223,15 +213,23 @@ public class NwDiagram extends UmlDiagram {
 		return CommandExecutionResult.ok();
 	}
 
+	private boolean alreadyInSomeGroup(String name) {
+		for (NwGroup g : groups) 
+			if (g.names().contains(name))
+				return true;
+
+		return false;
+	}
+
 	private CommandExecutionResult errorNoInit() {
 		return CommandExecutionResult.error("Maybe you forget 'nwdiag {' in your diagram ?");
 	}
 
 	private Map<String, String> toSet(String definition) {
 		final Map<String, String> result = new HashMap<String, String>();
-		if (definition == null) {
+		if (definition == null)
 			return result;
-		}
+
 		final Pattern p = Pattern.compile("\\s*(\\w+)\\s*=\\s*(\"([^\"]*)\"|[^\\s,]+)");
 		final Matcher m = p.matcher(definition);
 		while (m.find()) {
@@ -280,9 +278,9 @@ public class NwDiagram extends UmlDiagram {
 	}
 
 	private TextBlock toTextBlockForNetworkName(String name, String s) {
-		if (s != null) {
+		if (s != null)
 			name += "\\n" + s;
-		}
+
 		final StyleBuilder styleBuilder = getSkinParam().getCurrentStyleBuilder();
 		final Style style = getStyleDefinitionNetwork(SName.network).getMergedStyle(styleBuilder);
 		final FontConfiguration fontConfiguration = style.getFontConfiguration(getSkinParam().getThemeStyle(),
@@ -316,9 +314,9 @@ public class NwDiagram extends UmlDiagram {
 			final String address = current.getOwnAdress();
 			final TextBlock desc = toTextBlockForNetworkName(current.getDisplayName(), address);
 			final Dimension2D dim = desc.calculateDimension(stringBounder);
-			if (i == 0) {
+			if (i == 0)
 				deltaY = (dim.getHeight() - GridTextBlockDecorated.NETWORK_THIN) / 2;
-			}
+
 			deltaX = Math.max(deltaX, dim.getWidth());
 		}
 		double y = 0;
@@ -345,9 +343,9 @@ public class NwDiagram extends UmlDiagram {
 		final Map<Network, String> result = new LinkedHashMap<>();
 		for (Network network : networks) {
 			final String s = element.getAdress(network);
-			if (s != null) {
+			if (s != null)
 				result.put(network, s);
-			}
+
 		}
 		return result;
 	}
@@ -366,7 +364,9 @@ public class NwDiagram extends UmlDiagram {
 				final NServer server = ent.getValue();
 				if (server.getMainNetworkNext() == current) {
 					final Map<Network, String> conns = getLinks(server);
-					final int col = layout.get(server.getBar());
+					final Integer col = layout.get(server.getBar());
+					if (col == null)
+						continue;
 					double topMargin = LinkedElement.MAGIC;
 					NwGroup group = getGroupOf(server);
 					if (group != null)
@@ -380,40 +380,38 @@ public class NwDiagram extends UmlDiagram {
 	}
 
 	private NwGroup getGroupOf(NServer server) {
-		for (NwGroup group : groups) {
-			if (group.contains(server)) {
+		for (NwGroup group : groups)
+			if (group.contains(server))
 				return group;
-			}
-		}
+
 		return null;
 	}
 
 	public CommandExecutionResult setProperty(String property, String value) {
-		if (initDone == false) {
+		if (initDone == false)
 			return errorNoInit();
-		}
-		if ("address".equalsIgnoreCase(property) && lastNetwork() != null) {
+
+		if ("address".equalsIgnoreCase(property) && lastNetwork() != null)
 			lastNetwork().setOwnAdress(value);
-		}
-		if ("width".equalsIgnoreCase(property) && lastNetwork() != null) {
+
+		if ("width".equalsIgnoreCase(property) && lastNetwork() != null)
 			lastNetwork().setFullWidth("full".equalsIgnoreCase(value));
-		}
+
 		if ("color".equalsIgnoreCase(property)) {
 			final HColor color = value == null ? null
 					: getSkinParam().getIHtmlColorSet().getColorOrWhite(getSkinParam().getThemeStyle(), value);
-			if (currentGroup != null) {
+			if (currentGroup != null)
 				currentGroup.setColor(color);
-			} else if (lastNetwork() != null) {
+			else if (lastNetwork() != null)
 				lastNetwork().setColor(color);
-			}
+
 		}
-		if ("description".equalsIgnoreCase(property)) {
-			if (currentGroup == null) {
+		if ("description".equalsIgnoreCase(property))
+			if (currentGroup == null)
 				lastNetwork().setDescription(value);
-			} else {
+			else
 				currentGroup.setDescription(value);
-			}
-		}
+
 		return CommandExecutionResult.ok();
 	}
 

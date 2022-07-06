@@ -32,7 +32,6 @@
  */
 package net.sourceforge.plantuml.sequencediagram.graphic;
 
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -44,12 +43,10 @@ import net.sourceforge.plantuml.AnnotatedWorker;
 import net.sourceforge.plantuml.FileFormatOption;
 import net.sourceforge.plantuml.FontParam;
 import net.sourceforge.plantuml.ISkinParam;
-import net.sourceforge.plantuml.UseStyle;
-import net.sourceforge.plantuml.activitydiagram3.ftile.EntityImageLegend;
+import net.sourceforge.plantuml.awt.geom.Dimension2D;
 import net.sourceforge.plantuml.core.ImageData;
 import net.sourceforge.plantuml.cucadiagram.Display;
 import net.sourceforge.plantuml.cucadiagram.DisplaySection;
-import net.sourceforge.plantuml.graphic.FontConfiguration;
 import net.sourceforge.plantuml.graphic.StringBounder;
 import net.sourceforge.plantuml.graphic.TextBlock;
 import net.sourceforge.plantuml.graphic.TextBlockUtils;
@@ -84,9 +81,8 @@ public class SequenceDiagramFileMakerPuma2 implements FileMaker {
 		final DrawableSetInitializer initializer = new DrawableSetInitializer(skin, diagram.getSkinParam(),
 				diagram.isShowFootbox(), diagram.getAutonewpage());
 
-		for (Participant p : diagram.participants()) {
+		for (Participant p : diagram.participants())
 			initializer.addParticipant(p, diagram.getEnglober(p));
-		}
 
 		for (Event ev : diagram.events()) {
 			initializer.addEvent(ev);
@@ -105,16 +101,15 @@ public class SequenceDiagramFileMakerPuma2 implements FileMaker {
 		}
 		drawableSet = initializer.createDrawableSet(stringBounder);
 		final List<Newpage> newpages = new ArrayList<>();
-		for (Event ev : drawableSet.getAllEvents()) {
-			if (ev instanceof Newpage) {
+		for (Event ev : drawableSet.getAllEvents())
+			if (ev instanceof Newpage)
 				newpages.add((Newpage) ev);
-			}
-		}
+
 		fullDimension = drawableSet.getDimension();
 		final Map<Newpage, Double> positions = new LinkedHashMap<Newpage, Double>();
-		for (Newpage n : newpages) {
+		for (Newpage n : newpages)
 			positions.put(n, initializer.getYposition(stringBounder, n));
-		}
+
 		pages = create(drawableSet, positions, diagram.isShowFootbox(), diagram.getTitle().getDisplay()).getPages();
 	}
 
@@ -148,17 +143,10 @@ public class SequenceDiagramFileMakerPuma2 implements FileMaker {
 		if (Display.isNull(page.getTitle())) {
 			compTitle = null;
 		} else {
-			if (UseStyle.useBetaStyle()) {
-				final Style style = StyleSignatureBasic.of(SName.root, SName.document, SName.title)
-						.getMergedStyle(diagram.getSkinParam().getCurrentStyleBuilder());
-				compTitle = style.createTextBlockBordered(page.getTitle(), diagram.getSkinParam().getIHtmlColorSet(),
-						diagram.getSkinParam());
-			} else {
-				compTitle = TextBlockUtils.withMargin(
-						TextBlockUtils.title(new FontConfiguration(drawableSet.getSkinParam(), FontParam.TITLE, null),
-								page.getTitle(), drawableSet.getSkinParam()),
-						7, 7);
-			}
+			final Style style = StyleSignatureBasic.of(SName.root, SName.document, SName.title)
+					.getMergedStyle(diagram.getSkinParam().getCurrentStyleBuilder());
+			compTitle = style.createTextBlockBordered(page.getTitle(), diagram.getSkinParam().getIHtmlColorSet(),
+					diagram.getSkinParam());
 			final Dimension2D dimTitle = compTitle.calculateDimension(stringBounder);
 			area.setTitleArea(dimTitle.getWidth(), dimTitle.getHeight());
 		}
@@ -169,14 +157,10 @@ public class SequenceDiagramFileMakerPuma2 implements FileMaker {
 		if (diagram.getLegend().isNull()) {
 			legendBlock = TextBlockUtils.empty(0, 0);
 		} else {
-			if (UseStyle.useBetaStyle()) {
-				final Style style = StyleSignatureBasic.of(SName.root, SName.document, SName.legend)
-						.getMergedStyle(diagram.getSkinParam().getCurrentStyleBuilder());
-				legendBlock = style.createTextBlockBordered(diagram.getLegend().getDisplay(),
-						diagram.getSkinParam().getIHtmlColorSet(), diagram.getSkinParam());
-			} else {
-				legendBlock = EntityImageLegend.create(diagram.getLegend().getDisplay(), diagram.getSkinParam());
-			}
+			final Style style = StyleSignatureBasic.of(SName.root, SName.document, SName.legend)
+					.getMergedStyle(diagram.getSkinParam().getCurrentStyleBuilder());
+			legendBlock = style.createTextBlockBordered(diagram.getLegend().getDisplay(),
+					diagram.getSkinParam().getIHtmlColorSet(), diagram.getSkinParam());
 		}
 		final Dimension2D dimLegend = legendBlock.calculateDimension(stringBounder);
 		area.setLegend(dimLegend, isLegendTop(), diagram.getLegend().getHorizontalAlignment());
@@ -185,12 +169,11 @@ public class SequenceDiagramFileMakerPuma2 implements FileMaker {
 			public void drawU(UGraphic ug) {
 
 				double delta = 0;
-				if (index > 0) {
+				if (index > 0)
 					delta = page.getNewpage1() - page.getHeaderHeight();
-				}
-				if (delta < 0) {
+
+				if (delta < 0)
 					delta = 0;
-				}
 
 				if (compTitle != null) {
 					final HColor back = diagram.calculateBackColor();
@@ -210,9 +193,9 @@ public class SequenceDiagramFileMakerPuma2 implements FileMaker {
 				drawHeader(area, ug, index);
 				drawFooter(area, ug, index);
 
-				if (area.hasLegend()) {
+				if (area.hasLegend())
 					legendBlock.drawU(ug.apply(new UTranslate(area.getLegendX(), area.getLegendY())));
-				}
+
 			}
 
 		};
@@ -222,9 +205,9 @@ public class SequenceDiagramFileMakerPuma2 implements FileMaker {
 	private void drawFooter(SequenceDiagramArea area, UGraphic ug, int page) {
 		final PngTitler pngTitler = getPngTitler(FontParam.FOOTER, page);
 		final TextBlock text = pngTitler.getRibbonBlock();
-		if (text == null) {
+		if (text == null)
 			return;
-		}
+
 		text.drawU(ug.apply(
 				new UTranslate(area.getFooterX(diagram.getFooter().getHorizontalAlignment()), area.getFooterY())));
 	}
@@ -232,27 +215,20 @@ public class SequenceDiagramFileMakerPuma2 implements FileMaker {
 	private void drawHeader(SequenceDiagramArea area, UGraphic ug, int page) {
 		final PngTitler pngTitler = getPngTitler(FontParam.HEADER, page);
 		final TextBlock text = pngTitler.getRibbonBlock();
-		if (text == null) {
+		if (text == null)
 			return;
-		}
+
 		text.drawU(ug.apply(
 				new UTranslate(area.getHeaderX(diagram.getHeader().getHorizontalAlignment()), area.getHeaderY())));
 	}
 
 	private PngTitler getPngTitler(final FontParam fontParam, int page) {
 		final ISkinParam skinParam = diagram.getSkinParam();
-		final HColor hyperlinkColor = skinParam.getHyperlinkColor();
-		final HColor titleColor = skinParam.getFontHtmlColor(null, fontParam);
-		final String fontFamily = skinParam.getFont(null, false, fontParam).getFamily(null);
-		final int fontSize = skinParam.getFont(null, false, fontParam).getSize();
 		final DisplaySection display = diagram.getFooterOrHeaderTeoz(fontParam).withPage(page + 1, pages.size());
-		Style style = null;
-		if (UseStyle.useBetaStyle()) {
-			final StyleSignatureBasic def = fontParam.getStyleDefinition(null);
-			style = def.getMergedStyle(skinParam.getCurrentStyleBuilder());
-		}
-		return new PngTitler(titleColor, display, fontSize, fontFamily, hyperlinkColor,
-				skinParam.useUnderlineForHyperlink(), style, skinParam.getIHtmlColorSet(), skinParam);
+		final StyleSignatureBasic def = fontParam.getStyleDefinition(null);
+		final Style style = def.getMergedStyle(skinParam.getCurrentStyleBuilder());
+
+		return new PngTitler(display, style, skinParam.getIHtmlColorSet(), skinParam);
 	}
 
 	private boolean isLegendTop() {

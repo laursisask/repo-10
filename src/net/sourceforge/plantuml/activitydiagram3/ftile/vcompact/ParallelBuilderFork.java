@@ -32,14 +32,12 @@
  */
 package net.sourceforge.plantuml.activitydiagram3.ftile.vcompact;
 
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
 import net.sourceforge.plantuml.ColorParam;
 import net.sourceforge.plantuml.ISkinParam;
-import net.sourceforge.plantuml.UseStyle;
 import net.sourceforge.plantuml.activitydiagram3.ftile.AbstractConnection;
 import net.sourceforge.plantuml.activitydiagram3.ftile.Arrows;
 import net.sourceforge.plantuml.activitydiagram3.ftile.Connection;
@@ -53,6 +51,7 @@ import net.sourceforge.plantuml.activitydiagram3.ftile.FtileUtils;
 import net.sourceforge.plantuml.activitydiagram3.ftile.Snake;
 import net.sourceforge.plantuml.activitydiagram3.ftile.Swimlane;
 import net.sourceforge.plantuml.activitydiagram3.ftile.vertical.FtileBlackBlock;
+import net.sourceforge.plantuml.awt.geom.Dimension2D;
 import net.sourceforge.plantuml.cucadiagram.Display;
 import net.sourceforge.plantuml.graphic.Rainbow;
 import net.sourceforge.plantuml.graphic.StringBounder;
@@ -129,16 +128,11 @@ public class ParallelBuilderFork extends AbstractParallelFtilesBuilder {
 		final List<Connection> conns = new ArrayList<>();
 		final Swimlane swimlaneBlack = in;
 		final Style style = getStyleSignature().getMergedStyle(skinParam().getCurrentStyleBuilder());
-		final Ftile black = new FtileBlackBlock(skinParam(), barColor(), swimlaneBlack);
+		final Ftile black = new FtileBlackBlock(skinParam(), swimlaneBlack);
 		double x = 0;
 		for (Ftile tmp : list99) {
 			final Dimension2D dim = tmp.calculateDimension(getStringBounder());
-			final Rainbow def;
-			if (UseStyle.useBetaStyle())
-				def = Rainbow.build(style, skinParam().getIHtmlColorSet(), skinParam().getThemeStyle());
-			else
-				def = Rainbow.build(skinParam());
-
+			final Rainbow def = Rainbow.build(style, skinParam().getIHtmlColorSet(), skinParam().getThemeStyle());
 			final Rainbow rainbow = tmp.getInLinkRendering().getRainbow(def);
 			conns.add(new ConnectionIn(black, tmp, x, rainbow));
 			x += dim.getWidth();
@@ -185,7 +179,7 @@ public class ParallelBuilderFork extends AbstractParallelFtilesBuilder {
 	@Override
 	protected Ftile doStep2(Ftile middle, Ftile result) {
 		final Swimlane swimlaneBlack = out;
-		final Ftile out = new FtileBlackBlock(skinParam(), barColor(), swimlaneBlack);
+		final Ftile out = new FtileBlackBlock(skinParam(), swimlaneBlack);
 		((FtileBlackBlock) out).setBlackBlockDimension(result.calculateDimension(getStringBounder()).getWidth(),
 				barHeight);
 		if (label != null)
@@ -197,12 +191,7 @@ public class ParallelBuilderFork extends AbstractParallelFtilesBuilder {
 		double x = 0;
 		for (Ftile tmp : list99) {
 			final Dimension2D dim = tmp.calculateDimension(getStringBounder());
-			final Rainbow def;
-			if (UseStyle.useBetaStyle())
-				def = Rainbow.build(style, skinParam().getIHtmlColorSet(), skinParam().getThemeStyle());
-			else
-				def = Rainbow.build(skinParam());
-
+			final Rainbow def = Rainbow.build(style, skinParam().getIHtmlColorSet(), skinParam().getThemeStyle());
 			final Rainbow rainbow = tmp.getOutLinkRendering().getRainbow(def);
 			if (tmp.calculateDimension(getStringBounder()).hasPointOut())
 				conns.add(new ConnectionOut(tmp, out, x, rainbow, getJustBeforeBar2(middle, getStringBounder())));
@@ -213,9 +202,9 @@ public class ParallelBuilderFork extends AbstractParallelFtilesBuilder {
 		return result;
 	}
 
-	private HColor barColor() {
-		return getRose().getHtmlColor(skinParam(), ColorParam.activityBar);
-	}
+//	private HColor barColor() {
+//		return getRose().getHtmlColor(skinParam(), ColorParam.activityBar);
+//	}
 
 	class ConnectionIn extends AbstractConnection implements ConnectionTranslatable {
 

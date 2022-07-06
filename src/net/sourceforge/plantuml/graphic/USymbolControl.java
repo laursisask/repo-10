@@ -38,11 +38,6 @@ import net.sourceforge.plantuml.svek.Control;
 class USymbolControl extends USymbolSimpleAbstract {
 
 	@Override
-	public SkinParameter getSkinParameter() {
-		return SkinParameter.CONTROL;
-	}
-
-	@Override
 	public SName getSName() {
 		return SName.control;
 	}

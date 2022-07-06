@@ -5,8 +5,11 @@
  * (C) Copyright 2009-2023, Arnaud Roques
  *
  * Project Info:  http://plantuml.com
- * 
+ *
  * If you like this project or if you find it useful, you can support us at:
+ *
+ * http://plantuml.com/patreon (only 1$ per month!)
+ * http://plantuml.com/paypal
  *
  * This file is part of PlantUML.
  *
@@ -27,19 +30,17 @@
  *
  *
  * Original Author:  Arnaud Roques
- * 
+ *
  *
  */
 package net.sourceforge.plantuml.svek.image;
-
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
 
 import net.sourceforge.plantuml.ColorParam;
 import net.sourceforge.plantuml.FontParam;
 import net.sourceforge.plantuml.Guillemet;
 import net.sourceforge.plantuml.ISkinParam;
 import net.sourceforge.plantuml.SkinParamUtils;
-import net.sourceforge.plantuml.UseStyle;
+import net.sourceforge.plantuml.awt.geom.Dimension2D;
 import net.sourceforge.plantuml.cucadiagram.Display;
 import net.sourceforge.plantuml.cucadiagram.EntityPortion;
 import net.sourceforge.plantuml.cucadiagram.ILeaf;
@@ -80,18 +81,13 @@ public class EntityImageClassHeader extends AbstractEntityImage {
 		final Stereotype stereotype = entity.getStereotype();
 		final boolean displayGenericWithOldFashion = skinParam.displayGenericWithOldFashion();
 		final String generic = displayGenericWithOldFashion ? null : entity.getGeneric();
-		FontConfiguration fontConfigurationName;
 
-		if (UseStyle.useBetaStyle()) {
-			final Style style = StyleSignatureBasic
-					.of(SName.root, SName.element, SName.classDiagram, SName.class_, SName.header) //
-					.withTOBECHANGED(stereotype) //
-					.with(entity.getStereostyles()) //
-					.getMergedStyle(skinParam.getCurrentStyleBuilder());
-			fontConfigurationName = new FontConfiguration(skinParam, style);
-		} else {
-			fontConfigurationName = new FontConfiguration(getSkinParam(), FontParam.CLASS, stereotype);
-		}
+		final Style style = StyleSignatureBasic
+				.of(SName.root, SName.element, SName.classDiagram, SName.class_, SName.header) //
+				.withTOBECHANGED(stereotype) //
+				.with(entity.getStereostyles()) //
+				.getMergedStyle(skinParam.getCurrentStyleBuilder());
+		FontConfiguration fontConfigurationName = FontConfiguration.create(skinParam, style, entity.getColors());
 
 		if (italic)
 			fontConfigurationName = fontConfigurationName.italic();
@@ -120,7 +116,7 @@ public class EntityImageClassHeader extends AbstractEntityImage {
 			stereo = null;
 		else
 			stereo = TextBlockUtils.withMargin(Display.create(stereotype.getLabels(skinParam.guillemet())).create(
-					new FontConfiguration(getSkinParam(), FontParam.CLASS_STEREOTYPE, stereotype),
+					FontConfiguration.create(getSkinParam(), FontParam.CLASS_STEREOTYPE, stereotype),
 					HorizontalAlignment.CENTER, skinParam), 1, 0);
 
 		TextBlock genericBlock;
@@ -128,7 +124,7 @@ public class EntityImageClassHeader extends AbstractEntityImage {
 			genericBlock = null;
 		} else {
 			genericBlock = Display.getWithNewlines(generic).create(
-					new FontConfiguration(getSkinParam(), FontParam.CLASS_STEREOTYPE, stereotype),
+					FontConfiguration.create(getSkinParam(), FontParam.CLASS_STEREOTYPE, stereotype),
 					HorizontalAlignment.CENTER, skinParam);
 			genericBlock = TextBlockUtils.withMargin(genericBlock, 1, 1);
 			final HColor classBackground = SkinParamUtils.getColor(getSkinParam(), stereotype, ColorParam.background);
@@ -157,24 +153,14 @@ public class EntityImageClassHeader extends AbstractEntityImage {
 
 		final LeafType leafType = entity.getLeafType();
 
-		final HColor spotBackColor;
-		HColor spotBorder;
-
-		final HColor classBorder;
-		final HColor fontColor;
-		if (UseStyle.useBetaStyle()) {
-			final Style style = spotStyleSignature(leafType).getMergedStyle(skinParam.getCurrentStyleBuilder());
-			spotBorder = style.value(PName.LineColor).asColor(skinParam.getThemeStyle(), skinParam.getIHtmlColorSet());
-			spotBackColor = style.value(PName.BackGroundColor).asColor(skinParam.getThemeStyle(),
-					skinParam.getIHtmlColorSet());
-			classBorder = SkinParamUtils.getColor(getSkinParam(), stereotype, ColorParam.classBorder);
-			fontColor = style.value(PName.FontColor).asColor(skinParam.getThemeStyle(), skinParam.getIHtmlColorSet());
-		} else {
-			spotBackColor = SkinParamUtils.getColor(getSkinParam(), stereotype, spotBackground(leafType));
-			spotBorder = SkinParamUtils.getColor(getSkinParam(), stereotype, spotBorder(leafType));
-			classBorder = SkinParamUtils.getColor(getSkinParam(), stereotype, ColorParam.classBorder);
-			fontColor = SkinParamUtils.getFontColor(getSkinParam(), FontParam.CIRCLED_CHARACTER, null);
-		}
+		final Style style = spotStyleSignature(leafType).getMergedStyle(skinParam.getCurrentStyleBuilder());
+		HColor spotBorder = style.value(PName.LineColor).asColor(skinParam.getThemeStyle(),
+				skinParam.getIHtmlColorSet());
+		final HColor spotBackColor = style.value(PName.BackGroundColor).asColor(skinParam.getThemeStyle(),
+				skinParam.getIHtmlColorSet());
+		final HColor classBorder = SkinParamUtils.getColor(getSkinParam(), stereotype, ColorParam.classBorder);
+		final HColor fontColor = style.value(PName.FontColor).asColor(skinParam.getThemeStyle(),
+				skinParam.getIHtmlColorSet());
 
 		if (stereotype != null && stereotype.getCharacter() != 0)
 			return new CircledCharacter(stereotype.getCharacter(), getSkinParam().getCircledCharacterRadius(), font,
@@ -208,46 +194,12 @@ public class EntityImageClassHeader extends AbstractEntityImage {
 			return StyleSignatureBasic.of(SName.root, SName.element, SName.spot, SName.spotEnum);
 		case ENTITY:
 			return StyleSignatureBasic.of(SName.root, SName.element, SName.spot, SName.spotEntity);
+		case PROTOCOL:
+			return StyleSignatureBasic.of(SName.root, SName.element, SName.spot, SName.spotProtocol);
+		case STRUCT:
+			return StyleSignatureBasic.of(SName.root, SName.element, SName.spot, SName.spotStruct);
 		}
 		throw new IllegalStateException();
-	}
-
-	private ColorParam spotBackground(LeafType leafType) {
-		switch (leafType) {
-		case ANNOTATION:
-			return ColorParam.stereotypeNBackground;
-		case ABSTRACT_CLASS:
-			return ColorParam.stereotypeABackground;
-		case CLASS:
-			return ColorParam.stereotypeCBackground;
-		case INTERFACE:
-			return ColorParam.stereotypeIBackground;
-		case ENUM:
-			return ColorParam.stereotypeEBackground;
-		case ENTITY:
-			return ColorParam.stereotypeCBackground;
-		}
-		assert false;
-		return null;
-	}
-
-	private ColorParam spotBorder(LeafType leafType) {
-		switch (leafType) {
-		case ANNOTATION:
-			return ColorParam.stereotypeNBorder;
-		case ABSTRACT_CLASS:
-			return ColorParam.stereotypeABorder;
-		case CLASS:
-			return ColorParam.stereotypeCBorder;
-		case INTERFACE:
-			return ColorParam.stereotypeIBorder;
-		case ENUM:
-			return ColorParam.stereotypeEBorder;
-		case ENTITY:
-			return ColorParam.stereotypeCBorder;
-		}
-		assert false;
-		return null;
 	}
 
 	private char getCircledChar(LeafType leafType) {
@@ -264,6 +216,10 @@ public class EntityImageClassHeader extends AbstractEntityImage {
 			return 'E';
 		case ENTITY:
 			return 'E';
+		case PROTOCOL:
+			return 'P';
+		case STRUCT:
+			return 'S';
 		}
 		assert false;
 		return '?';

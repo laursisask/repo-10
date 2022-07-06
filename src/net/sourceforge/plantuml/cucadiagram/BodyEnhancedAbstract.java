@@ -35,11 +35,9 @@
  */
 package net.sourceforge.plantuml.cucadiagram;
 
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
-
 import net.sourceforge.plantuml.ISkinSimple;
 import net.sourceforge.plantuml.StringUtils;
-import net.sourceforge.plantuml.UseStyle;
+import net.sourceforge.plantuml.awt.geom.Dimension2D;
 import net.sourceforge.plantuml.graphic.AbstractTextBlock;
 import net.sourceforge.plantuml.graphic.FontConfiguration;
 import net.sourceforge.plantuml.graphic.HorizontalAlignment;
@@ -66,18 +64,18 @@ public abstract class BodyEnhancedAbstract extends AbstractTextBlock implements 
 
 	public static boolean isBlockSeparator(CharSequence cs) {
 		final String s = cs.toString();
-		if (s.startsWith("--") && s.endsWith("--")) {
+		if (s.startsWith("--") && s.endsWith("--"))
 			return true;
-		}
-		if (s.startsWith("==") && s.endsWith("==")) {
+
+		if (s.startsWith("==") && s.endsWith("=="))
 			return true;
-		}
-		if (s.startsWith("..") && s.endsWith("..") && s.equals("...") == false) {
+
+		if (s.startsWith("..") && s.endsWith("..") && s.equals("...") == false)
 			return true;
-		}
-		if (s.startsWith("__") && s.endsWith("__")) {
+
+		if (s.startsWith("__") && s.endsWith("__"))
 			return true;
-		}
+
 		return false;
 	}
 
@@ -116,9 +114,7 @@ public abstract class BodyEnhancedAbstract extends AbstractTextBlock implements 
 	}
 
 	final protected double getDefaultThickness() {
-		if (UseStyle.useBetaStyle())
-			return style.value(PName.LineThickness).asDouble();
-		return 1.5;
+		return style.value(PName.LineThickness).asDouble();
 	}
 
 }

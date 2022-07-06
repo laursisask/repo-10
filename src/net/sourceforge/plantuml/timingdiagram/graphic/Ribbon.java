@@ -31,15 +31,13 @@
  */
 package net.sourceforge.plantuml.timingdiagram.graphic;
 
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
 import net.sourceforge.plantuml.Dimension2DDouble;
-import net.sourceforge.plantuml.FontParam;
 import net.sourceforge.plantuml.ISkinParam;
-import net.sourceforge.plantuml.UseStyle;
+import net.sourceforge.plantuml.awt.geom.Dimension2D;
 import net.sourceforge.plantuml.command.Position;
 import net.sourceforge.plantuml.cucadiagram.Display;
 import net.sourceforge.plantuml.graphic.AbstractTextBlock;
@@ -110,9 +108,7 @@ public class Ribbon implements PDrawing {
 	}
 
 	private FontConfiguration getFontConfiguration() {
-		if (UseStyle.useBetaStyle() == false)
-			return new FontConfiguration(skinParam, FontParam.TIMING, null);
-		return new FontConfiguration(skinParam, style);
+		return FontConfiguration.create(skinParam, style);
 
 	}
 

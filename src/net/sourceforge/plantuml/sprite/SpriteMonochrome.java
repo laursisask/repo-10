@@ -210,7 +210,7 @@ public class SpriteMonochrome implements Sprite {
 		return new UImage(new PixelImage(im, AffineTransformType.TYPE_BILINEAR));
 	}
 
-	public TextBlock asTextBlock(final HColor color, final double scale) {
+	public TextBlock asTextBlock(final HColor color, final double scale, ColorMapper colorMapper) {
 		return new AbstractTextBlock() {
 
 			public void drawU(UGraphic ug) {

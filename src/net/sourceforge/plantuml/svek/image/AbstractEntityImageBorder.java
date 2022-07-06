@@ -36,10 +36,9 @@
 
 package net.sourceforge.plantuml.svek.image;
 
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
-
 import net.sourceforge.plantuml.FontParam;
 import net.sourceforge.plantuml.ISkinParam;
+import net.sourceforge.plantuml.awt.geom.Dimension2D;
 import net.sourceforge.plantuml.cucadiagram.EntityPosition;
 import net.sourceforge.plantuml.cucadiagram.ILeaf;
 import net.sourceforge.plantuml.cucadiagram.Rankdir;
@@ -75,7 +74,7 @@ public abstract class AbstractEntityImageBorder extends AbstractEntityImage {
 		}
 
 		final Stereotype stereotype = leaf.getStereotype();
-		final FontConfiguration fc = new FontConfiguration(skinParam, fontParam, stereotype);
+		final FontConfiguration fc = FontConfiguration.create(skinParam, fontParam, stereotype);
 		this.desc = leaf.getDisplay().create(fc, HorizontalAlignment.CENTER, skinParam);
 	}
 

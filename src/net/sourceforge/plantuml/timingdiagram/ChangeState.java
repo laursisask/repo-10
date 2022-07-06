@@ -32,8 +32,10 @@
  */
 package net.sourceforge.plantuml.timingdiagram;
 
+import java.util.Arrays;
+import java.util.List;
+
 import net.sourceforge.plantuml.ISkinParam;
-import net.sourceforge.plantuml.UseStyle;
 import net.sourceforge.plantuml.graphic.SymbolContext;
 import net.sourceforge.plantuml.graphic.color.ColorType;
 import net.sourceforge.plantuml.graphic.color.Colors;
@@ -41,7 +43,6 @@ import net.sourceforge.plantuml.style.PName;
 import net.sourceforge.plantuml.style.Style;
 import net.sourceforge.plantuml.ugraphic.UStroke;
 import net.sourceforge.plantuml.ugraphic.color.HColor;
-import net.sourceforge.plantuml.ugraphic.color.HColorUtils;
 
 public class ChangeState implements Comparable<ChangeState> {
 
@@ -51,9 +52,9 @@ public class ChangeState implements Comparable<ChangeState> {
 	private final Colors colors;
 
 	public ChangeState(TimeTick when, String comment, Colors colors, String... states) {
-		if (states.length == 0) {
+		if (states.length == 0)
 			throw new IllegalArgumentException();
-		}
+
 		this.when = when;
 		this.states = states;
 		this.comment = comment;
@@ -68,12 +69,12 @@ public class ChangeState implements Comparable<ChangeState> {
 		return when;
 	}
 
-	public final String[] getStates() {
-		return states;
-	}
-
 	public final String getState() {
 		return states[0];
+	}
+
+	public final List<String> getStates() {
+		return Arrays.asList(states);
 	}
 
 	public String getComment() {
@@ -81,28 +82,26 @@ public class ChangeState implements Comparable<ChangeState> {
 	}
 
 	public final HColor getBackColor(ISkinParam skinParam, Style style) {
-		if (colors == null || colors.getColor(ColorType.BACK) == null) {
-			if (UseStyle.useBetaStyle() == false)
-				return HColorUtils.COL_D7E0F2;
-
+		if (colors == null || colors.getColor(ColorType.BACK) == null)
 			return style.value(PName.BackGroundColor).asColor(skinParam.getThemeStyle(), skinParam.getIHtmlColorSet());
-		}
+
 		return colors.getColor(ColorType.BACK);
 	}
 
 	private final HColor getLineColor(ISkinParam skinParam, Style style) {
-		if (colors == null || colors.getColor(ColorType.LINE) == null) {
-			if (UseStyle.useBetaStyle() == false)
-				return HColorUtils.COL_038048;
-
+		if (colors == null || colors.getColor(ColorType.LINE) == null)
 			return style.value(PName.LineColor).asColor(skinParam.getThemeStyle(), skinParam.getIHtmlColorSet());
-		}
+
 		return colors.getColor(ColorType.LINE);
+	}
+
+	private UStroke getStroke(Style style) {
+		return style.getStroke();
 	}
 
 	public SymbolContext getContext(ISkinParam skinParam, Style style) {
 		return new SymbolContext(getBackColor(skinParam, style), getLineColor(skinParam, style))
-				.withStroke(new UStroke(1.5));
+				.withStroke(getStroke(style));
 	}
 
 	public final boolean isBlank() {

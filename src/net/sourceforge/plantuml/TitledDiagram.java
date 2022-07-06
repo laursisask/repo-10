@@ -87,21 +87,23 @@ public abstract class TitledDiagram extends AbstractPSystem implements Diagram, 
 		return pragma;
 	}
 
-	public TitledDiagram(ThemeStyle style, UmlSource source, UmlDiagramType type) {
+//	public TitledDiagram(ThemeStyle style, UmlSource source, UmlDiagramType type) {
+//		super(source);
+//		this.type = type;
+//		this.skinParam = SkinParam.create(type, style);
+//	}
+
+	public TitledDiagram(ThemeStyle style, UmlSource source, UmlDiagramType type, ISkinSimple orig) {
 		super(source);
 		this.type = type;
 		this.skinParam = SkinParam.create(type, style);
+		if (orig != null)
+			this.skinParam.copyAllFrom(orig);
+
 	}
 
 	public final StyleBuilder getCurrentStyleBuilder() {
 		return skinParam.getCurrentStyleBuilder();
-	}
-
-	public TitledDiagram(ThemeStyle style, UmlSource source, UmlDiagramType type, ISkinSimple orig) {
-		this(style, source, type);
-		if (orig != null) {
-			this.skinParam.copyAllFrom(orig);
-		}
 	}
 
 	final public UmlDiagramType getUmlDiagramType() {
@@ -273,19 +275,15 @@ public abstract class TitledDiagram extends AbstractPSystem implements Diagram, 
 	}
 
 	public HColor calculateBackColor() {
-		if (UseStyle.useBetaStyle()) {
-			final Style style = StyleSignatureBasic.of(SName.root, SName.document, this.getUmlDiagramType().getStyleName())
-					.getMergedStyle(this.getSkinParam().getCurrentStyleBuilder());
+		final Style style = StyleSignatureBasic.of(SName.root, SName.document, this.getUmlDiagramType().getStyleName())
+				.getMergedStyle(this.getSkinParam().getCurrentStyleBuilder());
 
-			HColor backgroundColor = style.value(PName.BackGroundColor).asColor(this.getSkinParam().getThemeStyle(),
-					this.getSkinParam().getIHtmlColorSet());
-			if (backgroundColor == null) {
-				backgroundColor = HColorUtils.transparent();
-			}
-			return backgroundColor;
+		HColor backgroundColor = style.value(PName.BackGroundColor).asColor(this.getSkinParam().getThemeStyle(),
+				this.getSkinParam().getIHtmlColorSet());
+		if (backgroundColor == null)
+			backgroundColor = HColorUtils.transparent();
 
-		}
-		return this.getSkinParam().getBackgroundColor();
+		return backgroundColor;
 	}
 
 }

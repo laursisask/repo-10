@@ -5,8 +5,11 @@
  * (C) Copyright 2009-2023, Arnaud Roques
  *
  * Project Info:  http://plantuml.com
- * 
+ *
  * If you like this project or if you find it useful, you can support us at:
+ *
+ * http://plantuml.com/patreon (only 1$ per month!)
+ * http://plantuml.com/paypal
  *
  * This file is part of PlantUML.
  *
@@ -42,12 +45,9 @@ import java.util.List;
 import java.util.Objects;
 
 import net.sourceforge.plantuml.Direction;
-import net.sourceforge.plantuml.ISkinParam;
-import net.sourceforge.plantuml.UseStyle;
 import net.sourceforge.plantuml.cucadiagram.LinkStyle;
 import net.sourceforge.plantuml.graphic.HtmlColorAndStyle;
 import net.sourceforge.plantuml.style.Style;
-import net.sourceforge.plantuml.style.StyleSignatureBasic;
 import net.sourceforge.plantuml.ugraphic.MinMax;
 import net.sourceforge.plantuml.ugraphic.UGraphic;
 import net.sourceforge.plantuml.ugraphic.ULine;
@@ -59,7 +59,7 @@ import net.sourceforge.plantuml.ugraphic.comp.CompressionMode;
 
 public class Worm implements Iterable<Point2D.Double> {
 
-	private final List<Point2D.Double> points = new ArrayList<Point2D.Double>();
+	private final List<Point2D.Double> points = new ArrayList<>();
 	private final Style style;
 
 	public Worm(Style style) {
@@ -94,15 +94,10 @@ public class Worm implements Iterable<Point2D.Double> {
 
 		ug = ug.apply(arrowColor);
 		ug = ug.apply(arrowColor.bg());
-		if (linkStyle.isNormal()) {
-			UStroke stroke = new UStroke(strokeValue);
-			if (UseStyle.useBetaStyle()) {
-				stroke = style.getStroke();
-			}
-			ug = ug.apply(stroke);
-		} else {
+		if (linkStyle.isNormal())
+			ug = ug.apply(style.getStroke());
+		else
 			ug = ug.apply(linkStyle.goThickness(strokeValue).getStroke3());
-		}
 
 		boolean drawn = false;
 		for (int i = 0; i < points.size() - 1; i++) {
@@ -227,7 +222,7 @@ public class Worm implements Iterable<Point2D.Double> {
 	public String toString() {
 		final StringBuilder result = new StringBuilder();
 		for (int i = 0; i < points.size() - 1; i++)
-			result.append(getDirectionAtPoint(i) + " ");
+			result.append(getDirectionAtPoint(i)).append(" ");
 
 		return result + points.toString();
 	}

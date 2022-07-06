@@ -34,6 +34,7 @@ package net.sourceforge.plantuml;
 
 import java.util.Comparator;
 
+import net.sourceforge.plantuml.annotation.HaxeIgnored;
 import net.sourceforge.plantuml.cucadiagram.dot.DotMaker2;
 
 public class Url implements EnsureVisible {
@@ -43,6 +44,7 @@ public class Url implements EnsureVisible {
 	private final String label;
 	private boolean member;
 
+	@HaxeIgnored
 	public Url(String url, String tooltip) {
 		this(url, tooltip, null);
 	}

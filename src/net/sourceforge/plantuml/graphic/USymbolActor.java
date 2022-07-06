@@ -45,11 +45,6 @@ class USymbolActor extends USymbolSimpleAbstract {
 	}
 
 	@Override
-	public SkinParameter getSkinParameter() {
-		return SkinParameter.ACTOR;
-	}
-
-	@Override
 	public SName getSName() {
 		return SName.actor;
 	}

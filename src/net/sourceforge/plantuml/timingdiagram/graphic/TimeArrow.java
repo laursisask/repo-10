@@ -31,10 +31,10 @@
  */
 package net.sourceforge.plantuml.timingdiagram.graphic;
 
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
 import java.awt.geom.Point2D;
 
 import net.sourceforge.plantuml.ISkinSimple;
+import net.sourceforge.plantuml.awt.geom.Dimension2D;
 import net.sourceforge.plantuml.cucadiagram.Display;
 import net.sourceforge.plantuml.cucadiagram.WithLinkType;
 import net.sourceforge.plantuml.graphic.FontConfiguration;
@@ -108,7 +108,7 @@ public class TimeArrow implements UDrawable {
 		final UFont font = UFont.serif(14);
 
 		final HColor color = type.getSpecificColor();
-		return new FontConfiguration(font, color, color, false);
+		return FontConfiguration.create(font, color, color, false);
 	}
 
 	public void drawU(UGraphic ug) {

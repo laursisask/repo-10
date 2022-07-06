@@ -32,13 +32,13 @@
  */
 package net.sourceforge.plantuml.graphic;
 
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 import net.sourceforge.plantuml.Dimension2DDouble;
+import net.sourceforge.plantuml.awt.geom.Dimension2D;
 import net.sourceforge.plantuml.style.SName;
 import net.sourceforge.plantuml.ugraphic.UGraphic;
 import net.sourceforge.plantuml.ugraphic.UGraphicStencil;
@@ -53,11 +53,6 @@ class USymbolCloud extends USymbol {
 
 	private final static boolean NEW = true;
 	private final static boolean DEBUG = false;
-
-	@Override
-	public SkinParameter getSkinParameter() {
-		return SkinParameter.CLOUD;
-	}
 
 	@Override
 	public SName getSName() {
@@ -138,7 +133,7 @@ class USymbolCloud extends USymbol {
 	}
 
 	private void specialLine(double bubbleSize, Random rnd, List<Point2D> points, Point2D p1, Point2D p2) {
-		final CoordinateChange change = new CoordinateChange(p1, p2);
+		final CoordinateChange change = CoordinateChange.create(p1, p2);
 		final double length = change.getLength();
 		final Point2D middle = change.getTrueCoordinate(length / 2, -rnd(rnd, 1, 1 + Math.min(12, bubbleSize * 0.8)));
 		// final Point2D middle = change.getTrueCoordinate(length / 2, -13);
@@ -152,7 +147,7 @@ class USymbolCloud extends USymbol {
 	}
 
 	private void bubbleLine(Random rnd, List<Point2D> points, Point2D p1, Point2D p2, double bubbleSize) {
-		final CoordinateChange change = new CoordinateChange(p1, p2);
+		final CoordinateChange change = CoordinateChange.create(p1, p2);
 		final double length = change.getLength();
 		int nb = (int) (length / bubbleSize);
 		if (nb == 0) {
@@ -165,7 +160,7 @@ class USymbolCloud extends USymbol {
 	}
 
 	private void addCurve(Random rnd, UPath path, Point2D p1, Point2D p2) {
-		final CoordinateChange change = new CoordinateChange(p1, p2);
+		final CoordinateChange change = CoordinateChange.create(p1, p2);
 		final double length = change.getLength();
 		final double coef = rnd(rnd, .25, .35);
 		final Point2D middle = change.getTrueCoordinate(length * coef, -length * rnd(rnd, .4, .55));

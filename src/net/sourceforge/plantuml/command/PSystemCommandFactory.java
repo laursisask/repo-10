@@ -5,8 +5,11 @@
  * (C) Copyright 2009-2023, Arnaud Roques
  *
  * Project Info:  http://plantuml.com
- * 
+ *
  * If you like this project or if you find it useful, you can support us at:
+ *
+ * http://plantuml.com/patreon (only 1$ per month!)
+ * http://plantuml.com/paypal
  *
  * This file is part of PlantUML.
  *
@@ -27,7 +30,7 @@
  *
  *
  * Original Author:  Arnaud Roques
- * 
+ *
  *
  */
 package net.sourceforge.plantuml.command;
@@ -40,6 +43,7 @@ import net.sourceforge.plantuml.ErrorUmlType;
 import net.sourceforge.plantuml.ISkinSimple;
 import net.sourceforge.plantuml.LineLocation;
 import net.sourceforge.plantuml.StringLocated;
+import net.sourceforge.plantuml.annotation.HaxeIgnored;
 import net.sourceforge.plantuml.api.ThemeStyle;
 import net.sourceforge.plantuml.core.Diagram;
 import net.sourceforge.plantuml.core.DiagramType;
@@ -57,6 +61,7 @@ public abstract class PSystemCommandFactory extends PSystemAbstractFactory {
 
 	public abstract AbstractPSystem createEmptyDiagram(ThemeStyle style, UmlSource source, ISkinSimple skinParam);
 
+	@HaxeIgnored
 	protected PSystemCommandFactory() {
 		this(DiagramType.UML);
 	}
@@ -160,7 +165,6 @@ public abstract class PSystemCommandFactory extends PSystemAbstractFactory {
 					continue;
 
 				it.copyStateFrom(cloned);
-				assert lines != null;
 				return new Step(cmd, lines);
 			}
 		}
@@ -168,7 +172,7 @@ public abstract class PSystemCommandFactory extends PSystemAbstractFactory {
 	}
 
 	private BlocLines isMultilineCommandOk(IteratorCounter2 it, Command cmd) {
-		BlocLines lines = new BlocLines();
+		BlocLines lines = BlocLines.create();
 		int nb = 0;
 		while (it.hasNext()) {
 			lines = addOneSingleLineManageEmbedded2(it, lines);

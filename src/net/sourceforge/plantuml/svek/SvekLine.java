@@ -35,7 +35,6 @@
  */
 package net.sourceforge.plantuml.svek;
 
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -57,6 +56,7 @@ import net.sourceforge.plantuml.Pragma;
 import net.sourceforge.plantuml.StringUtils;
 import net.sourceforge.plantuml.UmlDiagramType;
 import net.sourceforge.plantuml.Url;
+import net.sourceforge.plantuml.awt.geom.Dimension2D;
 import net.sourceforge.plantuml.command.Position;
 import net.sourceforge.plantuml.cucadiagram.Display;
 import net.sourceforge.plantuml.cucadiagram.EntityPort;
@@ -625,6 +625,14 @@ public class SvekLine implements Moveable, Hideable, GuideLine {
 		if (opale)
 			return;
 
+		if (link.isInvis())
+			return;
+
+		if (dotPath == null) {
+			Log.info("DotPath is null for " + this);
+			return;
+		}
+
 		ug.draw(link.commentForSvg());
 		final Map<UGroupType, String> typeIDent = new EnumMap<>(UGroupType.class);
 		typeIDent.put(UGroupType.CLASS,
@@ -648,9 +656,6 @@ public class SvekLine implements Moveable, Hideable, GuideLine {
 		x += dx;
 		y += dy;
 
-		if (link.isInvis())
-			return;
-
 		if (this.link.getColors() != null) {
 			final HColor newColor = this.link.getColors().getColor(ColorType.ARROW, ColorType.LINE);
 			if (newColor != null)
@@ -660,19 +665,18 @@ public class SvekLine implements Moveable, Hideable, GuideLine {
 
 		ug = ug.apply(new HColorNone().bg()).apply(color);
 		final LinkType linkType = link.getType();
-		UStroke stroke = suggestedStroke == null || linkType.getStyle().isNormal() == false
-				? linkType.getStroke3(defaultThickness)
-				: suggestedStroke;
+		UStroke stroke;
+		if (suggestedStroke == null || linkType.getStyle().isNormal() == false)
+			stroke = linkType.getStroke3(defaultThickness);
+		else
+			stroke = linkType.getStroke3(suggestedStroke);
+
 		if (link.getColors() != null && link.getColors().getSpecificLineStroke() != null)
 			stroke = link.getColors().getSpecificLineStroke();
 
 		ug = ug.apply(stroke);
 		// double moveEndY = 0;
 
-		if (dotPath == null) {
-			Log.info("DotPath is null for " + this);
-			return;
-		}
 		DotPath todraw = dotPath;
 		if (link.getEntity2().isGroup() && link.getEntity2().getUSymbol() instanceof USymbolFolder) {
 			final Cluster endCluster = bibliotekon.getCluster((IGroup) link.getEntity2());
@@ -738,7 +742,7 @@ public class SvekLine implements Moveable, Hideable, GuideLine {
 			final Set<Point2D> bez = dotPath.sample();
 			Point2D minPt = null;
 			double minDist = Double.MAX_VALUE;
-			for (Point2D pt : square) {
+			for (Point2D pt : square)
 				for (Point2D pt2 : bez) {
 					final double distance = pt2.distance(pt);
 					if (minPt == null || distance < minDist) {
@@ -746,7 +750,7 @@ public class SvekLine implements Moveable, Hideable, GuideLine {
 						minDist = distance;
 					}
 				}
-			}
+
 			link.getLinkConstraint().setPosition(link, minPt);
 			link.getLinkConstraint().drawMe(ug, skinParam);
 		}
@@ -769,9 +773,9 @@ public class SvekLine implements Moveable, Hideable, GuideLine {
 
 	private String uniq(final Set<String> ids, final String comment) {
 		boolean changed = ids.add(comment);
-		if (changed) {
+		if (changed)
 			return comment;
-		}
+
 		int i = 1;
 		while (true) {
 			final String candidate = comment + "-" + i;

@@ -39,11 +39,8 @@ import java.awt.geom.Point2D;
 import java.util.Collection;
 import java.util.List;
 
-import net.sourceforge.plantuml.ColorParam;
 import net.sourceforge.plantuml.ISkinParam;
 import net.sourceforge.plantuml.LineParam;
-import net.sourceforge.plantuml.UmlDiagramType;
-import net.sourceforge.plantuml.UseStyle;
 import net.sourceforge.plantuml.cucadiagram.CucaDiagram;
 import net.sourceforge.plantuml.cucadiagram.Link;
 import net.sourceforge.plantuml.cucadiagram.LinkDecor;
@@ -113,21 +110,6 @@ public class ElkPath implements UDrawable {
 
 	}
 
-	private ColorParam getArrowColorParam() {
-		if (diagram.getUmlDiagramType() == UmlDiagramType.CLASS)
-			return ColorParam.arrow;
-		else if (diagram.getUmlDiagramType() == UmlDiagramType.OBJECT)
-			return ColorParam.arrow;
-		else if (diagram.getUmlDiagramType() == UmlDiagramType.DESCRIPTION)
-			return ColorParam.arrow;
-		else if (diagram.getUmlDiagramType() == UmlDiagramType.ACTIVITY)
-			return ColorParam.arrow;
-		else if (diagram.getUmlDiagramType() == UmlDiagramType.STATE)
-			return ColorParam.arrow;
-
-		throw new IllegalStateException();
-	}
-
 	private Style getStyle() {
 		final StyleSignatureBasic signature = StyleSignatureBasic.of(SName.root, SName.element, styleName, SName.arrow);
 		return signature.getMergedStyle(diagram.getCurrentStyleBuilder());
@@ -138,13 +120,10 @@ public class ElkPath implements UDrawable {
 		if (link.isHidden())
 			return;
 
-		HColor color;
 		final ISkinParam skinParam = diagram.getSkinParam();
 
-		if (UseStyle.useBetaStyle())
-			color = getStyle().value(PName.LineColor).asColor(skinParam.getThemeStyle(), skinParam.getIHtmlColorSet());
-		else
-			color = rose.getHtmlColor(skinParam, null, getArrowColorParam());
+		HColor color = getStyle().value(PName.LineColor).asColor(skinParam.getThemeStyle(),
+				skinParam.getIHtmlColorSet());
 
 		if (this.link.getColors() != null) {
 			final HColor newColor = this.link.getColors().getColor(ColorType.ARROW, ColorType.LINE);
