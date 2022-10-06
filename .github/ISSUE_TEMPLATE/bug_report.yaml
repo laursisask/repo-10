@@ -44,12 +44,16 @@ body:
     validations:
       required: false
 
-  - type: input
+  - type: dropdown
     id: smg-version
     attributes:
-      label: "SMG version or Matter hash"
-      description: "What Matter version are you using?"
-      placeholder: "ex: SMG v0.4.0, <hash>"
+      label: "SMG version"
+      description: "What Matter SMG version are you using?"
+      options:
+        - release_0.1.0
+        - release_0.2.0
+        - release_0.3.0
+        - release_0.4.0
     validations:
       required: true
 
