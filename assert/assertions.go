@@ -63,7 +63,7 @@ func ObjectsAreEqual(expected, actual interface{}) bool {
 
 	if exp, ok := expected.(proto.Message); ok {
 		if act, ok := actual.(proto.Message); ok {
-			return proto.Equal(expProto, actProto)
+			return proto.Equal(exp, act)
 		}
 	}
 
