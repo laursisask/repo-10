@@ -80,7 +80,26 @@ func ObjectsAreEqual(expected, actual interface{}) bool {
 	exp, ok := expected.([]byte)
 	if !ok {
 		if eq := reflect.DeepEqual(expected, actual); !eq {
-			return cmp.Equal(expected, actual, protocmp.Transform())
+			// 🚨HACK ALERT!🚨
+			// Sometimes folks pass arrays of Protobuf types or types with Protobufs
+			// embedded or structs with Protobufs as fields in them so they miss the type
+			// assertion checks above and they will definitely not pass the DeepEqual call
+			// we just attempted.
+			// In an attempt to allow for gomock to behave the same after a Protobuf v2
+			// upgrade, we need to also try with the `go-cmp` package along with the
+			// `protocmp` Option. UNFORTUNATELY, any struct that is _not_  Protobuf
+			// related will likely cause this check to panic 🙀. To get us moving forward
+			// but to also ensure our tests do not start panicing all over, we're tossing
+			// in a recover that will eat the panic, act like nothing happened and return
+			// false.
+			defer func() {
+				if r := recover(); r != nil {
+					fmt.Println("recovered from a panic forked testify package")
+				}
+				eq = false
+			}()
+			eq = cmp.Equal(expected, actual, protocmp.Transform())
+			return false
 		}
 		return true
 	}
