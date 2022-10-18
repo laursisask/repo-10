@@ -18,8 +18,9 @@ import (
 	"unicode/utf8"
 
 	"github.com/davecgh/go-spew/spew"
-	"github.com/golang/protobuf/proto"
+	oldproto "github.com/golang/protobuf/proto"
 	"github.com/pmezard/go-difflib/difflib"
+	"google.golang.org/protobuf/proto"
 	"gopkg.in/yaml.v3"
 )
 
@@ -61,9 +62,16 @@ func ObjectsAreEqual(expected, actual interface{}) bool {
 		return expected == actual
 	}
 
+	// check v2 protobufs
 	if exp, ok := expected.(proto.Message); ok {
 		if act, ok := actual.(proto.Message); ok {
 			return proto.Equal(exp, act)
+		}
+	}
+	// check v1 protobufs
+	if exp, ok := expected.(oldproto.Message); ok {
+		if act, ok := actual.(oldproto.Message); ok {
+			return oldproto.Equal(exp, act)
 		}
 	}
 
