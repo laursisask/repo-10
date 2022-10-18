@@ -7,6 +7,7 @@ go 1.17
 require (
 	github.com/davecgh/go-spew v1.1.1
 	github.com/golang/protobuf v1.5.0
+	github.com/google/go-cmp v0.5.9
 	github.com/pmezard/go-difflib v1.0.0
 	github.com/stretchr/objx v0.5.2
 	google.golang.org/protobuf v1.28.1

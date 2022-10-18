@@ -96,9 +96,29 @@ func ObjectsAreEqual(expected, actual interface{}) bool {
 				if r := recover(); r != nil {
 					fmt.Println("recovered from a panic forked testify package")
 				}
-				eq = false
 			}()
-			eq = cmp.Equal(expected, actual, protocmp.Transform())
+			var useProtoCmp bool
+			// check if this is a slice of protos
+			expValue := reflect.ValueOf(expected)
+			expIsSlice := expValue.Kind() == reflect.Slice
+			actValue := reflect.ValueOf(actual)
+			actIsSlice := actValue.Kind() == reflect.Slice
+			if actIsSlice && expIsSlice {
+				var firstValue interface{}
+				if expValue.Len() > 0 {
+					firstValue = expValue.Index(0).Interface()
+				} else if actValue.Len() > 0 {
+					firstValue = actValue.Index(0).Interface()
+				}
+				_, useProtoCmp = firstValue.(proto.Message)
+				if !useProtoCmp {
+					_, useProtoCmp = firstValue.(protov1.Message)
+				}
+			}
+			if useProtoCmp {
+				return cmp.Equal(expected, actual, protocmp.Transform())
+			}
+			// check if this is a
 			return false
 		}
 		return true
