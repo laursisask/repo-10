@@ -19,8 +19,10 @@ import (
 
 	"github.com/davecgh/go-spew/spew"
 	protov1 "github.com/golang/protobuf/proto"
+	"github.com/google/go-cmp/cmp"
 	"github.com/pmezard/go-difflib/difflib"
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/testing/protocmp"
 	"gopkg.in/yaml.v3"
 )
 
@@ -77,7 +79,10 @@ func ObjectsAreEqual(expected, actual interface{}) bool {
 
 	exp, ok := expected.([]byte)
 	if !ok {
-		return reflect.DeepEqual(expected, actual)
+		if eq := reflect.DeepEqual(expected, actual); !eq {
+			return cmp.Equal(expected, actual, protocmp.Transform())
+		}
+		return true
 	}
 
 	act, ok := actual.([]byte)
