@@ -83,10 +83,10 @@ func ObjectsAreEqual(expected, actual interface{}) (eq bool) {
 			defer func() {
 				if r := recover(); r != nil {
 					fmt.Println("recovered from a protov1 panic in DD's forked testify package. please consider using proto.Equal instead.")
-				}
-				if exp, ok := expected.(gogo.Message); ok {
-					if act, ok := actual.(gogo.Message); ok {
-						eq = gogo.Equal(exp, act)
+					if exp, ok := expected.(gogo.Message); ok {
+						if act, ok := actual.(gogo.Message); ok {
+							eq = gogo.Equal(exp, act)
+						}
 					}
 				}
 			}()
@@ -112,8 +112,8 @@ func ObjectsAreEqual(expected, actual interface{}) (eq bool) {
 			defer func() {
 				if r := recover(); r != nil {
 					fmt.Println("recovered from a cmp panic in DD's forked testify package. please consider using proto.Equal instead.")
+					eq = false
 				}
-				eq = false
 			}()
 			var useProtoCmp bool
 			// check if this is a slice of protos
