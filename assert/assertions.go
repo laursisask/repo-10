@@ -18,6 +18,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/davecgh/go-spew/spew"
+	gogo "github.com/gogo/protobuf/proto"
 	protov1 "github.com/golang/protobuf/proto"
 	"github.com/google/go-cmp/cmp"
 	"github.com/pmezard/go-difflib/difflib"
@@ -59,7 +60,7 @@ type Comparison func() (success bool)
 // ObjectsAreEqual determines if two objects are considered equal.
 //
 // This function does no assertion of any kind.
-func ObjectsAreEqual(expected, actual interface{}) bool {
+func ObjectsAreEqual(expected, actual interface{}) (eq bool) {
 	if expected == nil || actual == nil {
 		return expected == actual
 	}
@@ -73,13 +74,29 @@ func ObjectsAreEqual(expected, actual interface{}) bool {
 	// check v1 protobufs
 	if exp, ok := expected.(protov1.Message); ok {
 		if act, ok := actual.(protov1.Message); ok {
+			// 🚨HACK ALERT!🚨
+			// There's no way to detect that this was protov1 or gogo/protobuf as they
+			// share the same interface BUT the Equal func for protov1 will _panic_ if it
+			// encounters a gogo generated struct.
+			// If a panic occurs, this will recover and attempt to compare it as a gogo
+			// struct.
+			defer func() {
+				if r := recover(); r != nil {
+					fmt.Println("recovered from a protov1 panic in DD's forked testify package. please consider using proto.Equal instead.")
+				}
+				if exp, ok := expected.(gogo.Message); ok {
+					if act, ok := actual.(gogo.Message); ok {
+						eq = gogo.Equal(exp, act)
+					}
+				}
+			}()
 			return protov1.Equal(exp, act)
 		}
 	}
 
 	exp, ok := expected.([]byte)
 	if !ok {
-		if eq := reflect.DeepEqual(expected, actual); !eq {
+		if eq = reflect.DeepEqual(expected, actual); !eq {
 			// 🚨HACK ALERT!🚨
 			// Sometimes folks pass arrays of Protobuf types or types with Protobufs
 			// embedded or structs with Protobufs as fields in them so they miss the type
@@ -94,8 +111,9 @@ func ObjectsAreEqual(expected, actual interface{}) bool {
 			// false.
 			defer func() {
 				if r := recover(); r != nil {
-					fmt.Println("recovered from a panic forked testify package")
+					fmt.Println("recovered from a cmp panic in DD's forked testify package. please consider using proto.Equal instead.")
 				}
+				eq = false
 			}()
 			var useProtoCmp bool
 			// check if this is a slice of protos
