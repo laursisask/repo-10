@@ -20,11 +20,10 @@ import (
 	"github.com/davecgh/go-spew/spew"
 	gogo "github.com/gogo/protobuf/proto"
 	protov1 "github.com/golang/protobuf/proto"
-	"github.com/google/go-cmp/cmp"
 	"github.com/pmezard/go-difflib/difflib"
 	"google.golang.org/protobuf/proto"
-	"google.golang.org/protobuf/testing/protocmp"
 	"gopkg.in/yaml.v3"
+	yaml "gopkg.in/yaml.v3"
 )
 
 //go:generate sh -c "cd ../_codegen && go build && cd - && ../_codegen/_codegen -output-package=assert -template=assertion_format.go.tmpl"
@@ -115,28 +114,22 @@ func ObjectsAreEqual(expected, actual interface{}) (eq bool) {
 					eq = false
 				}
 			}()
-			var useProtoCmp bool
-			// check if this is a slice of protos
+			// check if this is a slice so we can call this for each element
+			// this ensures slices of protobufs are compared properly
 			expValue := reflect.ValueOf(expected)
 			expIsSlice := expValue.Kind() == reflect.Slice
 			actValue := reflect.ValueOf(actual)
 			actIsSlice := actValue.Kind() == reflect.Slice
-			if actIsSlice && expIsSlice {
-				var firstValue interface{}
-				if expValue.Len() > 0 {
-					firstValue = expValue.Index(0).Interface()
-				} else if actValue.Len() > 0 {
-					firstValue = actValue.Index(0).Interface()
-				}
-				_, useProtoCmp = firstValue.(proto.Message)
-				if !useProtoCmp {
-					_, useProtoCmp = firstValue.(protov1.Message)
+			if (actIsSlice && expIsSlice) &&
+				(expValue.Len() == actValue.Len()) {
+				for i := 0; i < expValue.Len(); i++ {
+					if !ObjectsAreEqual(
+						expValue.Index(i).Interface(),
+						actValue.Index(i).Interface()) {
+						return false
+					}
 				}
 			}
-			if useProtoCmp {
-				return cmp.Equal(expected, actual, protocmp.Transform())
-			}
-			// check if this is a
 			return false
 		}
 		return true
