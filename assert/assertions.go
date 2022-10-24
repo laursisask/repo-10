@@ -122,13 +122,22 @@ func ObjectsAreEqual(expected, actual interface{}) (eq bool) {
 			actIsSlice := actValue.Kind() == reflect.Slice
 			if (actIsSlice && expIsSlice) &&
 				(expValue.Len() == actValue.Len()) {
+				var brokeLoop bool
+			sliceLoop:
 				for i := 0; i < expValue.Len(); i++ {
+					switch expValue.Index(i).Kind() {
+					case reflect.Interface, reflect.Struct, reflect.Pointer:
+					default: // give up for anything not an interface struct or pointer
+						brokeLoop = true
+						break sliceLoop
+					}
 					if !ObjectsAreEqual(
 						expValue.Index(i).Interface(),
 						actValue.Index(i).Interface()) {
 						return false
 					}
 				}
+				return !brokeLoop
 			}
 			return false
 		}
