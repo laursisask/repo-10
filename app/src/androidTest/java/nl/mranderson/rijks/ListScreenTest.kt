@@ -9,7 +9,6 @@ import androidx.paging.PagingData
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.coroutines.flow.flowOf
 import nl.mranderson.rijks.ui.MainActivity
-import nl.mranderson.rijks.ui.list.ListInteraction
 import nl.mranderson.rijks.ui.list.ListScreen
 import nl.mranderson.rijks.ui.list.ListViewModel
 import nl.mranderson.rijks.ui.theme.RijksTheme
