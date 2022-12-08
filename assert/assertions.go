@@ -96,8 +96,12 @@ func ObjectsAreEqual(expected, actual interface{}) (eq bool) {
 	exp, ok := expected.([]byte)
 	if !ok {
 		if eq = reflect.DeepEqual(expected, actual); !eq {
-			// check if this is a slice so we can call this for each element
-			// this ensures slices of protobufs are compared properly
+			// 🚨HACK ALERT!🚨
+			// Sometimes folks pass _slices_ of protobufs to testify, which will get past
+			// our checks above and return false here.
+			// This sad hack checks if the passed arguments are slices. If so, it compares
+			// each item one by one to catch the protobuf check above.
+			// Definitely not great but we should track how many times this helps.
 			expValue := reflect.ValueOf(expected)
 			expIsSlice := expValue.Kind() == reflect.Slice
 			actValue := reflect.ValueOf(actual)
@@ -108,8 +112,10 @@ func ObjectsAreEqual(expected, actual interface{}) (eq bool) {
 			sliceLoop:
 				for i := 0; i < expValue.Len(); i++ {
 					switch expValue.Index(i).Kind() {
-					case reflect.Interface, reflect.Struct, reflect.Pointer:
-					default: // give up for anything not an interface, struct or pointer
+					case reflect.Pointer:
+						// give up for anything not a pointer
+						// (any slice of protobufs should be a slice of pointers)
+					default:
 						brokeLoop = true
 						break sliceLoop
 					}
