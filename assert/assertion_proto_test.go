@@ -7,7 +7,6 @@ import (
 )
 
 func TestProtoObjectsAreEqual(t *testing.T) {
-
 	tests := []struct {
 		name     string
 		givenExp interface{}
@@ -56,7 +55,7 @@ func TestProtoObjectsAreEqual(t *testing.T) {
 				{Field1: "hello"},
 			},
 
-			want: true,
+			want: false,
 		},
 		{
 			name:     "proto v1 structs",
@@ -86,7 +85,7 @@ func TestProtoObjectsAreEqual(t *testing.T) {
 				{Field1: "hello"},
 			},
 
-			want: true,
+			want: false,
 		},
 		{
 			name:     "proto gogo structs equal",
@@ -100,7 +99,7 @@ func TestProtoObjectsAreEqual(t *testing.T) {
 			givenExp: &testproto.MessageGoGo{Field1: "hi"},
 			givenAct: &testproto.MessageGoGo{Field1: "hello"},
 
-			want: true,
+			want: false,
 		},
 		{
 			name: "proto gogo struct slices equal",
@@ -117,19 +116,24 @@ func TestProtoObjectsAreEqual(t *testing.T) {
 			name: "proto gogo struct slices not equal",
 			givenExp: []*testproto.MessageGoGo{
 				{Field1: "hi"},
+				{Field1: "howdy"},
 			},
 			givenAct: []*testproto.MessageGoGo{
 				{Field1: "hi"},
 				{Field1: "hello"},
 			},
 
-			want: true,
+			want: false,
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-
+			got := ObjectsAreEqual(test.givenExp, test.givenAct)
+			if got != test.want {
+				t.Errorf("wanted %t, got %t.\n\nExpected:\n%#v\n\nActual:\n%#v\n",
+					test.want, got, test.givenExp, test.givenAct)
+			}
 		})
 	}
 
