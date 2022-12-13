@@ -18,8 +18,6 @@ import (
 	"unicode/utf8"
 
 	"github.com/davecgh/go-spew/spew"
-	gogo "github.com/gogo/protobuf/proto"
-	protov1 "github.com/golang/protobuf/proto"
 	"github.com/pmezard/go-difflib/difflib"
 	"google.golang.org/protobuf/proto"
 	"gopkg.in/yaml.v3"
@@ -68,28 +66,6 @@ func ObjectsAreEqual(expected, actual interface{}) (eq bool) {
 	if exp, ok := expected.(proto.Message); ok {
 		if act, ok := actual.(proto.Message); ok {
 			return proto.Equal(exp, act)
-		}
-	}
-	// check v1 protobufs
-	if exp, ok := expected.(protov1.Message); ok {
-		if act, ok := actual.(protov1.Message); ok {
-			// 🚨HACK ALERT!🚨
-			// There's no way to detect that this was protov1 or gogo/protobuf as they
-			// share the same interface BUT the Equal func for protov1 will _panic_ if it
-			// encounters a gogo generated struct.
-			// If a panic occurs, this will recover and attempt to compare it as a gogo
-			// struct.
-			defer func() {
-				if r := recover(); r != nil {
-					fmt.Println("recovered from a protov1 panic in DD's forked testify package. please consider using proto.Equal instead.")
-					if exp, ok := expected.(gogo.Message); ok {
-						if act, ok := actual.(gogo.Message); ok {
-							eq = gogo.Equal(exp, act)
-						}
-					}
-				}
-			}()
-			return protov1.Equal(exp, act)
 		}
 	}
 
