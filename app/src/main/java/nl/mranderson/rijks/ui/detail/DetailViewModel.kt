@@ -28,8 +28,8 @@ class DetailViewModel(
     }
 
     private fun fetchArtDetails() {
-        _state.value = Loading
         viewModelScope.launch {
+            _state.value = Loading
             getArtDetails(artId = artId).onSuccess {
                 _state.value = Data(artDetail = it)
             }.onFailure {

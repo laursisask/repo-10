@@ -19,6 +19,8 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -30,26 +32,35 @@ import nl.mranderson.rijks.ui.components.ArtImage
 import nl.mranderson.rijks.ui.components.Chips
 import nl.mranderson.rijks.ui.components.ErrorView
 import nl.mranderson.rijks.ui.components.LoadingView
+import nl.mranderson.rijks.ui.detail.DetailViewModel.ScreenState.Data
+import nl.mranderson.rijks.ui.detail.DetailViewModel.ScreenState.Error
+import nl.mranderson.rijks.ui.detail.DetailViewModel.ScreenState.Loading
+import org.koin.androidx.compose.getViewModel
+import org.koin.core.parameter.parametersOf
 
 @Composable
 fun DetailScreen(
-    state: DetailViewModel.ScreenState,
-    interaction: DetailInteraction
+    artId: String,
+    viewModel: DetailViewModel = getViewModel(parameters = { parametersOf(artId) }),
+    onBackClicked: () -> Unit
 ) {
-    when (state) {
-        is DetailViewModel.ScreenState.Data -> {
+    val detailState by viewModel.state.observeAsState()
+
+    when (val state = detailState) {
+        is Data -> {
             ArtDetail(state.artDetail) {
-                interaction.onBackClicked()
+                onBackClicked()
             }
         }
-        is DetailViewModel.ScreenState.Error -> {
+        is Error -> {
             ErrorView(message = stringResource(id = R.string.global_error_message)) {
-                interaction.onRetryClicked()
+                viewModel.onRetryClicked()
             }
         }
-        DetailViewModel.ScreenState.Loading -> {
+        is Loading -> {
             LoadingView()
         }
+        else -> Unit
     }
 }
 

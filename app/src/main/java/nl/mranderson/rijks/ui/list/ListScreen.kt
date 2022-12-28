@@ -26,10 +26,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
-import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
-import kotlinx.coroutines.flow.Flow
 import nl.mranderson.rijks.R
 import nl.mranderson.rijks.ui.components.ArtImage
 import nl.mranderson.rijks.ui.components.ErrorButton
@@ -38,13 +36,14 @@ import nl.mranderson.rijks.ui.components.LoadingView
 import nl.mranderson.rijks.ui.list.ListViewModel.ArtUIModel
 import nl.mranderson.rijks.ui.list.ListViewModel.ArtUIModel.ArtData
 import nl.mranderson.rijks.ui.list.ListViewModel.ArtUIModel.AuthorSeparator
+import org.koin.androidx.compose.getViewModel
 
 @Composable
 fun ListScreen(
-    artCollection: Flow<PagingData<ArtUIModel>>,
-    interaction: ListInteraction
+    listViewModel: ListViewModel = getViewModel(),
+    onArtClicked: (String) -> Unit
 ) {
-    val lazyArtCollection = artCollection.collectAsLazyPagingItems()
+    val lazyArtCollection = listViewModel.artCollectionFlow.collectAsLazyPagingItems()
 
     LazyColumn(contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)) {
         items(lazyArtCollection.itemCount) { index ->
@@ -55,7 +54,9 @@ fun ListScreen(
                     )
                     is ArtData -> ArtListItem(
                         art = art,
-                        onArtClicked = { id -> interaction.onCollectionClicked(id) })
+                        onArtClicked = { id ->
+                            onArtClicked(id)
+                        })
                 }
             }
         }

@@ -10,7 +10,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import nl.mranderson.rijks.domain.model.ArtDetails
 import nl.mranderson.rijks.ui.MainActivity
 import nl.mranderson.rijks.ui.components.LOADING_INDICATOR_TEST_TAG
-import nl.mranderson.rijks.ui.detail.DetailInteraction
 import nl.mranderson.rijks.ui.detail.DetailScreen
 import nl.mranderson.rijks.ui.detail.DetailViewModel
 import nl.mranderson.rijks.ui.detail.DetailViewModel.ScreenState.Error
