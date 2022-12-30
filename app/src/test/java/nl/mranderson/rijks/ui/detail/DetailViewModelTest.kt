@@ -1,6 +1,7 @@
 package nl.mranderson.rijks.ui.detail
 
 import androidx.lifecycle.Observer
+import androidx.lifecycle.SavedStateHandle
 import kotlinx.coroutines.test.runTest
 import nl.mranderson.rijks.InstantExecutorExtension
 import nl.mranderson.rijks.TestCoroutineExtension
@@ -10,6 +11,7 @@ import nl.mranderson.rijks.ui.detail.DetailViewModel.ScreenState
 import nl.mranderson.rijks.ui.detail.DetailViewModel.ScreenState.Data
 import nl.mranderson.rijks.ui.detail.DetailViewModel.ScreenState.Error
 import nl.mranderson.rijks.ui.detail.DetailViewModel.ScreenState.Loading
+import nl.mranderson.rijks.ui.navigation.Screens
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -29,16 +31,17 @@ class DetailViewModelTest {
     val coroutines = TestCoroutineExtension()
 
     private var getArtDetails: GetArtDetails = mock()
+    private var savedStateHandle: SavedStateHandle = mock()
     private val stateCallback: Observer<ScreenState> = mock()
 
     private fun viewModel() = DetailViewModel(
-        artId = "ID-001",
+        savedState = savedStateHandle,
         getArtDetails = getArtDetails
     )
 
     @BeforeEach
     fun setUp() {
-        getArtDetails = mock()
+        whenever(savedStateHandle.get<String>(Screens.Detail.arg)).thenReturn("AB-001")
     }
 
     @AfterEach

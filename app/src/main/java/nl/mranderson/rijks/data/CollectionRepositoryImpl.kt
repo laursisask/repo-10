@@ -3,12 +3,13 @@ package nl.mranderson.rijks.data
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
+import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import nl.mranderson.rijks.domain.CollectionRepository
 import nl.mranderson.rijks.domain.model.Art
 import nl.mranderson.rijks.domain.model.ArtDetails
 
-class CollectionRepositoryImpl(
+class CollectionRepositoryImpl @Inject constructor(
     private val collectionPagingSource: CollectionPagingSource,
     private val collectionRemoteDataSource: CollectionRemoteDataSource
 ) : CollectionRepository {

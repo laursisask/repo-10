@@ -25,6 +25,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -36,11 +37,10 @@ import nl.mranderson.rijks.ui.components.LoadingView
 import nl.mranderson.rijks.ui.list.ListViewModel.ArtUIModel
 import nl.mranderson.rijks.ui.list.ListViewModel.ArtUIModel.ArtData
 import nl.mranderson.rijks.ui.list.ListViewModel.ArtUIModel.AuthorSeparator
-import org.koin.androidx.compose.getViewModel
 
 @Composable
 fun ListScreen(
-    listViewModel: ListViewModel = getViewModel(),
+    listViewModel: ListViewModel = hiltViewModel(),
     onArtClicked: (String) -> Unit
 ) {
     val lazyArtCollection = listViewModel.artCollectionFlow.collectAsLazyPagingItems()

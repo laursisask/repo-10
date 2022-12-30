@@ -1,46 +1,39 @@
 package nl.mranderson.rijks
 
-import nl.mranderson.rijks.data.CollectionPagingSource
-import nl.mranderson.rijks.data.mapper.CollectionMapper
+import dagger.Binds
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
+import nl.mranderson.rijks.data.CollectionDataSource
 import nl.mranderson.rijks.data.CollectionRemoteDataSource
 import nl.mranderson.rijks.data.CollectionRepositoryImpl
 import nl.mranderson.rijks.data.mapper.ArtDetailsMapper
+import nl.mranderson.rijks.data.mapper.CollectionMapper
 import nl.mranderson.rijks.domain.CollectionRepository
-import nl.mranderson.rijks.domain.usecase.GetArtDetails
-import nl.mranderson.rijks.domain.usecase.GetCollection
-import nl.mranderson.rijks.ui.detail.DetailViewModel
-import nl.mranderson.rijks.ui.list.ListViewModel
-import org.koin.androidx.viewmodel.dsl.viewModel
-import org.koin.dsl.module
 
-val appModule = module {
+@Module
+@InstallIn(SingletonComponent::class)
+abstract class AppModule {
 
-    viewModel { ListViewModel(getCollection = get()) }
+    @Binds
+    abstract fun bindCollectionDataSource(
+        collectionRemoteDataSource: CollectionRemoteDataSource
+    ): CollectionDataSource
 
-    viewModel { (artId: String) -> DetailViewModel(artId = artId, getArtDetails = get()) }
+    @Binds
+    abstract fun bindCollectionRepository(
+        collectionRepositoryImpl: CollectionRepositoryImpl
+    ): CollectionRepository
 
-    factory { GetCollection(collectionRepository = get()) }
+    companion object {
 
-    factory { GetArtDetails(collectionRepository = get()) }
+        @Provides
+        fun provideArtMapper() = ArtDetailsMapper
 
-    factory {
-        CollectionRemoteDataSource(
-            collectionApiService = get(),
-            artDetailsMapper = ArtDetailsMapper
-        )
+        @Provides
+        fun provideCollectionMapper() =  CollectionMapper
+
     }
 
-    factory {
-        CollectionPagingSource(
-            collectionApiService = get(),
-            collectionMapper = CollectionMapper
-        )
-    }
-
-    factory<CollectionRepository> {
-        CollectionRepositoryImpl(
-            collectionPagingSource = get(),
-            collectionRemoteDataSource = get()
-        )
-    }
 }

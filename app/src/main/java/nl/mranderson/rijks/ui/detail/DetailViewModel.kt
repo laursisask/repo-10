@@ -2,17 +2,22 @@ package nl.mranderson.rijks.ui.detail
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.launch
 import nl.mranderson.rijks.domain.model.ArtDetails
 import nl.mranderson.rijks.domain.usecase.GetArtDetails
 import nl.mranderson.rijks.ui.detail.DetailViewModel.ScreenState.Data
 import nl.mranderson.rijks.ui.detail.DetailViewModel.ScreenState.Error
 import nl.mranderson.rijks.ui.detail.DetailViewModel.ScreenState.Loading
+import nl.mranderson.rijks.ui.navigation.Screens
 
-class DetailViewModel(
-    private val artId: String,
+@HiltViewModel
+class DetailViewModel @Inject constructor(
+    private val savedState: SavedStateHandle,
     val getArtDetails: GetArtDetails
 ) : ViewModel() {
 
@@ -30,9 +35,14 @@ class DetailViewModel(
     private fun fetchArtDetails() {
         viewModelScope.launch {
             _state.value = Loading
-            getArtDetails(artId = artId).onSuccess {
-                _state.value = Data(artDetail = it)
-            }.onFailure {
+            val artId : String? = savedState[Screens.Detail.arg]
+            if (artId != null) {
+                getArtDetails(artId = artId).onSuccess {
+                    _state.value = Data(artDetail = it)
+                }.onFailure {
+                    _state.value = Error
+                }
+            } else {
                 _state.value = Error
             }
         }

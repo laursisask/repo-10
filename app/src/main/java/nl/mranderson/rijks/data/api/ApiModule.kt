@@ -1,45 +1,63 @@
 package nl.mranderson.rijks.data.api
 
+import android.content.Context
 import com.chuckerteam.chucker.api.ChuckerInterceptor
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
 import java.util.concurrent.TimeUnit
 import kotlinx.serialization.json.Json
-import okhttp3.HttpUrl
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
-import org.koin.android.ext.koin.androidApplication
-import org.koin.dsl.module
 import retrofit2.Retrofit
 
-fun apiModule(baseUrl: HttpUrl) = module {
+@Module
+@InstallIn(SingletonComponent::class)
+object ApiModule {
 
-    single {
-        OkHttpClient.Builder()
+    @Provides
+    fun provideOkHttpClient(
+        chuckerInterceptor : ChuckerInterceptor
+    ): OkHttpClient {
+        return OkHttpClient.Builder()
             .connectTimeout(30, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
             .addInterceptor(AuthenticationInterceptor())
-            .addInterceptor(get<ChuckerInterceptor>())
+            .addInterceptor(chuckerInterceptor)
             .build()
     }
 
-    single {
+    @Provides
+    fun provideRetrofit(
+        okHttpClient: OkHttpClient
+    ): Retrofit {
         val format = Json {
             ignoreUnknownKeys = true
             coerceInputValues = true
         }
 
-        Retrofit.Builder()
-            .baseUrl(baseUrl)
-            .client(get())
+        return Retrofit.Builder()
+            .baseUrl("https://www.rijksmuseum.nl/")
+            .client(okHttpClient)
             .addConverterFactory(format.asConverterFactory("application/json".toMediaType()))
             .build()
     }
 
-    single {
-        ChuckerInterceptor.Builder(androidApplication())
-            .build()
+    @Provides
+    fun provideChuckerInterceptor(
+        @ApplicationContext appContext: Context
+    ): ChuckerInterceptor {
+        return ChuckerInterceptor.Builder(context = appContext).build()
     }
 
-    single { get<Retrofit>(Retrofit::class).create(CollectionApiService::class.java) }
+    @Provides
+    fun provideCollectionApiService(
+        retrofit: Retrofit
+    ): CollectionApiService {
+        return retrofit.create(CollectionApiService::class.java)
+    }
 
 }
