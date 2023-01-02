@@ -1,4 +1,4 @@
-package nl.mranderson.rijks.data.api
+package nl.mranderson.rijks.data.di
 
 import android.content.Context
 import com.chuckerteam.chucker.api.ChuckerInterceptor
@@ -10,13 +10,15 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import java.util.concurrent.TimeUnit
 import kotlinx.serialization.json.Json
+import nl.mranderson.rijks.data.api.AuthenticationInterceptor
+import nl.mranderson.rijks.data.api.CollectionApiService
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 
 @Module
 @InstallIn(SingletonComponent::class)
-object ApiModule {
+class NetworkModule {
 
     @Provides
     fun provideOkHttpClient(

@@ -1,4 +1,4 @@
-package nl.mranderson.rijks
+package nl.mranderson.rijks.data.di
 
 import dagger.Binds
 import dagger.Module
@@ -14,7 +14,7 @@ import nl.mranderson.rijks.domain.CollectionRepository
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class AppModule {
+interface DataModule {
 
     @Binds
     abstract fun bindCollectionDataSource(
@@ -27,13 +27,11 @@ abstract class AppModule {
     ): CollectionRepository
 
     companion object {
-
         @Provides
         fun provideArtMapper() = ArtDetailsMapper
 
         @Provides
-        fun provideCollectionMapper() =  CollectionMapper
-
+        fun provideCollectionMapper() = CollectionMapper
     }
 
 }
