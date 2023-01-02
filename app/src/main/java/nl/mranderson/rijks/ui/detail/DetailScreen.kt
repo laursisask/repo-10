@@ -26,6 +26,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import nl.mranderson.rijks.R
 import nl.mranderson.rijks.domain.model.ArtDetails
 import nl.mranderson.rijks.ui.components.ArtImage
@@ -35,13 +36,10 @@ import nl.mranderson.rijks.ui.components.LoadingView
 import nl.mranderson.rijks.ui.detail.DetailViewModel.ScreenState.Data
 import nl.mranderson.rijks.ui.detail.DetailViewModel.ScreenState.Error
 import nl.mranderson.rijks.ui.detail.DetailViewModel.ScreenState.Loading
-import org.koin.androidx.compose.getViewModel
-import org.koin.core.parameter.parametersOf
 
 @Composable
 fun DetailScreen(
-    artId: String,
-    viewModel: DetailViewModel = getViewModel(parameters = { parametersOf(artId) }),
+    viewModel: DetailViewModel = hiltViewModel(),
     onBackClicked: () -> Unit
 ) {
     val detailState by viewModel.state.observeAsState()

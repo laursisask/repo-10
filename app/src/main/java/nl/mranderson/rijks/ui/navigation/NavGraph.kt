@@ -19,8 +19,8 @@ fun NavGraph (navController: NavHostController){
             })
         }
         composable(route = "${Screens.Detail.route}/{${Screens.Detail.arg}}") { backStackEntry ->
-            backStackEntry.arguments?.getString(Screens.Detail.arg)?.let { artId ->
-                DetailScreen(artId = artId, onBackClicked = {
+            backStackEntry.arguments?.getString(Screens.Detail.arg)?.let {
+                DetailScreen(onBackClicked = {
                     navController.popBackStack()
                 })
             }

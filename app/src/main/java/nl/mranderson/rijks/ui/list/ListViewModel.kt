@@ -5,11 +5,14 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import androidx.paging.insertSeparators
 import androidx.paging.map
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.map
 import nl.mranderson.rijks.domain.usecase.GetCollection
 import nl.mranderson.rijks.ui.list.ListViewModel.ArtUIModel.AuthorSeparator
 
-class ListViewModel(
+@HiltViewModel
+class ListViewModel @Inject constructor(
     getCollection: GetCollection
 ) : ViewModel() {
 
