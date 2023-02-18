@@ -23,6 +23,7 @@ const {
 const runAction = async (octokit, context, parameters) => {
     const {
         assignees = [],
+        unassignees = [],
         teams = [],
         numOfAssignee = 0,
         abortIfPreviousAssignees = false,
@@ -85,6 +86,9 @@ const runAction = async (octokit, context, parameters) => {
         if (!isIssue) {
             await removeAllReviewers(octokit, owner, repo, issueNumber);
         }
+    } else if (unassignees.length > 0) {
+        const assigneesToRemove = curAssignees.filter((assignee) => unassignees.includes(assignee));
+        await removeAssignees(octokit, owner, repo, issueNumber, assigneesToRemove);
     }
 
     // Get new issue assignees

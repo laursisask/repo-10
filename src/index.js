@@ -32,6 +32,9 @@ try {
         'removePreviousAssignees',
         { required: false }
     );
+    const unassignees = parseCsvInput(
+        core.getInput('unassignees', { required: false })
+    );
     const allowNoAssignees = core.getBooleanInput('allowNoAssignees', {
         required: false
     });
@@ -48,6 +51,7 @@ try {
     // Run action
     runAction(octokit, contextPayload, {
         assignees,
+        unassignees,
         teams,
         numOfAssignee,
         abortIfPreviousAssignees,
