@@ -83,12 +83,14 @@ const runAction = async (octokit, context, parameters) => {
         }
     } else if (unassignees.length > 0) {
         const assigneesToRemove = curAssignees.filter((assignee) => unassignees.includes(assignee));
-        await removeAssignees(octokit, owner, repo, issueNumber, assigneesToRemove);
+        if (assigneesToRemove && assigneesToRemove.length > 0) {
+            await removeAssignees(octokit, owner, repo, issueNumber, assigneesToRemove);
+        }
     }
 
     // Check assignees and teams parameters
     if (assignees.length > 0 || teams.length > 0) {
-        
+
         // Get new issue assignees
         let newAssignees = assignees;
 
