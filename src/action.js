@@ -32,12 +32,7 @@ const runAction = async (octokit, context, parameters) => {
         allowSelfAssign = true
     } = parameters;
 
-    // Check assignees and teams parameters
-    if (assignees.length === 0 && teams.length === 0) {
-        throw new Error(
-            'Missing required parameters: you must provide assignees or teams'
-        );
-    }
+
 
     // Get context info
     let issueNumber =
@@ -91,70 +86,74 @@ const runAction = async (octokit, context, parameters) => {
         await removeAssignees(octokit, owner, repo, issueNumber, assigneesToRemove);
     }
 
-    // Get new issue assignees
-    let newAssignees = assignees;
+    // Check assignees and teams parameters
+    if (assignees.length > 0 || teams.length > 0) {
+        
+        // Get new issue assignees
+        let newAssignees = assignees;
 
-    // Get assignee team members
-    if (teams.length > 0) {
-        const teamMembers = await getTeamMembers(octokit, owner, teams);
-        newAssignees = newAssignees.concat(teamMembers);
-    }
-
-    // Remove duplicates from assignees
-    newAssignees = [...new Set(newAssignees)];
-
-    // Remove author if allowSelfAssign is false
-    if (!allowSelfAssign) {
-        const foundIndex = newAssignees.indexOf(author);
-        if (foundIndex !== -1) {
-            newAssignees.splice(foundIndex, 1);
-        }
-    }
-
-    // Check if there are assignees left
-    if (newAssignees.length > 0) {
-        // Select random assignees
-        if (numOfAssignee) {
-            newAssignees = pickNRandomFromArray(newAssignees, numOfAssignee);
+        // Get assignee team members
+        if (teams.length > 0) {
+            const teamMembers = await getTeamMembers(octokit, owner, teams);
+            newAssignees = newAssignees.concat(teamMembers);
         }
 
-        // Assign issue
-        console.log(
-            `Setting assignees for ${
-                isIssue ? 'issue' : 'PR'
-            } ${issueNumber}: ${JSON.stringify(newAssignees)}`
-        );
-        await octokit.rest.issues.addAssignees({
-            owner,
-            repo,
-            issue_number: issueNumber,
-            assignees: newAssignees
-        });
-    } else if (!allowNoAssignees) {
-        throw new Error('No candidates found for assignment');
-    }
+        // Remove duplicates from assignees
+        newAssignees = [...new Set(newAssignees)];
 
-    // Assign PR reviewers
-    if (!isIssue) {
-        // Remove author from reviewers
-        const newReviewers = [...newAssignees];
-        const foundIndex = newReviewers.indexOf(author);
-        if (foundIndex !== -1) {
-            newReviewers.splice(foundIndex, 1);
+        // Remove author if allowSelfAssign is false
+        if (!allowSelfAssign) {
+            const foundIndex = newAssignees.indexOf(author);
+            if (foundIndex !== -1) {
+                newAssignees.splice(foundIndex, 1);
+            }
         }
 
-        if (newReviewers.length > 0) {
+        // Check if there are assignees left
+        if (newAssignees.length > 0) {
+            // Select random assignees
+            if (numOfAssignee) {
+                newAssignees = pickNRandomFromArray(newAssignees, numOfAssignee);
+            }
+
+            // Assign issue
             console.log(
-                `Setting reviewers for PR ${issueNumber}: ${JSON.stringify(
-                    newReviewers
-                )}`
+                `Setting assignees for ${
+                    isIssue ? 'issue' : 'PR'
+                } ${issueNumber}: ${JSON.stringify(newAssignees)}`
             );
-            await octokit.rest.pulls.requestReviewers({
+            await octokit.rest.issues.addAssignees({
                 owner,
                 repo,
-                pull_number: issueNumber,
-                reviewers: newReviewers
+                issue_number: issueNumber,
+                assignees: newAssignees
             });
+        } else if (!allowNoAssignees) {
+            throw new Error('No candidates found for assignment');
+        }
+
+        // Assign PR reviewers
+        if (!isIssue) {
+            // Remove author from reviewers
+            const newReviewers = [...newAssignees];
+            const foundIndex = newReviewers.indexOf(author);
+            if (foundIndex !== -1) {
+                newReviewers.splice(foundIndex, 1);
+            }
+
+            if (newReviewers.length > 0) {
+                console.log(
+                    `Setting reviewers for PR ${issueNumber}: ${JSON.stringify(
+                        newReviewers
+                    )}`
+                );
+                await octokit.rest.pulls.requestReviewers({
+                    owner,
+                    repo,
+                    pull_number: issueNumber,
+                    reviewers: newReviewers
+                });
+            }
         }
     }
 };

@@ -5,13 +5,13 @@ inputs:
         description: 'The GITHUB_TOKEN, needed to update the Issue'
         default: ${{ github.token }}
     assignees:
-        description: 'Comma separated list of user names to be assigned. Required if teams is not specified.'
+        description: 'Comma separated list of user names to be assigned.'
         required: false
     unassignees:
         description: 'Comma separated list of user names to be unassigned.'
         required: false
     teams:
-        description: 'Comma separated list of team names. Required if assignees is not specified.'
+        description: 'Comma separated list of team names.'
         required: false
     numOfAssignee:
         description: 'Number of random assignee'
