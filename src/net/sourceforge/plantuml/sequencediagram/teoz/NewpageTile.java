@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
  * 
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  * 
  * This file is part of PlantUML.
  *
@@ -35,10 +35,10 @@
  */
 package net.sourceforge.plantuml.sequencediagram.teoz;
 
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
 import net.sourceforge.plantuml.real.Real;
 import net.sourceforge.plantuml.sequencediagram.Event;
 import net.sourceforge.plantuml.sequencediagram.Newpage;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
 
 public class NewpageTile extends AbstractTile {
 
@@ -50,8 +50,8 @@ public class NewpageTile extends AbstractTile {
 		return 0;
 	}
 
-	public NewpageTile(Newpage newpage, TileArguments tileArguments) {
-		super(tileArguments.getStringBounder());
+	public NewpageTile(Newpage newpage, TileArguments tileArguments, YGauge currentY) {
+		super(tileArguments.getStringBounder(), currentY);
 		this.newpage = newpage;
 		this.tileArguments = tileArguments;
 	}
@@ -67,11 +67,11 @@ public class NewpageTile extends AbstractTile {
 	}
 
 	public Real getMinX() {
-		return tileArguments.getOrigin();
+		return tileArguments.getXOrigin();
 	}
 
 	public Real getMaxX() {
-		return tileArguments.getOrigin();
+		return tileArguments.getXOrigin();
 	}
 
 	public Event getEvent() {

@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -44,9 +47,10 @@ import ext.plantuml.com.google.zxing.client.j2se.MatrixToImageWriter;
 import ext.plantuml.com.google.zxing.common.BitMatrix;
 import ext.plantuml.com.google.zxing.qrcode.QRCodeWriter;
 import ext.plantuml.com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
-import net.sourceforge.plantuml.Log;
+import net.sourceforge.plantuml.utils.Log;
 
 public class FlashCodeUtilsZxing implements FlashCodeUtils {
+    // ::remove file when __MIT__
 
 	private static final Lock lock = new ReentrantLock();
 

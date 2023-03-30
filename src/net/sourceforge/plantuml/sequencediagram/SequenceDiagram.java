@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -45,30 +48,31 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.Stack;
 
-import net.sourceforge.plantuml.ColorParam;
+import net.atmp.ImageBuilder;
 import net.sourceforge.plantuml.FileFormat;
 import net.sourceforge.plantuml.FileFormatOption;
-import net.sourceforge.plantuml.ISkinSimple;
 import net.sourceforge.plantuml.OptionFlags;
 import net.sourceforge.plantuml.UmlDiagram;
-import net.sourceforge.plantuml.UmlDiagramType;
-import net.sourceforge.plantuml.api.ThemeStyle;
+import net.sourceforge.plantuml.abel.EntityPortion;
 import net.sourceforge.plantuml.command.CommandExecutionResult;
 import net.sourceforge.plantuml.core.DiagramDescription;
 import net.sourceforge.plantuml.core.ImageData;
 import net.sourceforge.plantuml.core.UmlSource;
-import net.sourceforge.plantuml.cucadiagram.Display;
-import net.sourceforge.plantuml.cucadiagram.EntityPortion;
-import net.sourceforge.plantuml.cucadiagram.Stereotype;
-import net.sourceforge.plantuml.graphic.SymbolContext;
+import net.sourceforge.plantuml.klimt.Fashion;
+import net.sourceforge.plantuml.klimt.color.HColor;
+import net.sourceforge.plantuml.klimt.creole.Display;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.shape.TextBlock;
+import net.sourceforge.plantuml.log.Logme;
 import net.sourceforge.plantuml.sequencediagram.graphic.FileMaker;
 import net.sourceforge.plantuml.sequencediagram.graphic.SequenceDiagramFileMakerPuma2;
 import net.sourceforge.plantuml.sequencediagram.graphic.SequenceDiagramTxtMaker;
 import net.sourceforge.plantuml.sequencediagram.teoz.SequenceDiagramFileMakerTeoz;
+import net.sourceforge.plantuml.skin.ColorParam;
+import net.sourceforge.plantuml.skin.UmlDiagramType;
 import net.sourceforge.plantuml.skin.rose.Rose;
+import net.sourceforge.plantuml.stereo.Stereotype;
 import net.sourceforge.plantuml.style.ClockwiseTopRightBottomLeft;
-import net.sourceforge.plantuml.ugraphic.ImageBuilder;
-import net.sourceforge.plantuml.ugraphic.color.HColor;
 import net.sourceforge.plantuml.xmi.SequenceDiagramXmiMaker;
 
 public class SequenceDiagram extends UmlDiagram {
@@ -91,8 +95,8 @@ public class SequenceDiagram extends UmlDiagram {
 
 	private final Rose skin2 = new Rose();
 
-	public SequenceDiagram(ThemeStyle style, UmlSource source, ISkinSimple skinParam) {
-		super(style, source, UmlDiagramType.SEQUENCE, skinParam);
+	public SequenceDiagram(UmlSource source, Map<String, String> skinParam) {
+		super(source, UmlDiagramType.SEQUENCE, skinParam);
 	}
 
 	@Deprecated
@@ -158,7 +162,7 @@ public class SequenceDiagram extends UmlDiagram {
 		return participantsget(code) != null;
 	}
 
-	public String addMessage(AbstractMessage m) {
+	public CommandExecutionResult addMessage(AbstractMessage m) {
 		if (m.isParallel())
 			m.setParallelBrother(getLastAbstractMessage());
 
@@ -167,12 +171,13 @@ public class SequenceDiagram extends UmlDiagram {
 		events.add(m);
 		if (pendingCreate != null) {
 			if (m.compatibleForCreate(pendingCreate.getParticipant()) == false)
-				return "After create command, you have to send a message to \"" + pendingCreate.getParticipant() + "\"";
+				return CommandExecutionResult.error("After create command, you have to send a message to \""
+						+ pendingCreate.getParticipant() + "\"");
 
 			m.addLifeEvent(pendingCreate);
 			pendingCreate = null;
 		}
-		return null;
+		return CommandExecutionResult.ok();
 	}
 
 	private AbstractMessage getLastAbstractMessage() {
@@ -250,12 +255,13 @@ public class SequenceDiagram extends UmlDiagram {
 	private FileMaker getSequenceDiagramPngMaker(int index, FileFormatOption fileFormatOption) {
 
 		final FileFormat fileFormat = fileFormatOption.getFileFormat();
-
+		// ::comment when __CORE__
 		if (fileFormat == FileFormat.ATXT || fileFormat == FileFormat.UTXT)
 			return new SequenceDiagramTxtMaker(this, fileFormat);
 
 		if (fileFormat.name().startsWith("XMI"))
 			return new SequenceDiagramXmiMaker(this, fileFormat);
+		// ::done
 
 		if (modeTeoz())
 			return new SequenceDiagramFileMakerTeoz(this, skin2, fileFormatOption, index);
@@ -279,6 +285,17 @@ public class SequenceDiagram extends UmlDiagram {
 		return sequenceDiagramPngMaker.createOne(os, index, fileFormat.isWithMetadata());
 	}
 
+	@Override
+	final public void exportDiagramGraphic(UGraphic ug) {
+		final FileMaker sequenceDiagramPngMaker = getSequenceDiagramPngMaker(0, new FileFormatOption(FileFormat.PNG));
+		sequenceDiagramPngMaker.createOneGraphic(ug);
+	}
+
+	@Override
+	final protected TextBlock getTextBlock() {
+		throw new UnsupportedOperationException();
+	}
+
 	// support for CommandReturn
 	private final Stack<AbstractMessage> activationState = new Stack<>();
 
@@ -299,7 +316,7 @@ public class SequenceDiagram extends UmlDiagram {
 		if (lastDelay != null)
 			return "You cannot Activate/Deactivate just after a ...";
 
-		final LifeEvent lifeEvent = new LifeEvent(p, lifeEventType, new SymbolContext(backcolor, linecolor));
+		final LifeEvent lifeEvent = new LifeEvent(p, lifeEventType, new Fashion(backcolor, linecolor));
 		events.add(lifeEvent);
 		if (lifeEventType == LifeEventType.CREATE) {
 			pendingCreate = lifeEvent;
@@ -307,7 +324,7 @@ public class SequenceDiagram extends UmlDiagram {
 		}
 		if (lastEventWithDeactivate == null) {
 			if (lifeEventType == LifeEventType.ACTIVATE) {
-				p.incInitialLife(new SymbolContext(backcolor, linecolor));
+				p.incInitialLife(new Fashion(backcolor, linecolor));
 				return null;
 			}
 			if (p.getInitialLife() == 0)
@@ -437,13 +454,17 @@ public class SequenceDiagram extends UmlDiagram {
 
 	@Override
 	public int getNbImages() {
+		// ::comment when __CORE__
 		try {
 			// The DEBUG StringBounder is ok just to compute the number of pages here.
 			return getSequenceDiagramPngMaker(1, new FileFormatOption(FileFormat.DEBUG)).getNbPages();
 		} catch (Throwable t) {
-			t.printStackTrace();
+			Logme.error(t);
+			// ::done
 			return 1;
+			// ::comment when __CORE__
 		}
+		// ::done
 	}
 
 	public void removeHiddenParticipants() {

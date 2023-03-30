@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -94,12 +97,12 @@ class RealLine {
 				for (AbstractReal real : all) {
 					final double v = real.getCurrentValue();
 					// System.err.println("RealLine::compile v=" + v);
-					if (v > max) {
+					if (v > max)
 						max = v;
-					}
-					if (v < min) {
+
+					if (v < min)
 						min = v;
-					}
+
 				}
 				// System.err.println("RealLine::compile min=" + min + " max=" + max);
 				return;
@@ -114,12 +117,12 @@ class RealLine {
 	}
 
 	private void printCounter(Map<PositiveForce, Integer> counter) {
-		for (PositiveForce f : forces) {
+		for (PositiveForce f : forces)
 			System.err.println("force=" + f);
-		}
-		for (Map.Entry<PositiveForce, Integer> ent : counter.entrySet()) {
+
+		for (Map.Entry<PositiveForce, Integer> ent : counter.entrySet())
 			System.err.println("count=" + ent.getValue() + " for " + ent.getKey());
-		}
+
 	}
 
 	private static void incCounter(Map<PositiveForce, Integer> counter, PositiveForce f) {

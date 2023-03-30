@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,35 +35,35 @@
  */
 package net.sourceforge.plantuml.posimo;
 
-import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
+import net.sourceforge.plantuml.klimt.geom.XLine2D;
+import net.sourceforge.plantuml.klimt.geom.XPoint2D;
+import net.sourceforge.plantuml.klimt.geom.XRectangle2D;
 
 public class LineRectIntersection {
 
-	private final Point2D inter;
+	private final XPoint2D inter;
 
-	public LineRectIntersection(Line2D line, Rectangle2D rect) {
-		final Point2D p1 = new Point2D.Double(rect.getMinX(), rect.getMinY());
-		final Point2D p2 = new Point2D.Double(rect.getMaxX(), rect.getMinY());
-		final Point2D p3 = new Point2D.Double(rect.getMaxX(), rect.getMaxY());
-		final Point2D p4 = new Point2D.Double(rect.getMinX(), rect.getMaxY());
+	public LineRectIntersection(XLine2D line, XRectangle2D rect) {
+		final XPoint2D p1 = new XPoint2D(rect.getMinX(), rect.getMinY());
+		final XPoint2D p2 = new XPoint2D(rect.getMaxX(), rect.getMinY());
+		final XPoint2D p3 = new XPoint2D(rect.getMaxX(), rect.getMaxY());
+		final XPoint2D p4 = new XPoint2D(rect.getMinX(), rect.getMaxY());
 
-		final Point2D inter1 = new LineSegmentIntersection(new Line2D.Double(p1, p2), line).getIntersection();
-		final Point2D inter2 = new LineSegmentIntersection(new Line2D.Double(p2, p3), line).getIntersection();
-		final Point2D inter3 = new LineSegmentIntersection(new Line2D.Double(p3, p4), line).getIntersection();
-		final Point2D inter4 = new LineSegmentIntersection(new Line2D.Double(p4, p1), line).getIntersection();
+		final XPoint2D inter1 = new LineSegmentIntersection(XLine2D.line(p1, p2), line).getIntersection();
+		final XPoint2D inter2 = new LineSegmentIntersection(XLine2D.line(p2, p3), line).getIntersection();
+		final XPoint2D inter3 = new LineSegmentIntersection(XLine2D.line(p3, p4), line).getIntersection();
+		final XPoint2D inter4 = new LineSegmentIntersection(XLine2D.line(p4, p1), line).getIntersection();
 
-		final Point2D o = line.getP1();
+		final XPoint2D o = line.getP1();
 		inter = getCloser(o, inter1, inter2, inter3, inter4);
 
 	}
 
-	public static Point2D getCloser(final Point2D o, final Point2D... other) {
+	public static XPoint2D getCloser(final XPoint2D o, final XPoint2D... other) {
 		double minDist = Double.MAX_VALUE;
-		Point2D result = null;
+		XPoint2D result = null;
 
-		for (Point2D pt : other) {
+		for (XPoint2D pt : other)
 			if (pt != null) {
 				final double dist = pt.distanceSq(o);
 				if (dist < minDist) {
@@ -68,12 +71,11 @@ public class LineRectIntersection {
 					result = pt;
 				}
 			}
-		}
 
 		return result;
 	}
 
-	public final Point2D getIntersection() {
+	public final XPoint2D getIntersection() {
 		return inter;
 	}
 

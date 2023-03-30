@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -37,14 +40,17 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sourceforge.plantuml.AFile;
-import net.sourceforge.plantuml.AFileRegular;
-import net.sourceforge.plantuml.AFileZipEntry;
-import net.sourceforge.plantuml.AParentFolder;
-import net.sourceforge.plantuml.Log;
 import net.sourceforge.plantuml.OptionFlags;
+import net.sourceforge.plantuml.file.AFile;
+import net.sourceforge.plantuml.file.AFileRegular;
+import net.sourceforge.plantuml.file.AFileZipEntry;
+import net.sourceforge.plantuml.file.AParentFolder;
 import net.sourceforge.plantuml.security.SFile;
 import net.sourceforge.plantuml.security.SecurityUtils;
+import net.sourceforge.plantuml.utils.Log;
+// ::uncomment when __CORE__
+//import java.util.Collections;
+//  ::done
 
 public class ImportedFiles {
 
@@ -104,13 +110,20 @@ public class ImportedFiles {
 
 	public List<SFile> getPath() {
 		final List<SFile> result = new ArrayList<>(imported);
+		// ::comment when __CORE__
 		result.addAll(includePath());
 		result.addAll(SecurityUtils.getPath(SecurityUtils.PATHS_CLASSES));
+		// ::done
 		return result;
 	}
 
 	private List<SFile> includePath() {
+		// ::comment when __CORE__
 		return SecurityUtils.getPath(SecurityUtils.PATHS_INCLUDES);
+		// ::done
+		// ::uncomment when __CORE__
+		// return Collections.emptyList();
+		// ::done
 	}
 
 	private boolean isAbsolute(String nameOrPath) {
@@ -137,24 +150,26 @@ public class ImportedFiles {
 			file = getAFile(filename.substring(0, idx));
 			entry = filename.substring(idx + 1);
 		}
-		if (isAllowed(file) == false) {
+		if (isAllowed(file) == false)
 			return FileWithSuffix.none();
-		}
+
 		return new FileWithSuffix(filename, suffix, file, entry);
 	}
 
 	private boolean isAllowed(AFile file) throws IOException {
-		if (OptionFlags.ALLOW_INCLUDE) {
+		// ::comment when __CORE__
+		if (OptionFlags.ALLOW_INCLUDE)
 			return true;
-		}
+
 		if (file != null) {
 			final SFile folder = file.getSystemFolder();
 			// System.err.println("canonicalPath=" + path + " " + folder + " " +
 			// INCLUDE_PATH);
-			if (includePath().contains(folder)) {
+			if (includePath().contains(folder))
 				return true;
-			}
+
 		}
+		// ::done
 		return false;
 	}
 

@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,10 +35,10 @@
  */
 package net.sourceforge.plantuml.sequencediagram.teoz;
 
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
-
-import net.sourceforge.plantuml.ISkinParam;
-import net.sourceforge.plantuml.graphic.StringBounder;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
 import net.sourceforge.plantuml.real.Real;
 import net.sourceforge.plantuml.sequencediagram.Divider;
 import net.sourceforge.plantuml.sequencediagram.Event;
@@ -44,28 +47,34 @@ import net.sourceforge.plantuml.skin.Component;
 import net.sourceforge.plantuml.skin.ComponentType;
 import net.sourceforge.plantuml.skin.Context2D;
 import net.sourceforge.plantuml.skin.rose.Rose;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
+import net.sourceforge.plantuml.style.ISkinParam;
 
 public class DividerTile extends AbstractTile implements Tile {
 
 	private final Rose skin;
 	private final ISkinParam skinParam;
 	private final Divider divider;
-	private final Real origin;
+	private final Real xorigin;
 	private final TileArguments tileArguments;
+	private final YGauge yGauge;
 
 	public Event getEvent() {
 		return divider;
 	}
 
-	public DividerTile(Divider divider, TileArguments tileArguments) {
-		super(tileArguments.getStringBounder());
+	public DividerTile(Divider divider, TileArguments tileArguments, YGauge currentY) {
+		super(tileArguments.getStringBounder(), currentY);
 		this.tileArguments = tileArguments;
 		this.divider = divider;
 		this.skin = tileArguments.getSkin();
 		this.skinParam = tileArguments.getSkinParam();
-		this.origin = tileArguments.getOrigin();
+		this.xorigin = tileArguments.getXOrigin();
+		this.yGauge = YGauge.create(currentY.getMax(), getPreferredHeight());
+	}
+
+	@Override
+	public YGauge getYGauge() {
+		return yGauge;
 	}
 
 	private Component getComponent(StringBounder stringBounder) {
@@ -77,9 +86,9 @@ public class DividerTile extends AbstractTile implements Tile {
 	public void drawU(UGraphic ug) {
 		final StringBounder stringBounder = ug.getStringBounder();
 		final Component comp = getComponent(stringBounder);
-		final Dimension2D dim = comp.getPreferredDimension(stringBounder);
-		final Area area = Area.create(tileArguments.getBorder2() - tileArguments.getBorder1() - origin.getCurrentValue(),
-				dim.getHeight());
+		final XDimension2D dim = comp.getPreferredDimension(stringBounder);
+		final Area area = Area.create(
+				tileArguments.getBorder2() - tileArguments.getBorder1() - xorigin.getCurrentValue(), dim.getHeight());
 
 		ug = ug.apply(UTranslate.dx(tileArguments.getBorder1()));
 		comp.drawU(ug, area, (Context2D) ug);
@@ -87,7 +96,7 @@ public class DividerTile extends AbstractTile implements Tile {
 
 	public double getPreferredHeight() {
 		final Component comp = getComponent(getStringBounder());
-		final Dimension2D dim = comp.getPreferredDimension(getStringBounder());
+		final XDimension2D dim = comp.getPreferredDimension(getStringBounder());
 		return dim.getHeight();
 	}
 
@@ -98,13 +107,13 @@ public class DividerTile extends AbstractTile implements Tile {
 	}
 
 	public Real getMinX() {
-		return origin;
+		return xorigin;
 	}
 
 	public Real getMaxX() {
 		final Component comp = getComponent(getStringBounder());
-		final Dimension2D dim = comp.getPreferredDimension(getStringBounder());
-		return origin.addFixed(dim.getWidth());
+		final XDimension2D dim = comp.getPreferredDimension(getStringBounder());
+		return xorigin.addFixed(dim.getWidth());
 	}
 
 }

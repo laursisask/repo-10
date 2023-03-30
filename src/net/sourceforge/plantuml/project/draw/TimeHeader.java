@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
  * 
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  * 
  * This file is part of PlantUML.
  *
@@ -37,26 +37,27 @@ package net.sourceforge.plantuml.project.draw;
 
 import java.util.Objects;
 
-import net.sourceforge.plantuml.SpriteContainerEmpty;
-import net.sourceforge.plantuml.api.ThemeStyle;
-import net.sourceforge.plantuml.cucadiagram.Display;
-import net.sourceforge.plantuml.graphic.FontConfiguration;
-import net.sourceforge.plantuml.graphic.HorizontalAlignment;
-import net.sourceforge.plantuml.graphic.TextBlock;
+import net.sourceforge.plantuml.klimt.UStroke;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.color.HColor;
+import net.sourceforge.plantuml.klimt.color.HColorSet;
+import net.sourceforge.plantuml.klimt.color.HColors;
+import net.sourceforge.plantuml.klimt.creole.Display;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.font.FontConfiguration;
+import net.sourceforge.plantuml.klimt.font.UFont;
+import net.sourceforge.plantuml.klimt.geom.HorizontalAlignment;
+import net.sourceforge.plantuml.klimt.shape.TextBlock;
+import net.sourceforge.plantuml.klimt.shape.ULine;
+import net.sourceforge.plantuml.klimt.shape.URectangle;
+import net.sourceforge.plantuml.klimt.sprite.SpriteContainerEmpty;
 import net.sourceforge.plantuml.project.time.Day;
 import net.sourceforge.plantuml.project.timescale.TimeScale;
 import net.sourceforge.plantuml.style.PName;
 import net.sourceforge.plantuml.style.Style;
-import net.sourceforge.plantuml.ugraphic.UFont;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.ULine;
-import net.sourceforge.plantuml.ugraphic.URectangle;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
-import net.sourceforge.plantuml.ugraphic.color.HColor;
-import net.sourceforge.plantuml.ugraphic.color.HColorNone;
-import net.sourceforge.plantuml.ugraphic.color.HColorSet;
 
 public abstract class TimeHeader {
+    // ::remove folder when __HAXE__
 
 	protected final double Y_POS_ROW16() {
 		return 16;
@@ -71,36 +72,34 @@ public abstract class TimeHeader {
 	private final Style timelineStyle;
 
 	private final HColorSet colorSet;
-	private final ThemeStyle themeStyle;
 
 	protected final Day min;
 	protected final Day max;
 
-	public TimeHeader(Style timelineStyle, Style closedStyle, Day min, Day max, TimeScale timeScale, HColorSet colorSet,
-			ThemeStyle themeStyle) {
+	public TimeHeader(Style timelineStyle, Style closedStyle, Day min, Day max, TimeScale timeScale,
+			HColorSet colorSet) {
 		this.timeScale = timeScale;
 		this.min = min;
 		this.max = max;
 		this.closedStyle = Objects.requireNonNull(closedStyle);
 		this.timelineStyle = Objects.requireNonNull(timelineStyle);
 		this.colorSet = colorSet;
-		this.themeStyle = themeStyle;
 	}
 
 	protected final HColor closedBackgroundColor() {
-		return closedStyle.value(PName.BackGroundColor).asColor(themeStyle, colorSet);
+		return closedStyle.value(PName.BackGroundColor).asColor(colorSet);
 	}
 
 	protected final HColor closedFontColor() {
-		return closedStyle.value(PName.FontColor).asColor(themeStyle, colorSet);
+		return closedStyle.value(PName.FontColor).asColor(colorSet);
 	}
 
 	protected final HColor openFontColor() {
-		return timelineStyle.value(PName.FontColor).asColor(themeStyle, colorSet);
+		return timelineStyle.value(PName.FontColor).asColor(colorSet);
 	}
 
 	protected final HColor getBarColor() {
-		return timelineStyle.value(PName.LineColor).asColor(themeStyle, colorSet);
+		return timelineStyle.value(PName.LineColor).asColor(colorSet);
 	}
 
 	public abstract double getTimeHeaderHeight();
@@ -120,9 +119,13 @@ public abstract class TimeHeader {
 		ug.apply(getBarColor()).apply(UTranslate.dy(y)).draw(hline);
 	}
 
-	protected final void drawVbar(UGraphic ug, double x, double y1, double y2) {
+	protected final void drawVbar(UGraphic ug, double x, double y1, double y2, boolean bold) {
 		final ULine vbar = ULine.vline(y2 - y1);
-		ug.apply(getBarColor()).apply(new UTranslate(x, y1)).draw(vbar);
+		if (bold)
+			ug = goBold(ug);
+		else
+			ug = ug.apply(getBarColor());
+		ug.apply(new UTranslate(x, y1)).draw(vbar);
 	}
 
 	final protected FontConfiguration getFontConfiguration(int size, boolean bold, HColor color) {
@@ -130,7 +133,7 @@ public abstract class TimeHeader {
 		if (bold)
 			font = font.bold();
 
-		return FontConfiguration.create(font, color, color, false);
+		return FontConfiguration.create(font, color, color, null);
 	}
 
 	public final TimeScale getTimeScale() {
@@ -167,9 +170,13 @@ public abstract class TimeHeader {
 		if (height == 0)
 			return;
 
-		ug = ug.apply(new HColorNone());
+		ug = ug.apply(HColors.none());
 		ug = ug.apply(new UTranslate(x1, getFullHeaderHeight()));
-		ug.draw(new URectangle(x2 - x1, height));
+		ug.draw(URectangle.build(x2 - x1, height));
+	}
+
+	protected final UGraphic goBold(UGraphic ug) {
+		return ug.apply(HColors.BLACK).apply(UStroke.withThickness(2));
 	}
 
 }

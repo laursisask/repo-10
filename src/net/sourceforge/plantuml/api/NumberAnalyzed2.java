@@ -2,10 +2,13 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -29,11 +32,11 @@ import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.prefs.Preferences;
 
-import net.sourceforge.plantuml.Log;
-import net.sourceforge.plantuml.annotation.HaxeIgnored;
+import net.sourceforge.plantuml.log.Logme;
+import net.sourceforge.plantuml.utils.Log;
 
-@HaxeIgnored
 public class NumberAnalyzed2 implements INumberAnalyzed {
+    // ::remove folder when __HAXE__
 
 	private static final int SLIDING_WINDOW = 512;
 
@@ -89,10 +92,10 @@ public class NumberAnalyzed2 implements INumberAnalyzed {
 		try {
 			final StringTokenizer st = new StringTokenizer(value, ";");
 			return new NumberAnalyzed2(name, Long.parseLong(st.nextToken(), 36), Long.parseLong(st.nextToken(), 36),
-					Long.parseLong(st.nextToken(), 36), Long.parseLong(st.nextToken(), 36), Long.parseLong(
-							st.nextToken(), 36), Long.parseLong(st.nextToken(), 36));
+					Long.parseLong(st.nextToken(), 36), Long.parseLong(st.nextToken(), 36),
+					Long.parseLong(st.nextToken(), 36), Long.parseLong(st.nextToken(), 36));
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logme.error(e);
 			Log.info("Error reading " + value);
 			return null;
 		}

@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  *
  * If you like this project or if you find it useful, you can support us at:
  *
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  *
  * This file is part of PlantUML.
  *
@@ -35,28 +35,34 @@
  */
 package net.sourceforge.plantuml.svek.image;
 
-import net.sourceforge.plantuml.CornerParam;
-import net.sourceforge.plantuml.Dimension2DDouble;
-import net.sourceforge.plantuml.FontParam;
-import net.sourceforge.plantuml.Guillemet;
-import net.sourceforge.plantuml.ISkinParam;
-import net.sourceforge.plantuml.LineConfigurable;
-import net.sourceforge.plantuml.Url;
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
-import net.sourceforge.plantuml.creole.Stencil;
-import net.sourceforge.plantuml.cucadiagram.Display;
-import net.sourceforge.plantuml.cucadiagram.EntityPortion;
-import net.sourceforge.plantuml.cucadiagram.ILeaf;
-import net.sourceforge.plantuml.cucadiagram.LeafType;
+import net.sourceforge.plantuml.abel.Entity;
+import net.sourceforge.plantuml.abel.EntityPortion;
+import net.sourceforge.plantuml.abel.LeafType;
+import net.sourceforge.plantuml.abel.LineConfigurable;
 import net.sourceforge.plantuml.cucadiagram.PortionShower;
-import net.sourceforge.plantuml.cucadiagram.Stereotype;
 import net.sourceforge.plantuml.cucadiagram.TextBlockCucaJSon;
-import net.sourceforge.plantuml.graphic.FontConfiguration;
-import net.sourceforge.plantuml.graphic.HorizontalAlignment;
-import net.sourceforge.plantuml.graphic.StringBounder;
-import net.sourceforge.plantuml.graphic.TextBlock;
-import net.sourceforge.plantuml.graphic.TextBlockUtils;
-import net.sourceforge.plantuml.graphic.color.ColorType;
+import net.sourceforge.plantuml.klimt.Shadowable;
+import net.sourceforge.plantuml.klimt.UStroke;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.color.ColorType;
+import net.sourceforge.plantuml.klimt.color.HColor;
+import net.sourceforge.plantuml.klimt.creole.Display;
+import net.sourceforge.plantuml.klimt.creole.Stencil;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.drawing.UGraphicStencil;
+import net.sourceforge.plantuml.klimt.font.FontConfiguration;
+import net.sourceforge.plantuml.klimt.font.FontParam;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
+import net.sourceforge.plantuml.klimt.geom.HorizontalAlignment;
+import net.sourceforge.plantuml.klimt.geom.PlacementStrategyY1Y2;
+import net.sourceforge.plantuml.klimt.geom.ULayoutGroup;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
+import net.sourceforge.plantuml.klimt.shape.TextBlock;
+import net.sourceforge.plantuml.klimt.shape.TextBlockUtils;
+import net.sourceforge.plantuml.klimt.shape.URectangle;
+import net.sourceforge.plantuml.skin.CornerParam;
+import net.sourceforge.plantuml.stereo.Stereotype;
+import net.sourceforge.plantuml.style.ISkinParam;
 import net.sourceforge.plantuml.style.PName;
 import net.sourceforge.plantuml.style.SName;
 import net.sourceforge.plantuml.style.Style;
@@ -65,15 +71,8 @@ import net.sourceforge.plantuml.svek.AbstractEntityImage;
 import net.sourceforge.plantuml.svek.Ports;
 import net.sourceforge.plantuml.svek.ShapeType;
 import net.sourceforge.plantuml.svek.WithPorts;
-import net.sourceforge.plantuml.ugraphic.PlacementStrategyY1Y2;
-import net.sourceforge.plantuml.ugraphic.Shadowable;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.UGraphicStencil;
-import net.sourceforge.plantuml.ugraphic.ULayoutGroup;
-import net.sourceforge.plantuml.ugraphic.URectangle;
-import net.sourceforge.plantuml.ugraphic.UStroke;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
-import net.sourceforge.plantuml.ugraphic.color.HColor;
+import net.sourceforge.plantuml.text.Guillemet;
+import net.sourceforge.plantuml.url.Url;
 
 public class EntityImageJson extends AbstractEntityImage implements Stencil, WithPorts {
 
@@ -85,14 +84,13 @@ public class EntityImageJson extends AbstractEntityImage implements Stencil, Wit
 
 	final private LineConfigurable lineConfig;
 
-	public EntityImageJson(ILeaf entity, ISkinParam skinParam, PortionShower portionShower) {
+	public EntityImageJson(Entity entity, ISkinParam skinParam, PortionShower portionShower) {
 		super(entity, skinParam);
 		this.lineConfig = entity;
 		final Stereotype stereotype = entity.getStereotype();
 		this.roundCorner = skinParam.getRoundCorner(CornerParam.DEFAULT, null);
 
-		final FontConfiguration fcHeader = getStyleHeader().getFontConfiguration(getSkinParam().getThemeStyle(),
-				getSkinParam().getIHtmlColorSet());
+		final FontConfiguration fcHeader = getStyleHeader().getFontConfiguration(getSkinParam().getIHtmlColorSet());
 
 		this.name = TextBlockUtils
 				.withMargin(entity.getDisplay().create(fcHeader, HorizontalAlignment.CENTER, skinParam), 2, 2);
@@ -106,9 +104,9 @@ public class EntityImageJson extends AbstractEntityImage implements Stencil, Wit
 					HorizontalAlignment.CENTER, skinParam);
 
 		final FontConfiguration fontConfiguration = getStyleHeader()
-				.getFontConfiguration(getSkinParam().getThemeStyle(), getSkinParam().getIHtmlColorSet());
-		this.entries = entity.getBodier().getBody(FontParam.OBJECT_ATTRIBUTE, skinParam, false, false,
-				entity.getStereotype(), getStyle(), fontConfiguration);
+				.getFontConfiguration(getSkinParam().getIHtmlColorSet());
+		this.entries = entity.getBodier().getBody(skinParam, false, false, entity.getStereotype(), getStyle(),
+				fontConfiguration);
 
 		this.url = entity.getUrl99();
 
@@ -116,50 +114,51 @@ public class EntityImageJson extends AbstractEntityImage implements Stencil, Wit
 
 	@Override
 	public Ports getPorts(StringBounder stringBounder) {
-		final Dimension2D dimTitle = getTitleDimension(stringBounder);
+		final XDimension2D dimTitle = getTitleDimension(stringBounder);
 		return ((WithPorts) entries).getPorts(stringBounder).translateY(dimTitle.getHeight());
 	}
 
 	private int marginEmptyFieldsOrMethod = 13;
 
-	public Dimension2D calculateDimension(StringBounder stringBounder) {
-		final Dimension2D dimTitle = getTitleDimension(stringBounder);
-		final Dimension2D dimFields = entries.calculateDimension(stringBounder);
+	public XDimension2D calculateDimension(StringBounder stringBounder) {
+		final XDimension2D dimTitle = getTitleDimension(stringBounder);
+		final XDimension2D dimFields = entries.calculateDimension(stringBounder);
 		double width = Math.max(dimFields.getWidth(), dimTitle.getWidth() + 2 * xMarginCircle);
-		if (width < getSkinParam().minClassWidth())
-			width = getSkinParam().minClassWidth();
+		final Style style = getStyle();
+
+		final double minimumWidth = style.value(PName.MinimumWidth).asDouble();
+		if (width < minimumWidth)
+			width = minimumWidth;
 
 		final double height = getMethodOrFieldHeight(dimFields) + dimTitle.getHeight();
-		return new Dimension2DDouble(width, height);
+		return new XDimension2D(width, height);
 	}
 
 	private Style getStyle() {
-		return StyleSignatureBasic.of(SName.root, SName.element, SName.objectDiagram, SName.map)
+		return StyleSignatureBasic.of(SName.root, SName.element, SName.objectDiagram, SName.json)
 				.withTOBECHANGED(getEntity().getStereotype()).getMergedStyle(getSkinParam().getCurrentStyleBuilder());
 	}
 
 	private Style getStyleHeader() {
-		return StyleSignatureBasic.of(SName.root, SName.element, SName.objectDiagram, SName.map, SName.header)
+		return StyleSignatureBasic.of(SName.root, SName.element, SName.objectDiagram, SName.json, SName.header)
 				.withTOBECHANGED(getEntity().getStereotype()).getMergedStyle(getSkinParam().getCurrentStyleBuilder());
 	}
 
 	final public void drawU(UGraphic ug) {
 		final StringBounder stringBounder = ug.getStringBounder();
-		final Dimension2D dimTotal = calculateDimension(stringBounder);
-		final Dimension2D dimTitle = getTitleDimension(stringBounder);
+		final XDimension2D dimTotal = calculateDimension(stringBounder);
+		final XDimension2D dimTitle = getTitleDimension(stringBounder);
 
 		final double widthTotal = dimTotal.getWidth();
 		final double heightTotal = dimTotal.getHeight();
-		final Shadowable rect = new URectangle(widthTotal, heightTotal).rounded(roundCorner);
+		final Shadowable rect = URectangle.build(widthTotal, heightTotal).rounded(roundCorner);
 
 		HColor backcolor = getEntity().getColors().getColor(ColorType.BACK);
 
 		final Style style = getStyle();
-		final HColor borderColor = style.value(PName.LineColor).asColor(getSkinParam().getThemeStyle(),
-				getSkinParam().getIHtmlColorSet());
+		final HColor borderColor = style.value(PName.LineColor).asColor(getSkinParam().getIHtmlColorSet());
 		if (backcolor == null)
-			backcolor = style.value(PName.BackGroundColor).asColor(getSkinParam().getThemeStyle(),
-					getSkinParam().getIHtmlColorSet());
+			backcolor = style.value(PName.BackGroundColor).asColor(getSkinParam().getIHtmlColorSet());
 
 		rect.setDeltaShadow(style.value(PName.Shadowing).asDouble());
 		final UStroke stroke = style.getStroke();
@@ -188,7 +187,7 @@ public class EntityImageJson extends AbstractEntityImage implements Stencil, Wit
 		ug.closeGroup();
 	}
 
-	private double getMethodOrFieldHeight(final Dimension2D dim) {
+	private double getMethodOrFieldHeight(final XDimension2D dim) {
 		final double fieldsHeight = dim.getHeight();
 		if (fieldsHeight == 0 && this.getEntity().getLeafType() != LeafType.MAP)
 			return marginEmptyFieldsOrMethod;
@@ -198,15 +197,15 @@ public class EntityImageJson extends AbstractEntityImage implements Stencil, Wit
 
 	private int xMarginCircle = 5;
 
-	private Dimension2D getTitleDimension(StringBounder stringBounder) {
+	private XDimension2D getTitleDimension(StringBounder stringBounder) {
 		return getNameAndSteretypeDimension(stringBounder);
 	}
 
-	private Dimension2D getNameAndSteretypeDimension(StringBounder stringBounder) {
-		final Dimension2D nameDim = name.calculateDimension(stringBounder);
-		final Dimension2D stereoDim = stereo == null ? new Dimension2DDouble(0, 0)
+	private XDimension2D getNameAndSteretypeDimension(StringBounder stringBounder) {
+		final XDimension2D nameDim = name.calculateDimension(stringBounder);
+		final XDimension2D stereoDim = stereo == null ? new XDimension2D(0, 0)
 				: stereo.calculateDimension(stringBounder);
-		final Dimension2D nameAndStereo = new Dimension2DDouble(Math.max(nameDim.getWidth(), stereoDim.getWidth()),
+		final XDimension2D nameAndStereo = new XDimension2D(Math.max(nameDim.getWidth(), stereoDim.getWidth()),
 				nameDim.getHeight() + stereoDim.getHeight());
 		return nameAndStereo;
 	}

@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -48,10 +51,11 @@ import java.util.prefs.Preferences;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
-import net.sourceforge.plantuml.Log;
+import net.sourceforge.plantuml.log.Logme;
 import net.sourceforge.plantuml.security.SFile;
 import net.sourceforge.plantuml.security.SecurityUtils;
 import net.sourceforge.plantuml.stats.api.Stats;
+import net.sourceforge.plantuml.utils.Log;
 
 public class StatsUtils {
 
@@ -89,13 +93,13 @@ public class StatsUtils {
 				}
 			});
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logme.error(e);
 		}
 		if (prefs.getInt("VERSION", 0) != VERSION) {
 			try {
 				prefs.clear();
 			} catch (BackingStoreException e1) {
-				e1.printStackTrace();
+				Logme.error(e1);
 			}
 			prefs.putInt("VERSION", VERSION);
 		}
@@ -151,7 +155,7 @@ public class StatsUtils {
 				htmlOutput(stats);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logme.error(e);
 		}
 	}
 
@@ -168,8 +172,7 @@ public class StatsUtils {
 		}
 	}
 
-	static void xmlOutput(Stats stats)
-			throws TransformerException, ParserConfigurationException, IOException {
+	static void xmlOutput(Stats stats) throws TransformerException, ParserConfigurationException, IOException {
 		try (OutputStream os = SecurityUtils.createFileOutputStream("plantuml-stats.xml")) {
 			new XmlConverter(stats).createXml(os);
 		}

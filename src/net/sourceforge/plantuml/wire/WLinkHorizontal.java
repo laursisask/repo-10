@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
  * 
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  * 
  * This file is part of PlantUML.
  *
@@ -35,21 +35,20 @@
  */
 package net.sourceforge.plantuml.wire;
 
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
-
-import net.sourceforge.plantuml.ISkinParam;
-import net.sourceforge.plantuml.cucadiagram.Display;
-import net.sourceforge.plantuml.graphic.FontConfiguration;
-import net.sourceforge.plantuml.graphic.HorizontalAlignment;
-import net.sourceforge.plantuml.graphic.TextBlock;
-import net.sourceforge.plantuml.ugraphic.UFont;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.ULine;
-import net.sourceforge.plantuml.ugraphic.UPath;
-import net.sourceforge.plantuml.ugraphic.URectangle;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
-import net.sourceforge.plantuml.ugraphic.color.HColor;
-import net.sourceforge.plantuml.ugraphic.color.HColorUtils;
+import net.sourceforge.plantuml.klimt.UPath;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.color.HColor;
+import net.sourceforge.plantuml.klimt.color.HColors;
+import net.sourceforge.plantuml.klimt.creole.Display;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.font.FontConfiguration;
+import net.sourceforge.plantuml.klimt.font.UFont;
+import net.sourceforge.plantuml.klimt.geom.HorizontalAlignment;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
+import net.sourceforge.plantuml.klimt.shape.TextBlock;
+import net.sourceforge.plantuml.klimt.shape.ULine;
+import net.sourceforge.plantuml.klimt.shape.URectangle;
+import net.sourceforge.plantuml.style.ISkinParam;
 
 public class WLinkHorizontal {
 
@@ -73,11 +72,11 @@ public class WLinkHorizontal {
 	}
 
 	private HColor getBlack() {
-		return HColorUtils.BLACK.withDark(HColorUtils.WHITE);
+		return HColors.BLACK.withDark(HColors.WHITE);
 	}
 
 	private HColor getWhite() {
-		return HColorUtils.WHITE.withDark(HColorUtils.BLACK);
+		return HColors.WHITE.withDark(HColors.BLACK);
 	}
 
 	private TextBlock getTextBlock() {
@@ -89,7 +88,7 @@ public class WLinkHorizontal {
 	public void drawMe(UGraphic ug) {
 		ug = ug.apply(color);
 		final TextBlock textBlock = getTextBlock();
-		final Dimension2D dimText = textBlock.calculateDimension(ug.getStringBounder());
+		final XDimension2D dimText = textBlock.calculateDimension(ug.getStringBounder());
 
 		UGraphic ugText = ug.apply(start);
 		final double len = destination - start.getDx();
@@ -119,7 +118,7 @@ public class WLinkHorizontal {
 				break;
 			}
 			if (type == WLinkType.NORMAL)
-				ugText.apply(getWhite()).apply(getWhite().bg()).draw(new URectangle(dimText));
+				ugText.apply(getWhite()).apply(getWhite().bg()).draw(URectangle.build(dimText));
 
 			textBlock.drawU(ugText);
 		}
@@ -128,7 +127,7 @@ public class WLinkHorizontal {
 
 	private void drawBusArrow(UGraphic ug) {
 		final double dx = destination - start.getDx() - 2;
-		final UPath path = new UPath();
+		final UPath path = UPath.none();
 		if (direction == WArrowDirection.NONE) {
 			path.moveTo(0, 0);
 			path.lineTo(dx, 0);
@@ -182,7 +181,7 @@ public class WLinkHorizontal {
 	private void drawNormalArrow(UGraphic ug) {
 		final double dx = destination - start.getDx() - 2;
 		if (direction == WArrowDirection.BOTH || direction == WArrowDirection.NORMAL) {
-			final UPath path = new UPath();
+			final UPath path = UPath.none();
 			path.moveTo(0, 0);
 			path.lineTo(-5, -5);
 			path.lineTo(-5, 5);
@@ -191,7 +190,7 @@ public class WLinkHorizontal {
 			ug.apply(start.compose(UTranslate.dx(dx))).draw(path);
 		}
 		if (direction == WArrowDirection.BOTH || direction == WArrowDirection.REVERSE) {
-			final UPath path = new UPath();
+			final UPath path = UPath.none();
 			path.moveTo(0, 0);
 			path.lineTo(5, -5);
 			path.lineTo(5, 5);

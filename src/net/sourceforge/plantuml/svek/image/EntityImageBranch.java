@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  *
  * If you like this project or if you find it useful, you can support us at:
  *
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  *
  * This file is part of PlantUML.
  *
@@ -38,28 +38,27 @@ package net.sourceforge.plantuml.svek.image;
 import java.util.EnumMap;
 import java.util.Map;
 
-import net.sourceforge.plantuml.Dimension2DDouble;
-import net.sourceforge.plantuml.ISkinParam;
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
-import net.sourceforge.plantuml.cucadiagram.ILeaf;
-import net.sourceforge.plantuml.graphic.StringBounder;
+import net.sourceforge.plantuml.abel.Entity;
+import net.sourceforge.plantuml.klimt.UGroupType;
+import net.sourceforge.plantuml.klimt.UStroke;
+import net.sourceforge.plantuml.klimt.color.HColor;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
+import net.sourceforge.plantuml.klimt.shape.UPolygon;
+import net.sourceforge.plantuml.style.ISkinParam;
 import net.sourceforge.plantuml.style.PName;
 import net.sourceforge.plantuml.style.SName;
 import net.sourceforge.plantuml.style.Style;
 import net.sourceforge.plantuml.style.StyleSignatureBasic;
 import net.sourceforge.plantuml.svek.AbstractEntityImage;
 import net.sourceforge.plantuml.svek.ShapeType;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.UGroupType;
-import net.sourceforge.plantuml.ugraphic.UPolygon;
-import net.sourceforge.plantuml.ugraphic.UStroke;
-import net.sourceforge.plantuml.ugraphic.color.HColor;
 
 public class EntityImageBranch extends AbstractEntityImage {
 
 	final private static int SIZE = 12;
 
-	public EntityImageBranch(ILeaf entity, ISkinParam skinParam) {
+	public EntityImageBranch(Entity entity, ISkinParam skinParam) {
 		super(entity, skinParam);
 	}
 
@@ -67,8 +66,8 @@ public class EntityImageBranch extends AbstractEntityImage {
 		return StyleSignatureBasic.of(SName.root, SName.element, SName.activityDiagram, SName.activity, SName.diamond);
 	}
 
-	public Dimension2D calculateDimension(StringBounder stringBounder) {
-		return new Dimension2DDouble(SIZE * 2, SIZE * 2);
+	public XDimension2D calculateDimension(StringBounder stringBounder) {
+		return new XDimension2D(SIZE * 2, SIZE * 2);
 	}
 
 	final public void drawU(UGraphic ug) {
@@ -80,17 +79,15 @@ public class EntityImageBranch extends AbstractEntityImage {
 		diams.addPoint(SIZE, 0);
 
 		final Style style = getDefaultStyleDefinition().getMergedStyle(getSkinParam().getCurrentStyleBuilder());
-		final HColor border = style.value(PName.LineColor).asColor(getSkinParam().getThemeStyle(),
-				getSkinParam().getIHtmlColorSet());
-		final HColor back = style.value(PName.BackGroundColor).asColor(getSkinParam().getThemeStyle(),
-				getSkinParam().getIHtmlColorSet());
+		final HColor border = style.value(PName.LineColor).asColor(getSkinParam().getIHtmlColorSet());
+		final HColor back = style.value(PName.BackGroundColor).asColor(getSkinParam().getIHtmlColorSet());
 		final UStroke stroke = style.getStroke();
 		final double shadowing = style.value(PName.Shadowing).asDouble();
 
 		diams.setDeltaShadow(shadowing);
 		final Map<UGroupType, String> typeIDent = new EnumMap<>(UGroupType.class);
-		typeIDent.put(UGroupType.CLASS, "elem " + getEntity().getCode() + " selected");
-		typeIDent.put(UGroupType.ID, "elem_" + getEntity().getCode());
+		typeIDent.put(UGroupType.CLASS, "elem " + getEntity().getName() + " selected");
+		typeIDent.put(UGroupType.ID, "elem_" + getEntity().getName());
 		ug.startGroup(typeIDent);
 		ug.apply(border).apply(back.bg()).apply(stroke).draw(diams);
 		ug.closeGroup();

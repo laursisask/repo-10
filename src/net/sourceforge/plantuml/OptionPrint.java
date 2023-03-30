@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -43,7 +46,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 
-import net.sourceforge.plantuml.cucadiagram.dot.GraphvizUtils;
+import net.sourceforge.plantuml.dot.GraphvizUtils;
 import net.sourceforge.plantuml.security.SFile;
 import net.sourceforge.plantuml.security.SecurityProfile;
 import net.sourceforge.plantuml.security.SecurityUtils;
@@ -52,17 +55,18 @@ import net.sourceforge.plantuml.version.PSystemVersion;
 import net.sourceforge.plantuml.version.Version;
 
 public class OptionPrint {
+	// ::remove file when __CORE__
+	// ::remove file when __HAXE__
 
 	static public void printTestDot() throws InterruptedException {
 		final List<String> result = new ArrayList<>();
 		final int errorCode = GraphvizUtils.addDotStatus(result, false);
-		for (String s : result) {
-			if (errorCode == 0) {
+		for (String s : result)
+			if (errorCode == 0)
 				System.out.println(s);
-			} else {
+			else
 				System.err.println(s);
-			}
-		}
+
 		exit(errorCode);
 	}
 
@@ -81,6 +85,7 @@ public class OptionPrint {
 		System.out.println("\t**\tmeans any characters (used to recurse through directories)");
 		System.out.println();
 		System.out.println("where options include:");
+		System.out.println("    -darkmode\t\tTo use dark mode for diagrams");
 		System.out.println("    -gui\t\tTo run the graphical user interface");
 		System.out.println("    -tpng\t\tTo generate images using PNG format (default)");
 		System.out.println("    -tsvg\t\tTo generate images using SVG format");
@@ -150,7 +155,8 @@ public class OptionPrint {
 		System.out.println("    -pipeimageindex N\tTo generate the Nth image with pipe option");
 		System.out.println("    -stdlib\t\tTo print standard library info");
 		System.out.println("    -extractstdlib\tTo extract PlantUML Standard Library into stdlib folder");
-		System.out.println("    -filedir xxx\tTo behave as if the PlantUML source is in this dir (only affects '-pipe')");
+		System.out.println(
+				"    -filedir xxx\tTo behave as if the PlantUML source is in this dir (only affects '-pipe' and PicoWeb 'POST /render')");
 		System.out.println("    -filename \"example.puml\"\tTo override %filename% variable");
 		System.out.println("    -preproc\t\tTo output preprocessor text of diagrams");
 		System.out.println("    -cypher\t\tTo cypher texts of diagrams so that you can share them");
@@ -160,27 +166,27 @@ public class OptionPrint {
 	}
 
 	static private void exit(int errorCode) throws InterruptedException {
-		if (OptionFlags.getInstance().isSystemExit() || errorCode != 0) {
+		if (OptionFlags.getInstance().isSystemExit() || errorCode != 0)
 			System.exit(errorCode);
-		}
+
 		throw new InterruptedException("exit");
 	}
 
 	public static void printVersion() throws InterruptedException {
 		System.out.println(Version.fullDescription());
-		for (String v : interestingProperties()) {
+		for (String v : interestingProperties()) 
 			System.out.println(v);
-		}
-		for (String v : interestingValues()) {
+
+		for (String v : interestingValues())
 			System.out.println(v);
-		}
+
 		System.out.println();
 		final List<String> result = new ArrayList<>();
 		final int errorCode = GraphvizUtils.addDotStatus(result, false);
-		for (String s : result) {
+		for (String s : result)
 			System.out.println(s);
-		}
-		exit(errorCode);
+
+		System.exit(0);
 	}
 
 	public static Collection<String> interestingProperties() {

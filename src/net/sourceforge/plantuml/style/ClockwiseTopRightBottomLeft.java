@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -31,6 +34,9 @@
  *
  */
 package net.sourceforge.plantuml.style;
+
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
 
 public class ClockwiseTopRightBottomLeft {
 
@@ -91,6 +97,10 @@ public class ClockwiseTopRightBottomLeft {
 		this.left = left;
 	}
 
+	public ClockwiseTopRightBottomLeft incTop(double delta) {
+		return new ClockwiseTopRightBottomLeft(top + delta, right, bottom, left);
+	}
+
 	@Override
 	public String toString() {
 		return "" + top + ":" + right + ":" + bottom + ":" + left;
@@ -112,9 +122,19 @@ public class ClockwiseTopRightBottomLeft {
 		return left;
 	}
 
+	// ::comment when __HAXE__
 	public static ClockwiseTopRightBottomLeft marginForDocument(StyleBuilder styleBuilder) {
 		final Style style = StyleSignatureBasic.of(SName.root, SName.document).getMergedStyle(styleBuilder);
 		return style.getMargin();
+	}
+	// ::done
+
+	public UTranslate getTranslate() {
+		return new UTranslate(left, top);
+	}
+
+	public XDimension2D apply(XDimension2D dim) {
+		return new XDimension2D(left + dim.getWidth() + right, top + dim.getHeight() + bottom);
 	}
 
 }

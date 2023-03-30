@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -46,18 +49,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import net.sourceforge.plantuml.Log;
-import net.sourceforge.plantuml.Url;
-import net.sourceforge.plantuml.eps.EpsGraphics;
-import net.sourceforge.plantuml.ugraphic.UPath;
-import net.sourceforge.plantuml.ugraphic.USegment;
-import net.sourceforge.plantuml.ugraphic.USegmentType;
-import net.sourceforge.plantuml.ugraphic.color.ColorMapper;
-import net.sourceforge.plantuml.ugraphic.color.HColor;
-import net.sourceforge.plantuml.ugraphic.color.HColorUtils;
+import net.sourceforge.plantuml.klimt.UPath;
+import net.sourceforge.plantuml.klimt.color.ColorMapper;
+import net.sourceforge.plantuml.klimt.color.HColor;
+import net.sourceforge.plantuml.klimt.color.HColors;
+import net.sourceforge.plantuml.klimt.drawing.eps.EpsGraphics;
+import net.sourceforge.plantuml.klimt.geom.USegment;
+import net.sourceforge.plantuml.klimt.geom.USegmentType;
+import net.sourceforge.plantuml.url.Url;
+import net.sourceforge.plantuml.utils.Log;
 import net.sourceforge.plantuml.version.Version;
 
 public class TikzGraphics {
+    // ::remove folder when __HAXE__
+	// ::remove folder when __CORE__
 
 	// https://www.sharelatex.com/blog/2013/08/27/tikz-series-pt1.html
 	// http://cremeronline.com/LaTeX/minimaltikz.pdf
@@ -65,8 +70,8 @@ public class TikzGraphics {
 	private final List<String> cmd = new ArrayList<>();
 	private final boolean withPreamble;
 
-	private HColor color = HColorUtils.BLACK;
-	private HColor fillcolor = HColorUtils.BLACK;
+	private HColor color = HColors.BLACK;
+	private HColor fillcolor = HColors.BLACK;
 	private HColor fillcolorGradient2 = null;
 	private char gradientPolicy;
 	private double thickness = 1.0;
@@ -106,7 +111,7 @@ public class TikzGraphics {
 	}
 
 	private String getColorName(HColor hcolor) {
-		final Color color = mapper.toColor(hcolor);
+		final Color color = hcolor.toColor(mapper);
 		if (color.equals(Color.WHITE))
 			return "white";
 
@@ -121,12 +126,12 @@ public class TikzGraphics {
 		if (fillcolor == null)
 			return false;
 
-		if (HColorUtils.isTransparent(fillcolor))
+		if (fillcolor.isTransparent())
 			return false;
 
-		if (mapper.toColor(fillcolor).getAlpha() == 0)
+		if (fillcolor.toColor(mapper).getAlpha() == 0)
 			return false;
-		
+
 		return true;
 	}
 
@@ -510,14 +515,20 @@ public class TikzGraphics {
 			sb.append(",dash pattern=" + dash);
 
 		sb.append("] ");
+		double lastx = 0;
+		double lasty = 0;
 		for (USegment seg : path) {
 			final USegmentType type = seg.getSegmentType();
 			final double coord[] = seg.getCoord();
 			if (type == USegmentType.SEG_MOVETO) {
 				sb.append(couple(coord[0] + x, coord[1] + y));
+				lastx = coord[0] + x;
+				lasty = coord[1] + y;
 			} else if (type == USegmentType.SEG_LINETO) {
 				sb.append(" -- ");
 				sb.append(couple(coord[0] + x, coord[1] + y));
+				lastx = coord[0] + x;
+				lasty = coord[1] + y;
 			} else if (type == USegmentType.SEG_QUADTO) {
 				throw new UnsupportedOperationException();
 			} else if (type == USegmentType.SEG_CUBICTO) {
@@ -529,10 +540,44 @@ public class TikzGraphics {
 				sb.append(couple(coord[2] + x, coord[3] + y));
 				sb.append(" .. ");
 				sb.append(couple(coord[4] + x, coord[5] + y));
+				lastx = coord[4] + x;
+				lasty = coord[5] + y;
 			} else if (type == USegmentType.SEG_CLOSE) {
 				// Nothing
 			} else if (type == USegmentType.SEG_ARCTO) {
-				// Nothing
+
+				final double newx = coord[5] + x;
+				final double newy = coord[6] + y;
+				final boolean easyCase = coord[2] == 0 && coord[3] == 0 && coord[4] == 1;
+
+				if (easyCase && newx > lastx && newy < lasty) {
+					final int start = 180;
+					final int end = 270;
+					final String radius = format(coord[0]);
+					sb.append(" arc(" + start + ":" + end + ":" + radius + "pt) ");
+				} else if (easyCase && newx > lastx && newy > lasty) {
+					final int start = 270;
+					final int end = 360;
+					final String radius = format(coord[0]);
+					sb.append(" arc(" + start + ":" + end + ":" + radius + "pt) ");
+				} else if (easyCase && newx < lastx && newy > lasty) {
+					final int start = 0;
+					final int end = 90;
+					final String radius = format(coord[0]);
+					sb.append(" arc(" + start + ":" + end + ":" + radius + "pt) ");
+				} else if (easyCase && newx < lastx && newy < lasty) {
+					final int start = 90;
+					final int end = 180;
+					final String radius = format(coord[0]);
+					sb.append(" arc(" + start + ":" + end + ":" + radius + "pt) ");
+				} else {
+					sb.append(" -- ");
+					sb.append(couple(coord[5] + x, coord[6] + y));
+				}
+
+				lastx = newx;
+				lasty = newy;
+
 			} else {
 				Log.println("unknown4 " + seg);
 			}
@@ -643,7 +688,7 @@ public class TikzGraphics {
 	private void addColor(HColor hcolor) {
 		if (hcolor == null)
 			return;
-		final Color color = mapper.toColor(hcolor);
+		final Color color = hcolor.toColor(mapper);
 		if (color == null)
 			return;
 

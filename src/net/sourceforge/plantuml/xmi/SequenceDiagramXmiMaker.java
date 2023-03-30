@@ -20,6 +20,8 @@ import org.w3c.dom.Document;
 import net.sourceforge.plantuml.FileFormat;
 import net.sourceforge.plantuml.api.ImageDataSimple;
 import net.sourceforge.plantuml.core.ImageData;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.log.Logme;
 import net.sourceforge.plantuml.sequencediagram.SequenceDiagram;
 import net.sourceforge.plantuml.sequencediagram.graphic.FileMaker;
 import net.sourceforge.plantuml.xml.XmlFactories;
@@ -41,7 +43,7 @@ public final class SequenceDiagramXmiMaker implements FileMaker {
 		try {
 			builder = XmlFactories.newDocumentBuilder();
 		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
+			Logme.error(e);
 			return imageData;
 		}
 		Document document = builder.newDocument();
@@ -53,18 +55,17 @@ public final class SequenceDiagramXmiMaker implements FileMaker {
 			xmi = new XmiSequenceDiagramArgo(diagram, document);
 		else
 			xmi = new XmiSequenceDiagramStandard(diagram, document);
-		
+
 		xmi.build();
-		
+
 		try {
 			writeDocument(document, os);
 		} catch (TransformerException | ParserConfigurationException e) {
-			e.printStackTrace();
+			Logme.error(e);
 		}
 		return imageData;
 	}
-	
-	
+
 	@Override
 	public int getNbPages() {
 		return 1;
@@ -80,6 +81,11 @@ public final class SequenceDiagramXmiMaker implements FileMaker {
 		transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 		transformer.setOutputProperty(OutputKeys.ENCODING, UTF_8.name());
 		transformer.transform(source, resultat);
+	}
+
+	@Override
+	public void createOneGraphic(UGraphic ug) {
+		throw new UnsupportedOperationException();
 	}
 
 }

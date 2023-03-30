@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
  * 
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  * 
  * This file is part of PlantUML.
  *
@@ -38,10 +38,8 @@ package net.sourceforge.plantuml.hcl;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
-import net.sourceforge.plantuml.ISkinSimple;
-import net.sourceforge.plantuml.UmlDiagramType;
-import net.sourceforge.plantuml.api.ThemeStyle;
 import net.sourceforge.plantuml.command.PSystemAbstractFactory;
 import net.sourceforge.plantuml.core.Diagram;
 import net.sourceforge.plantuml.core.DiagramType;
@@ -49,6 +47,9 @@ import net.sourceforge.plantuml.core.UmlSource;
 import net.sourceforge.plantuml.json.JsonValue;
 import net.sourceforge.plantuml.jsondiagram.JsonDiagram;
 import net.sourceforge.plantuml.jsondiagram.StyleExtractor;
+import net.sourceforge.plantuml.log.Logme;
+import net.sourceforge.plantuml.skin.UmlDiagramType;
+import net.sourceforge.plantuml.yaml.Highlighted;
 
 public class HclDiagramFactory extends PSystemAbstractFactory {
 
@@ -57,8 +58,8 @@ public class HclDiagramFactory extends PSystemAbstractFactory {
 	}
 
 	@Override
-	public Diagram createSystem(ThemeStyle style, UmlSource source, ISkinSimple skinParam) {
-		final List<String> highlighted = new ArrayList<>();
+	public Diagram createSystem(UmlSource source, Map<String, String> skinParam) {
+		final List<Highlighted> highlighted = new ArrayList<>();
 		JsonValue data = null;
 		StyleExtractor styleExtractor = null;
 		try {
@@ -76,9 +77,9 @@ public class HclDiagramFactory extends PSystemAbstractFactory {
 			HclParser parser = new HclParser(list);
 			data = parser.parseMe();
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logme.error(e);
 		}
-		final JsonDiagram result = new JsonDiagram(style, source, UmlDiagramType.HCL, data, highlighted);
+		final JsonDiagram result = new JsonDiagram(source, UmlDiagramType.HCL, data, highlighted, styleExtractor);
 //		if (styleExtractor != null) {
 //			styleExtractor.applyStyles(result.getSkinParam());
 //			final String title = styleExtractor.getTitle();

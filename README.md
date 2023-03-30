@@ -16,6 +16,7 @@ Original README
 PlantUML
 ========
 
+[![Discord server](https://img.shields.io/discord/1083727021328306236?color=5865F2&logo=discord&logoColor=white)](https://discord.gg/sXhzexAQGh)
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/plantuml?logo=github)](https://github.com/sponsors/plantuml/)
 [![GitHub Org's stars](https://img.shields.io/github/stars/plantuml)](https://github.com/plantuml/plantuml/stargazers/)
 [![GitHub watchers](https://img.shields.io/github/watchers/plantuml/plantuml)](https://github.com/plantuml/plantuml/watchers/)
@@ -55,6 +56,7 @@ PlantUML is a component that allows to quickly write:
 The following non-UML diagrams are also supported:
  * [JSON data](http://plantuml.com/json)
  * [YAML data](http://plantuml.com/yaml)
+ * [Extended Backus-Naur Form (EBNF) diagram](http://plantuml.com/ebnf)
  * [Network diagram (nwdiag)](http://plantuml.com/nwdiag)
  * [Wireframe graphical interface or UI mockups (salt)](http://plantuml.com/salt)
  * [Archimate diagram](http://plantuml.com/archimate-diagram)

@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,9 +35,9 @@
  */
 package net.sourceforge.plantuml.sequencediagram.graphic;
 
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
-import net.sourceforge.plantuml.graphic.HorizontalAlignment;
-import net.sourceforge.plantuml.graphic.StringBounder;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
+import net.sourceforge.plantuml.klimt.geom.HorizontalAlignment;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
 import net.sourceforge.plantuml.png.PngTitler;
 import net.sourceforge.plantuml.utils.MathUtils;
 
@@ -62,7 +65,7 @@ public class SequenceDiagramArea {
 	private boolean isLegendTop;
 	private HorizontalAlignment legendHorizontalAlignment;
 
-	public void setLegend(Dimension2D dimLegend, boolean isLegendTop, HorizontalAlignment horizontalAlignment) {
+	public void setLegend(XDimension2D dimLegend, boolean isLegendTop, HorizontalAlignment horizontalAlignment) {
 		this.legendHorizontalAlignment = horizontalAlignment;
 		this.legendWidth = dimLegend.getWidth();
 		this.legendHeight = dimLegend.getHeight();
@@ -102,7 +105,7 @@ public class SequenceDiagramArea {
 		this.captionHeight = height;
 	}
 
-	public void setCaptionArea(Dimension2D dim) {
+	public void setCaptionArea(XDimension2D dim) {
 		setCaptionArea(dim.getWidth(), dim.getHeight());
 	}
 
@@ -136,9 +139,9 @@ public class SequenceDiagramArea {
 	}
 
 	public double getLegendY() {
-		if (isLegendTop) {
+		if (isLegendTop)
 			return titleHeight + headerHeight + headerMargin;
-		}
+
 		return sequenceHeight + headerHeight + headerMargin + titleHeight;
 
 	}
@@ -201,14 +204,14 @@ public class SequenceDiagramArea {
 	}
 
 	public void initFooter(PngTitler pngTitler, StringBounder stringBounder) {
-		final Dimension2D dim = pngTitler.getTextDimension(stringBounder);
+		final XDimension2D dim = pngTitler.getTextDimension(stringBounder);
 		if (dim != null)
 			setFooterArea(dim.getWidth(), dim.getHeight(), 0);
 
 	}
 
 	public void initHeader(PngTitler pngTitler, StringBounder stringBounder) {
-		final Dimension2D dim = pngTitler.getTextDimension(stringBounder);
+		final XDimension2D dim = pngTitler.getTextDimension(stringBounder);
 		if (dim != null)
 			setHeaderArea(dim.getWidth(), dim.getHeight(), 0);
 

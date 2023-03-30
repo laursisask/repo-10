@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,31 +35,31 @@
  */
 package net.sourceforge.plantuml.sequencediagram.teoz;
 
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 
-import net.sourceforge.plantuml.ColorParam;
-import net.sourceforge.plantuml.ISkinParam;
-import net.sourceforge.plantuml.SkinParamBackcolored;
-import net.sourceforge.plantuml.graphic.StringBounder;
-import net.sourceforge.plantuml.graphic.SymbolContext;
+import net.sourceforge.plantuml.klimt.Fashion;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
 import net.sourceforge.plantuml.sequencediagram.graphic.Segment;
 import net.sourceforge.plantuml.skin.Area;
+import net.sourceforge.plantuml.skin.ColorParam;
 import net.sourceforge.plantuml.skin.Component;
 import net.sourceforge.plantuml.skin.ComponentType;
 import net.sourceforge.plantuml.skin.Context2D;
+import net.sourceforge.plantuml.skin.SkinParamBackcolored;
 import net.sourceforge.plantuml.skin.rose.Rose;
+import net.sourceforge.plantuml.style.ISkinParam;
 import net.sourceforge.plantuml.style.Style;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
 
 public class LiveBoxesDrawer {
 
 	private double y1;
-	private SymbolContext symbolContext;
+	private Fashion symbolContext;
 
 	private final Component cross;
 	private final Context2D context;
@@ -67,8 +70,8 @@ public class LiveBoxesDrawer {
 
 	public LiveBoxesDrawer(Context2D context, Rose skin, ISkinParam skinParam, Map<Double, Double> delays) {
 		this.cross = skin.createComponent(
-				new Style[] { ComponentType.DESTROY.getStyleSignature()
-						.getMergedStyle(skinParam.getCurrentStyleBuilder()) },
+				new Style[] {
+						ComponentType.DESTROY.getStyleSignature().getMergedStyle(skinParam.getCurrentStyleBuilder()) },
 				ComponentType.DESTROY, null, skinParam, null);
 		this.compForWidth = skin.createComponent(
 				new Style[] { ComponentType.ALIVE_BOX_CLOSE_CLOSE.getStyleSignature()
@@ -87,7 +90,7 @@ public class LiveBoxesDrawer {
 		return compForWidth.getPreferredWidth(stringBounder);
 	}
 
-	public void addStart(double y1, SymbolContext symbolContext) {
+	public void addStart(double y1, Fashion symbolContext) {
 		this.y1 = y1;
 		this.symbolContext = symbolContext;
 	}
@@ -112,7 +115,7 @@ public class LiveBoxesDrawer {
 
 	public void drawDestroyIfNeeded(UGraphic ug, Step step) {
 		if (step.isDestroy()) {
-			final Dimension2D dimCross = cross.getPreferredDimension(ug.getStringBounder());
+			final XDimension2D dimCross = cross.getPreferredDimension(ug.getStringBounder());
 			cross.drawU(ug.apply(new UTranslate(-dimCross.getWidth() / 2, step.getValue() - dimCross.getHeight() / 2)),
 					null, context);
 		}

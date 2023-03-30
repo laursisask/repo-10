@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,34 +35,36 @@
  */
 package net.sourceforge.plantuml.activitydiagram3.ftile;
 
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
-import java.awt.geom.Point2D;
 import java.util.Iterator;
 
-import net.sourceforge.plantuml.Direction;
-import net.sourceforge.plantuml.graphic.HtmlColorAndStyle;
-import net.sourceforge.plantuml.graphic.StringBounder;
-import net.sourceforge.plantuml.graphic.TextBlock;
-import net.sourceforge.plantuml.graphic.TextBlockUtils;
+import net.sourceforge.plantuml.decoration.HtmlColorAndStyle;
+import net.sourceforge.plantuml.klimt.Arrows;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
+import net.sourceforge.plantuml.klimt.geom.XPoint2D;
+import net.sourceforge.plantuml.klimt.shape.TextBlock;
+import net.sourceforge.plantuml.klimt.shape.TextBlockUtils;
+import net.sourceforge.plantuml.klimt.shape.UPolygon;
 import net.sourceforge.plantuml.style.Style;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.UPolygon;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
+import net.sourceforge.plantuml.utils.Direction;
 
-public class WormTexted implements Iterable<Point2D.Double> {
+public class WormTexted implements Iterable<XPoint2D> {
+	// ::remove folder when __HAXE__
 
 	private final Worm worm;
 	private TextBlock textBlock;
 
-	private WormTexted(Style style) {
-		this(new Worm(style));
+	private WormTexted(Style style, Arrows arrows) {
+		this(new Worm(style, arrows));
 	}
 
 	private WormTexted(Worm worm) {
 		this.worm = worm;
 	}
 
-	public Iterator<Point2D.Double> iterator() {
+	public Iterator<XPoint2D> iterator() {
 		return worm.iterator();
 	}
 
@@ -76,7 +81,7 @@ public class WormTexted implements Iterable<Point2D.Double> {
 		return worm;
 	}
 
-	public Point2D get(int i) {
+	public XPoint2D get(int i) {
 		return worm.get(i);
 	}
 
@@ -105,26 +110,26 @@ public class WormTexted implements Iterable<Point2D.Double> {
 		return TextBlockUtils.isEmpty(textBlock, stringBounder);
 	}
 
-	private Point2D getTextBlockPosition(StringBounder stringBounder) {
-		final Point2D pt1 = get(0);
-		final Point2D pt2 = get(1);
-		final Dimension2D dim = textBlock.calculateDimension(stringBounder);
+	private XPoint2D getTextBlockPosition(StringBounder stringBounder) {
+		final XPoint2D pt1 = get(0);
+		final XPoint2D pt2 = get(1);
+		final XDimension2D dim = textBlock.calculateDimension(stringBounder);
 		// if (worm.getDirectionsCode().startsWith("LD")) {
 		// final double y = pt1.getY() - dim.getHeight();
-		// return new Point2D.Double(Math.max(pt1.getX(), pt2.getX()) - dim.getWidth(), y);
+		// return new XPoint2D(Math.max(pt1.getX(), pt2.getX()) - dim.getWidth(), y);
 		// }
 		final double y = (pt1.getY() + pt2.getY()) / 2 - dim.getHeight() / 2;
-		return new Point2D.Double(Math.max(pt1.getX(), pt2.getX()) + 4, y);
+		return new XPoint2D(Math.max(pt1.getX(), pt2.getX()) + 4, y);
 	}
 
 	public double getMaxX(StringBounder stringBounder) {
 		double result = -Double.MAX_VALUE;
-		for (Point2D pt : this) {
+		for (XPoint2D pt : this) {
 			result = Math.max(result, pt.getX());
 		}
 		if (textBlock != null) {
-			final Point2D position = getTextBlockPosition(stringBounder);
-			final Dimension2D dim = textBlock.calculateDimension(stringBounder);
+			final XPoint2D position = getTextBlockPosition(stringBounder);
+			final XDimension2D dim = textBlock.calculateDimension(stringBounder);
 			result = Math.max(result, position.getX() + dim.getWidth());
 		}
 		return result;
@@ -132,8 +137,8 @@ public class WormTexted implements Iterable<Point2D.Double> {
 
 	void drawInternalLabel(UGraphic ug) {
 		if (textBlock != null) {
-			final Point2D position = getTextBlockPosition(ug.getStringBounder());
-			textBlock.drawU(ug.apply(new UTranslate(position)));
+			final XPoint2D position = getTextBlockPosition(ug.getStringBounder());
+			textBlock.drawU(ug.apply(UTranslate.point(position)));
 		}
 	}
 

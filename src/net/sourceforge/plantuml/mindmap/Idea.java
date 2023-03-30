@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
  * 
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  * 
  * This file is part of PlantUML.
  *
@@ -40,9 +40,14 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import net.sourceforge.plantuml.cucadiagram.Display;
+import net.sourceforge.plantuml.klimt.color.HColor;
+import net.sourceforge.plantuml.klimt.creole.Display;
+import net.sourceforge.plantuml.style.MergeStrategy;
+import net.sourceforge.plantuml.style.SName;
+import net.sourceforge.plantuml.style.Style;
 import net.sourceforge.plantuml.style.StyleBuilder;
-import net.sourceforge.plantuml.ugraphic.color.HColor;
+import net.sourceforge.plantuml.style.StyleSignatureBasic;
+import net.sourceforge.plantuml.wbs.WElement;
 
 class Idea {
 
@@ -54,6 +59,50 @@ class Idea {
 	private final HColor backColor;
 	private final StyleBuilder styleBuilder;
 	private final String stereotype;
+
+	private StyleSignatureBasic getDefaultStyleDefinitionNode(int level) {
+		final String depth = SName.depth(level);
+		if (level == 0)
+			return StyleSignatureBasic.of(SName.root, SName.element, SName.mindmapDiagram, SName.node, SName.rootNode)
+					.addS(stereotype).add(depth);
+
+		if (shape == IdeaShape.NONE && children.size() == 0)
+			return StyleSignatureBasic
+					.of(SName.root, SName.element, SName.mindmapDiagram, SName.node, SName.leafNode, SName.boxless)
+					.addS(stereotype).add(depth);
+
+		if (shape == IdeaShape.NONE)
+			return StyleSignatureBasic.of(SName.root, SName.element, SName.mindmapDiagram, SName.node, SName.boxless)
+					.addS(stereotype).add(depth);
+
+		if (children.size() == 0)
+			return StyleSignatureBasic.of(SName.root, SName.element, SName.mindmapDiagram, SName.node, SName.leafNode)
+					.addS(stereotype).add(depth);
+
+		return StyleSignatureBasic.of(SName.root, SName.element, SName.mindmapDiagram, SName.node).addS(stereotype)
+				.add(depth);
+	}
+
+	private static final int STEP_BY_PARENT = WElement.STEP_BY_PARENT;
+
+	public Style getStyle() {
+		int deltaPriority = STEP_BY_PARENT * 1000;
+		Style result = styleBuilder.getMergedStyleSpecial(getDefaultStyleDefinitionNode(level), deltaPriority);
+		for (Idea up = parent; up != null; up = up.parent) {
+			final StyleSignatureBasic ss = up.getDefaultStyleDefinitionNode(level).addStar();
+			deltaPriority -= STEP_BY_PARENT;
+			final Style styleParent = styleBuilder.getMergedStyleSpecial(ss, deltaPriority);
+			result = result.mergeWith(styleParent, MergeStrategy.OVERWRITE_EXISTING_VALUE);
+		}
+		return result;
+	}
+
+	public Style getStyleArrow() {
+		final String depth = SName.depth(level);
+		final StyleSignatureBasic defaultStyleDefinitionArrow = StyleSignatureBasic
+				.of(SName.root, SName.element, SName.mindmapDiagram, SName.arrow).addS(stereotype).add(depth);
+		return defaultStyleDefinitionArrow.getMergedStyle(styleBuilder);
+	}
 
 	public static Idea createIdeaSimple(StyleBuilder styleBuilder, HColor backColor, Display label, IdeaShape shape,
 			String stereotype) {

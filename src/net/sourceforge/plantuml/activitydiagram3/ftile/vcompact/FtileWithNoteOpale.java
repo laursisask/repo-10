@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,46 +35,45 @@
  */
 package net.sourceforge.plantuml.activitydiagram3.ftile.vcompact;
 
-import java.awt.geom.Point2D;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import net.sourceforge.plantuml.AlignmentParam;
-import net.sourceforge.plantuml.Dimension2DDouble;
-import net.sourceforge.plantuml.Direction;
-import net.sourceforge.plantuml.ISkinParam;
-import net.sourceforge.plantuml.LineBreakStrategy;
+import net.sourceforge.plantuml.activitydiagram3.LinkRendering;
 import net.sourceforge.plantuml.activitydiagram3.PositionedNote;
 import net.sourceforge.plantuml.activitydiagram3.ftile.AbstractFtile;
 import net.sourceforge.plantuml.activitydiagram3.ftile.Ftile;
 import net.sourceforge.plantuml.activitydiagram3.ftile.FtileGeometry;
 import net.sourceforge.plantuml.activitydiagram3.ftile.Swimlane;
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
-import net.sourceforge.plantuml.creole.CreoleMode;
-import net.sourceforge.plantuml.creole.Parser;
-import net.sourceforge.plantuml.creole.Sheet;
-import net.sourceforge.plantuml.creole.SheetBlock1;
-import net.sourceforge.plantuml.creole.SheetBlock2;
-import net.sourceforge.plantuml.creole.Stencil;
-import net.sourceforge.plantuml.graphic.FontConfiguration;
-import net.sourceforge.plantuml.graphic.HorizontalAlignment;
-import net.sourceforge.plantuml.graphic.StringBounder;
-import net.sourceforge.plantuml.graphic.TextBlock;
-import net.sourceforge.plantuml.graphic.VerticalAlignment;
+import net.sourceforge.plantuml.klimt.LineBreakStrategy;
+import net.sourceforge.plantuml.klimt.UStroke;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.color.HColor;
+import net.sourceforge.plantuml.klimt.creole.CreoleMode;
+import net.sourceforge.plantuml.klimt.creole.Sheet;
+import net.sourceforge.plantuml.klimt.creole.SheetBlock1;
+import net.sourceforge.plantuml.klimt.creole.SheetBlock2;
+import net.sourceforge.plantuml.klimt.creole.Stencil;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.font.FontConfiguration;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
+import net.sourceforge.plantuml.klimt.geom.HorizontalAlignment;
+import net.sourceforge.plantuml.klimt.geom.VerticalAlignment;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
+import net.sourceforge.plantuml.klimt.geom.XPoint2D;
+import net.sourceforge.plantuml.klimt.shape.TextBlock;
 import net.sourceforge.plantuml.sequencediagram.NotePosition;
 import net.sourceforge.plantuml.sequencediagram.NoteType;
+import net.sourceforge.plantuml.skin.AlignmentParam;
+import net.sourceforge.plantuml.style.ISkinParam;
 import net.sourceforge.plantuml.style.PName;
 import net.sourceforge.plantuml.style.SName;
 import net.sourceforge.plantuml.style.Style;
 import net.sourceforge.plantuml.style.StyleSignatureBasic;
 import net.sourceforge.plantuml.style.Styleable;
 import net.sourceforge.plantuml.svek.image.Opale;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.UStroke;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
-import net.sourceforge.plantuml.ugraphic.color.HColor;
+import net.sourceforge.plantuml.utils.Direction;
 
 public class FtileWithNoteOpale extends AbstractFtile implements Stencil, Styleable {
 
@@ -135,26 +137,25 @@ public class FtileWithNoteOpale extends AbstractFtile implements Stencil, Stylea
 
 		final Style style = getStyleSignature().getMergedStyle(skinParam.getCurrentStyleBuilder())
 				.eventuallyOverride(note.getColors());
-		final HColor noteBackgroundColor = style.value(PName.BackGroundColor).asColor(skinParam.getThemeStyle(),
-				getIHtmlColorSet());
-		final HColor borderColor = style.value(PName.LineColor).asColor(skinParam.getThemeStyle(), getIHtmlColorSet());
-		final FontConfiguration fc = style.getFontConfiguration(skinParam.getThemeStyle(), getIHtmlColorSet());
+		final HColor noteBackgroundColor = style.value(PName.BackGroundColor).asColor(getIHtmlColorSet());
+		final HColor borderColor = style.value(PName.LineColor).asColor(getIHtmlColorSet());
+		final FontConfiguration fc = style.getFontConfiguration(getIHtmlColorSet());
 		final double shadowing = style.value(PName.Shadowing).asDouble();
 		final LineBreakStrategy wrapWidth = style.wrapWidth();
 		final UStroke stroke = style.getStroke();
 
 		final HorizontalAlignment align = skinParam.getHorizontalAlignment(AlignmentParam.noteTextAlignment, null,
 				false, null);
-		final Sheet sheet = Parser.build(fc, align, skinParam, CreoleMode.FULL).createSheet(note.getDisplay());
+		final Sheet sheet = skinParam.sheet(fc, align, CreoleMode.FULL).createSheet(note.getDisplay());
 		final TextBlock text = new SheetBlock2(new SheetBlock1(sheet, wrapWidth, skinParam.getPadding()), this, stroke);
 		opale = new Opale(shadowing, borderColor, noteBackgroundColor, text, withLink, stroke);
 
 	}
 
 	private UTranslate getTranslate(StringBounder stringBounder) {
-		final Dimension2D dimTotal = calculateDimensionInternal(stringBounder);
-		final Dimension2D dimNote = opale.calculateDimension(stringBounder);
-		final Dimension2D dimTile = tile.calculateDimension(stringBounder);
+		final XDimension2D dimTotal = calculateDimensionInternal(stringBounder);
+		final XDimension2D dimNote = opale.calculateDimension(stringBounder);
+		final XDimension2D dimTile = tile.calculateDimension(stringBounder);
 		final double yForFtile = (dimTotal.getHeight() - dimTile.getHeight()) / 2;
 		final double marge;
 		if (notePosition == NotePosition.LEFT)
@@ -168,15 +169,15 @@ public class FtileWithNoteOpale extends AbstractFtile implements Stencil, Stylea
 	@Override
 	public UTranslate getTranslateFor(Ftile child, StringBounder stringBounder) {
 		if (child == tile)
-			return new UTranslate();
+			return UTranslate.none();
 		return super.getTranslateFor(child, stringBounder);
 
 	}
 
 	private UTranslate getTranslateForOpale(UGraphic ug) {
 		final StringBounder stringBounder = ug.getStringBounder();
-		final Dimension2D dimTotal = calculateDimension(stringBounder);
-		final Dimension2D dimNote = opale.calculateDimension(stringBounder);
+		final XDimension2D dimTotal = calculateDimension(stringBounder);
+		final XDimension2D dimNote = opale.calculateDimension(stringBounder);
 
 		final double yForNote;
 		if (verticalAlignment == VerticalAlignment.CENTER)
@@ -199,17 +200,17 @@ public class FtileWithNoteOpale extends AbstractFtile implements Stencil, Stylea
 			intoSw = null;
 
 		final StringBounder stringBounder = ug.getStringBounder();
-		final Dimension2D dimNote = opale.calculateDimension(stringBounder);
+		final XDimension2D dimNote = opale.calculateDimension(stringBounder);
 
 		if (notePosition == NotePosition.LEFT) {
 			final Direction strategy = Direction.RIGHT;
-			final Point2D pp1 = new Point2D.Double(dimNote.getWidth(), dimNote.getHeight() / 2);
-			final Point2D pp2 = new Point2D.Double(dimNote.getWidth() + suppSpace, dimNote.getHeight() / 2);
+			final XPoint2D pp1 = new XPoint2D(dimNote.getWidth(), dimNote.getHeight() / 2);
+			final XPoint2D pp2 = new XPoint2D(dimNote.getWidth() + suppSpace, dimNote.getHeight() / 2);
 			opale.setOpale(strategy, pp1, pp2);
 		} else {
 			final Direction strategy = Direction.LEFT;
-			final Point2D pp1 = new Point2D.Double(0, dimNote.getHeight() / 2);
-			final Point2D pp2 = new Point2D.Double(-suppSpace, dimNote.getHeight() / 2);
+			final XPoint2D pp1 = new XPoint2D(0, dimNote.getHeight() / 2);
+			final XPoint2D pp2 = new XPoint2D(-suppSpace, dimNote.getHeight() / 2);
 			opale.setOpale(strategy, pp1, pp2);
 		}
 
@@ -221,7 +222,7 @@ public class FtileWithNoteOpale extends AbstractFtile implements Stencil, Stylea
 
 	@Override
 	protected FtileGeometry calculateDimensionFtile(StringBounder stringBounder) {
-		final Dimension2D dimTotal = calculateDimensionInternal(stringBounder);
+		final XDimension2D dimTotal = calculateDimensionInternal(stringBounder);
 		final FtileGeometry orig = tile.calculateDimension(stringBounder);
 		final UTranslate translate = getTranslate(stringBounder);
 		if (orig.hasPointOut())
@@ -231,11 +232,11 @@ public class FtileWithNoteOpale extends AbstractFtile implements Stencil, Stylea
 		return new FtileGeometry(dimTotal, orig.getLeft() + translate.getDx(), orig.getInY() + translate.getDy());
 	}
 
-	private Dimension2D calculateDimensionInternal(StringBounder stringBounder) {
-		final Dimension2D dimNote = opale.calculateDimension(stringBounder);
-		final Dimension2D dimTile = tile.calculateDimension(stringBounder);
+	private XDimension2D calculateDimensionInternal(StringBounder stringBounder) {
+		final XDimension2D dimNote = opale.calculateDimension(stringBounder);
+		final XDimension2D dimTile = tile.calculateDimension(stringBounder);
 		final double height = Math.max(dimNote.getHeight(), dimTile.getHeight());
-		return new Dimension2DDouble(dimTile.getWidth() + 1 * dimNote.getWidth() + suppSpace, height);
+		return new XDimension2D(dimTile.getWidth() + 1 * dimNote.getWidth() + suppSpace, height);
 	}
 
 	public double getStartingX(StringBounder stringBounder, double y) {
@@ -244,6 +245,11 @@ public class FtileWithNoteOpale extends AbstractFtile implements Stencil, Stylea
 
 	public double getEndingX(StringBounder stringBounder, double y) {
 		return opale.calculateDimension(stringBounder).getWidth() - opale.getMarginX1();
+	}
+
+	@Override
+	final public LinkRendering getInLinkRendering() {
+		return tile.getInLinkRendering();
 	}
 
 }

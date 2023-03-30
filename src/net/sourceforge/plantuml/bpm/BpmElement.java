@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -31,32 +34,32 @@
  */
 package net.sourceforge.plantuml.bpm;
 
-import java.awt.geom.Rectangle2D;
-
-import net.sourceforge.plantuml.ColorParam;
-import net.sourceforge.plantuml.ISkinParam;
-import net.sourceforge.plantuml.SkinParamUtils;
+import net.atmp.InnerStrategy;
 import net.sourceforge.plantuml.activitydiagram3.ftile.BoxStyle;
 import net.sourceforge.plantuml.activitydiagram3.ftile.vertical.FtileBox;
 import net.sourceforge.plantuml.activitydiagram3.ftile.vertical.FtileCircleStart;
 import net.sourceforge.plantuml.activitydiagram3.ftile.vertical.FtileDiamond;
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
-import net.sourceforge.plantuml.cucadiagram.Display;
-import net.sourceforge.plantuml.graphic.FontConfiguration;
-import net.sourceforge.plantuml.graphic.HorizontalAlignment;
-import net.sourceforge.plantuml.graphic.InnerStrategy;
-import net.sourceforge.plantuml.graphic.StringBounder;
-import net.sourceforge.plantuml.graphic.TextBlock;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.color.HColor;
+import net.sourceforge.plantuml.klimt.color.HColors;
+import net.sourceforge.plantuml.klimt.creole.Display;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.font.FontConfiguration;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
+import net.sourceforge.plantuml.klimt.font.UFont;
+import net.sourceforge.plantuml.klimt.geom.HorizontalAlignment;
+import net.sourceforge.plantuml.klimt.geom.MinMax;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
+import net.sourceforge.plantuml.klimt.geom.XRectangle2D;
+import net.sourceforge.plantuml.klimt.shape.AbstractTextBlock;
+import net.sourceforge.plantuml.klimt.shape.TextBlock;
+import net.sourceforge.plantuml.klimt.shape.ULine;
+import net.sourceforge.plantuml.skin.ColorParam;
+import net.sourceforge.plantuml.skin.SkinParamUtils;
+import net.sourceforge.plantuml.style.ISkinParam;
 import net.sourceforge.plantuml.style.SName;
 import net.sourceforge.plantuml.style.Style;
 import net.sourceforge.plantuml.style.StyleSignatureBasic;
-import net.sourceforge.plantuml.ugraphic.MinMax;
-import net.sourceforge.plantuml.ugraphic.UFont;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.ULine;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
-import net.sourceforge.plantuml.ugraphic.color.HColor;
-import net.sourceforge.plantuml.ugraphic.color.HColorUtils;
 
 public class BpmElement extends AbstractConnectorPuzzle implements ConnectorPuzzle {
 
@@ -92,11 +95,11 @@ public class BpmElement extends AbstractConnectorPuzzle implements ConnectorPuzz
 
 	public TextBlock toTextBlock(ISkinParam skinParam) {
 		final TextBlock raw = toTextBlockInternal(skinParam);
-		return new TextBlock() {
+		return new AbstractTextBlock() {
 
 			public void drawU(UGraphic ug) {
 				raw.drawU(ug);
-				ug = ug.apply(HColorUtils.RED);
+				ug = ug.apply(HColors.RED);
 				for (Where w : Where.values()) {
 					if (have(w)) {
 						drawLine(ug, w, raw.calculateDimension(ug.getStringBounder()));
@@ -104,11 +107,11 @@ public class BpmElement extends AbstractConnectorPuzzle implements ConnectorPuzz
 				}
 			}
 
-			public Rectangle2D getInnerPosition(String member, StringBounder stringBounder, InnerStrategy strategy) {
+			public XRectangle2D getInnerPosition(String member, StringBounder stringBounder, InnerStrategy strategy) {
 				return raw.getInnerPosition(member, stringBounder, strategy);
 			}
 
-			public Dimension2D calculateDimension(StringBounder stringBounder) {
+			public XDimension2D calculateDimension(StringBounder stringBounder) {
 				return raw.calculateDimension(stringBounder);
 			}
 
@@ -118,7 +121,7 @@ public class BpmElement extends AbstractConnectorPuzzle implements ConnectorPuzz
 		};
 	}
 
-	private void drawLine(UGraphic ug, Where w, Dimension2D total) {
+	private void drawLine(UGraphic ug, Where w, XDimension2D total) {
 		final double width = total.getWidth();
 		final double height = total.getHeight();
 		if (w == Where.WEST) {
@@ -145,7 +148,7 @@ public class BpmElement extends AbstractConnectorPuzzle implements ConnectorPuzz
 
 	public TextBlock toTextBlockInternal(ISkinParam skinParam) {
 		if (type == BpmElementType.START) {
-			return new FtileCircleStart(skinParam, HColorUtils.BLACK, null, getStyle(skinParam));
+			return new FtileCircleStart(skinParam, HColors.BLACK, null, getStyle(skinParam));
 		}
 		if (type == BpmElementType.MERGE) {
 			final HColor borderColor = SkinParamUtils.getColor(skinParam, null, ColorParam.activityBorder);
@@ -157,16 +160,16 @@ public class BpmElement extends AbstractConnectorPuzzle implements ConnectorPuzz
 			return FtileBox.create(skinParam, display, null, BoxStyle.PLAIN, null);
 		}
 		final UFont font = UFont.serif(14);
-		final FontConfiguration fc = FontConfiguration.create(font, HColorUtils.RED, HColorUtils.RED, false);
+		final FontConfiguration fc = FontConfiguration.create(font, HColors.RED, HColors.RED, null);
 		if (Display.isNull(display)) {
 			return Display.getWithNewlines(type.toString()).create(fc, HorizontalAlignment.LEFT, skinParam);
 		}
 		return display.create(fc, HorizontalAlignment.LEFT, skinParam);
 	}
 
-	private Dimension2D dimension;
+	private XDimension2D dimension;
 
-	public Dimension2D getDimension(StringBounder stringBounder, ISkinParam skinParam) {
+	public XDimension2D getDimension(StringBounder stringBounder, ISkinParam skinParam) {
 		if (dimension == null) {
 			dimension = toTextBlock(skinParam).calculateDimension(stringBounder);
 		}

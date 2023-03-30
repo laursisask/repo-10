@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,44 +35,47 @@
  */
 package net.sourceforge.plantuml.svek.extremity;
 
-import java.awt.geom.Point2D;
-
-import net.sourceforge.plantuml.graphic.UDrawable;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.geom.XPoint2D;
+import net.sourceforge.plantuml.klimt.shape.UDrawable;
 
 public abstract class Extremity implements UDrawable {
 
-
 	protected double manageround(double angle) {
 		final double deg = angle * 180.0 / Math.PI;
-		if (isCloseTo(0, deg)) {
+		if (isCloseTo(0, deg))
 			return 0;
-		}
-		if (isCloseTo(90, deg)) {
+
+		if (isCloseTo(90, deg))
 			return 90.0 * Math.PI / 180.0;
-		}
-		if (isCloseTo(180, deg)) {
+
+		if (isCloseTo(180, deg))
 			return 180.0 * Math.PI / 180.0;
-		}
-		if (isCloseTo(270, deg)) {
+
+		if (isCloseTo(270, deg))
 			return 270.0 * Math.PI / 180.0;
-		}
-		if (isCloseTo(360, deg)) {
+
+		if (isCloseTo(360, deg))
 			return 0;
-		}
+
 		return angle;
 	}
 
 	private boolean isCloseTo(double value, double variable) {
-		if (Math.abs(value - variable) < 0.05) {
+		if (Math.abs(value - variable) < 0.05)
 			return true;
-		}
+
 		return false;
 	}
-	
-	public abstract Point2D somePoint();
-	
-	public Point2D isTooSmallSoGiveThePointCloserToThisOne(Point2D pt) {
+
+	public abstract XPoint2D somePoint();
+
+	public XPoint2D isTooSmallSoGiveThePointCloserToThisOne(XPoint2D pt) {
 		return null;
+	}
+
+	public UTranslate getDeltaForKal() {
+		return UTranslate.none();
 	}
 
 }

@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,14 +35,14 @@
  */
 package net.sourceforge.plantuml.classdiagram.command;
 
-import net.sourceforge.plantuml.LineLocation;
+import net.atmp.CucaDiagram;
 import net.sourceforge.plantuml.command.CommandExecutionResult;
 import net.sourceforge.plantuml.command.SingleLineCommand2;
-import net.sourceforge.plantuml.command.regex.IRegex;
-import net.sourceforge.plantuml.command.regex.RegexConcat;
-import net.sourceforge.plantuml.command.regex.RegexLeaf;
-import net.sourceforge.plantuml.command.regex.RegexResult;
-import net.sourceforge.plantuml.cucadiagram.CucaDiagram;
+import net.sourceforge.plantuml.regex.IRegex;
+import net.sourceforge.plantuml.regex.RegexConcat;
+import net.sourceforge.plantuml.regex.RegexLeaf;
+import net.sourceforge.plantuml.regex.RegexResult;
+import net.sourceforge.plantuml.utils.LineLocation;
 
 public class CommandHideShowSpecificClass extends SingleLineCommand2<CucaDiagram> {
 
@@ -59,9 +62,11 @@ public class CommandHideShowSpecificClass extends SingleLineCommand2<CucaDiagram
 
 		// final String codeString = arg.get("CODE", 0);
 		// if (codeString.equals("class")) {
-		// diagram.hideOrShow(LeafType.CLASS, arg.get("COMMAND", 0).equalsIgnoreCase("show"));
+		// diagram.hideOrShow(LeafType.CLASS, arg.get("COMMAND",
+		// 0).equalsIgnoreCase("show"));
 		// } else if (codeString.equals("interface")) {
-		// diagram.hideOrShow(LeafType.INTERFACE, arg.get("COMMAND", 0).equalsIgnoreCase("show"));
+		// diagram.hideOrShow(LeafType.INTERFACE, arg.get("COMMAND",
+		// 0).equalsIgnoreCase("show"));
 		// } else {
 		// final Code code = diagram.buildCode(codeString);
 		// IEntity hidden = diagram.getEntityFactory().getLeafsget(code);
@@ -69,7 +74,8 @@ public class CommandHideShowSpecificClass extends SingleLineCommand2<CucaDiagram
 		// hidden = diagram.getEntityFactory().getGroupsget(code);
 		// }
 		// if (hidden == null) {
-		// return CommandExecutionResult.error("Class/Package does not exist : " + code.getFullName());
+		// return CommandExecutionResult.error("Class/Package does not exist : " +
+		// code.getFullName());
 		// }
 		// diagram.hideOrShow(hidden, arg.get("COMMAND", 0).equalsIgnoreCase("show"));
 		// }

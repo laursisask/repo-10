@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,20 +35,19 @@
  */
 package net.sourceforge.plantuml.sequencediagram.graphic;
 
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
 import java.util.Objects;
 
-import net.sourceforge.plantuml.Dimension2DDouble;
-import net.sourceforge.plantuml.Url;
-import net.sourceforge.plantuml.graphic.StringBounder;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
 import net.sourceforge.plantuml.sequencediagram.NotePosition;
 import net.sourceforge.plantuml.skin.Area;
 import net.sourceforge.plantuml.skin.ArrowComponent;
 import net.sourceforge.plantuml.skin.Component;
 import net.sourceforge.plantuml.skin.Context2D;
 import net.sourceforge.plantuml.skin.rose.Rose;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
+import net.sourceforge.plantuml.url.Url;
 
 class MessageArrow extends Arrow {
 
@@ -53,8 +55,8 @@ class MessageArrow extends Arrow {
 	private final LivingParticipantBox p2;
 	private final Component compAliveBox;
 
-	public MessageArrow(double startingY, Rose skin, ArrowComponent arrow, LivingParticipantBox p1, LivingParticipantBox p2,
-			Url url, Component compAliveBox) {
+	public MessageArrow(double startingY, Rose skin, ArrowComponent arrow, LivingParticipantBox p1,
+			LivingParticipantBox p2, Url url, Component compAliveBox) {
 		super(startingY, skin, arrow, url);
 
 		if (p1 == p2) {
@@ -78,8 +80,8 @@ class MessageArrow extends Arrow {
 	}
 
 	private double getRightEndInternal(StringBounder stringBounder) {
-		final Segment segment = getParticipantAt(stringBounder, NotePosition.RIGHT).getLiveThicknessAt(stringBounder,
-				getArrowYStartLevel(stringBounder)).getSegment();
+		final Segment segment = getParticipantAt(stringBounder, NotePosition.RIGHT)
+				.getLiveThicknessAt(stringBounder, getArrowYStartLevel(stringBounder)).getSegment();
 		if (segment.getLength() == 0) {
 			return segment.getPos1();
 		}
@@ -138,16 +140,16 @@ class MessageArrow extends Arrow {
 		endUrl(ug);
 	}
 
-	private Dimension2D getActualDimension(StringBounder stringBounder) {
-		return new Dimension2DDouble(getActualWidth(stringBounder) - getPaddingArrowHead(), getArrowComponent()
-				.getPreferredHeight(stringBounder));
+	private XDimension2D getActualDimension(StringBounder stringBounder) {
+		return new XDimension2D(getActualWidth(stringBounder) - getPaddingArrowHead(),
+				getArrowComponent().getPreferredHeight(stringBounder));
 	}
 
 	@Override
 	public double getArrowYStartLevel(StringBounder stringBounder) {
 		if (getArrowComponent() instanceof ArrowComponent) {
 			final ArrowComponent arrowComponent = (ArrowComponent) getArrowComponent();
-			final Dimension2D dim = new Dimension2DDouble(arrowComponent.getPreferredWidth(stringBounder),
+			final XDimension2D dim = new XDimension2D(arrowComponent.getPreferredWidth(stringBounder),
 					arrowComponent.getPreferredHeight(stringBounder));
 			return getStartingY() + arrowComponent.getStartPoint(stringBounder, dim).getY();
 		}
@@ -158,7 +160,7 @@ class MessageArrow extends Arrow {
 	public double getArrowYEndLevel(StringBounder stringBounder) {
 		if (getArrowComponent() instanceof ArrowComponent) {
 			final ArrowComponent arrowComponent = (ArrowComponent) getArrowComponent();
-			final Dimension2D dim = new Dimension2DDouble(arrowComponent.getPreferredWidth(stringBounder),
+			final XDimension2D dim = new XDimension2D(arrowComponent.getPreferredWidth(stringBounder),
 					arrowComponent.getPreferredHeight(stringBounder));
 			return getStartingY() + arrowComponent.getEndPoint(stringBounder, dim).getY();
 		}

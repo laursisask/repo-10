@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -33,14 +36,14 @@
  */
 package net.sourceforge.plantuml.svek;
 
-import net.sourceforge.plantuml.graphic.HorizontalAlignment;
-import net.sourceforge.plantuml.graphic.SymbolContext;
-import net.sourceforge.plantuml.graphic.TextBlock;
-import net.sourceforge.plantuml.graphic.USymbol;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.UStroke;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
-import net.sourceforge.plantuml.ugraphic.color.HColor;
+import net.sourceforge.plantuml.decoration.symbol.USymbol;
+import net.sourceforge.plantuml.klimt.Fashion;
+import net.sourceforge.plantuml.klimt.UStroke;
+import net.sourceforge.plantuml.klimt.color.HColor;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.geom.RectangleArea;
+import net.sourceforge.plantuml.klimt.geom.HorizontalAlignment;
+import net.sourceforge.plantuml.klimt.shape.TextBlock;
 
 public class ClusterDecoration {
 
@@ -49,40 +52,34 @@ public class ClusterDecoration {
 	final private TextBlock title;
 	final private TextBlock stereo;
 
-	final private double minX;
-	final private double minY;
-	final private double maxX;
-	final private double maxY;
+	final private RectangleArea rectangleArea;
 
-	public ClusterDecoration(PackageStyle style, USymbol symbol, TextBlock title, TextBlock stereo, double minX,
-			double minY, double maxX, double maxY, UStroke stroke) {
+	public ClusterDecoration(PackageStyle style, USymbol symbol, TextBlock title, TextBlock stereo,
+			RectangleArea rectangleArea, UStroke stroke) {
 		this.symbol = guess(symbol, style);
 		this.stereo = stereo;
 		this.title = title;
-		this.minX = minX;
-		this.minY = minY;
-		this.maxX = maxX;
-		this.maxY = maxY;
+		this.rectangleArea = rectangleArea;
 		this.defaultStroke = stroke;
 	}
 
 	private static USymbol guess(USymbol symbol, PackageStyle style) {
-		if (symbol != null) {
+		if (symbol != null)
 			return symbol;
-		}
+
 		return style.toUSymbol();
 	}
 
 	public void drawU(UGraphic ug, HColor backColor, HColor borderColor, double shadowing, double roundCorner,
 			HorizontalAlignment titleAlignment, HorizontalAlignment stereoAlignment, double diagonalCorner) {
-		final SymbolContext biColor = new SymbolContext(backColor, borderColor);
+		final Fashion biColor = new Fashion(backColor, borderColor);
 		if (symbol == null)
 			throw new UnsupportedOperationException();
 
-		final SymbolContext symbolContext = biColor.withShadow(shadowing).withStroke(defaultStroke)
-				.withCorner(roundCorner, diagonalCorner);
-		symbol.asBig(title, titleAlignment, stereo, maxX - minX, maxY - minY, symbolContext, stereoAlignment)
-				.drawU(ug.apply(new UTranslate(minX, minY)));
+		final Fashion symbolContext = biColor.withShadow(shadowing).withStroke(defaultStroke).withCorner(roundCorner,
+				diagonalCorner);
+		symbol.asBig(title, titleAlignment, stereo, rectangleArea.getWidth(), rectangleArea.getHeight(),
+				symbolContext, stereoAlignment).drawU(ug.apply(rectangleArea.getPosition()));
 	}
 
 }

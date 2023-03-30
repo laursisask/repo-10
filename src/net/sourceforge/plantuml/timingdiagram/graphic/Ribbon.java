@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -31,35 +34,36 @@
  */
 package net.sourceforge.plantuml.timingdiagram.graphic;
 
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sourceforge.plantuml.Dimension2DDouble;
-import net.sourceforge.plantuml.ISkinParam;
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
-import net.sourceforge.plantuml.command.Position;
-import net.sourceforge.plantuml.cucadiagram.Display;
-import net.sourceforge.plantuml.graphic.AbstractTextBlock;
-import net.sourceforge.plantuml.graphic.FontConfiguration;
-import net.sourceforge.plantuml.graphic.HorizontalAlignment;
-import net.sourceforge.plantuml.graphic.StringBounder;
-import net.sourceforge.plantuml.graphic.SymbolContext;
-import net.sourceforge.plantuml.graphic.TextBlock;
-import net.sourceforge.plantuml.graphic.TextBlockUtils;
-import net.sourceforge.plantuml.graphic.UDrawable;
-import net.sourceforge.plantuml.graphic.color.ColorType;
-import net.sourceforge.plantuml.graphic.color.Colors;
+import net.sourceforge.plantuml.klimt.Fashion;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.color.ColorType;
+import net.sourceforge.plantuml.klimt.color.Colors;
+import net.sourceforge.plantuml.klimt.color.HColor;
+import net.sourceforge.plantuml.klimt.creole.Display;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.font.FontConfiguration;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
+import net.sourceforge.plantuml.klimt.geom.HorizontalAlignment;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
+import net.sourceforge.plantuml.klimt.geom.XPoint2D;
+import net.sourceforge.plantuml.klimt.shape.AbstractTextBlock;
+import net.sourceforge.plantuml.klimt.shape.TextBlock;
+import net.sourceforge.plantuml.klimt.shape.TextBlockUtils;
+import net.sourceforge.plantuml.klimt.shape.UDrawable;
+import net.sourceforge.plantuml.klimt.shape.ULine;
+import net.sourceforge.plantuml.klimt.shape.URectangle;
+import net.sourceforge.plantuml.style.ISkinParam;
+import net.sourceforge.plantuml.style.PName;
 import net.sourceforge.plantuml.style.Style;
 import net.sourceforge.plantuml.timingdiagram.ChangeState;
 import net.sourceforge.plantuml.timingdiagram.TimeConstraint;
 import net.sourceforge.plantuml.timingdiagram.TimeTick;
 import net.sourceforge.plantuml.timingdiagram.TimingNote;
 import net.sourceforge.plantuml.timingdiagram.TimingRuler;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.ULine;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
-import net.sourceforge.plantuml.ugraphic.color.HColor;
+import net.sourceforge.plantuml.utils.Position;
 
 public class Ribbon implements PDrawing {
 
@@ -93,10 +97,10 @@ public class Ribbon implements PDrawing {
 				+ getHeightForTopComment(stringBounder) + getRibbonHeight() / 2;
 		for (ChangeState change : changes)
 			if (change.getWhen().compareTo(tick) == 0)
-				return new IntricatedPoint(new Point2D.Double(x, y), new Point2D.Double(x, y));
+				return new IntricatedPoint(new XPoint2D(x, y), new XPoint2D(x, y));
 
-		return new IntricatedPoint(new Point2D.Double(x, y - getRibbonHeight() / 2),
-				new Point2D.Double(x, y + getRibbonHeight() / 2));
+		return new IntricatedPoint(new XPoint2D(x, y - getRibbonHeight() / 2),
+				new XPoint2D(x, y + getRibbonHeight() / 2));
 	}
 
 	public void addChange(ChangeState change) {
@@ -127,12 +131,12 @@ public class Ribbon implements PDrawing {
 				}
 			}
 
-			public Dimension2D calculateDimension(StringBounder stringBounder) {
+			public XDimension2D calculateDimension(StringBounder stringBounder) {
 				double width = getInitialWidth(stringBounder);
 				if (compact)
 					width += title.calculateDimension(stringBounder).getWidth() + 10;
 
-				return new Dimension2DDouble(width, getRibbonHeight());
+				return new XDimension2D(width, getRibbonHeight());
 			}
 		};
 	}
@@ -148,7 +152,8 @@ public class Ribbon implements PDrawing {
 	private void drawNotes(UGraphic ug, final Position position) {
 		for (TimingNote note : notes)
 			if (note.getPosition() == position) {
-				final double x = ruler.getPosInPixel(note.getWhen());
+				final TimeTick when = note.getWhen();
+				final double x = when == null ? 0 : ruler.getPosInPixel(when);
 				note.drawU(ug.apply(UTranslate.dx(x)));
 			}
 	}
@@ -180,10 +185,13 @@ public class Ribbon implements PDrawing {
 	}
 
 	private void drawPentaA(UGraphic ug, double len, ChangeState change) {
-		SymbolContext context = change.getContext(skinParam, style);
+		Fashion context = change.getContext(skinParam, style);
 		final HColor back = initialColors.getColor(ColorType.BACK);
+		final HColor line = initialColors.getColor(ColorType.LINE);
 		if (back != null)
 			context = context.withBackColor(back);
+		if (line != null)
+			context = context.withForeColor(line);
 
 		final PentaAShape shape = PentaAShape.create(len, getRibbonHeight(), context);
 		shape.drawU(ug);
@@ -244,8 +252,13 @@ public class Ribbon implements PDrawing {
 	}
 
 	private void drawBeforeZeroState(UGraphic ug) {
-		if (initialState != null && changes.size() > 0) {
-			final StringBounder stringBounder = ug.getStringBounder();
+		if (initialState == null)
+			return;
+		final StringBounder stringBounder = ug.getStringBounder();
+		if (changes.size() == 0) {
+			drawSingle(ug.apply(UTranslate.dx(-getInitialWidth(stringBounder))),
+					getInitialWidth(stringBounder) + ruler.getWidth());
+		} else {
 			final double a = getPosInPixel(changes.get(0));
 			drawPentaA(ug.apply(UTranslate.dx(-getInitialWidth(stringBounder))), getInitialWidth(stringBounder) + a,
 					changes.get(0));
@@ -256,9 +269,26 @@ public class Ribbon implements PDrawing {
 		final StringBounder stringBounder = ug.getStringBounder();
 		if (initialState != null) {
 			final TextBlock initial = createTextBlock(initialState);
-			final Dimension2D dimInital = initial.calculateDimension(stringBounder);
+			final XDimension2D dimInital = initial.calculateDimension(stringBounder);
 			initial.drawU(ug.apply(new UTranslate(-getMarginX() - dimInital.getWidth(), -dimInital.getHeight() / 2)));
 		}
+	}
+
+	private void drawSingle(UGraphic ug, double len) {
+		final HColor back = style.value(PName.BackGroundColor).asColor(skinParam.getIHtmlColorSet());
+		final HColor line = style.value(PName.LineColor).asColor(skinParam.getIHtmlColorSet());
+		Fashion context = new Fashion(back, back).withStroke(style.getStroke());
+		ug = context.apply(ug);
+
+		final double height = getRibbonHeight();
+		final URectangle rect = URectangle.build(len, height);
+		ug.draw(rect);
+
+		final ULine border = ULine.hline(len);
+		ug = ug.apply(line);
+		ug.draw(border);
+		ug.apply(UTranslate.dy(height)).draw(border);
+
 	}
 
 	private void drawStates(UGraphic ug) {
@@ -288,7 +318,7 @@ public class Ribbon implements PDrawing {
 			final double x = ruler.getPosInPixel(change.getWhen());
 			if (change.isBlank() == false && change.isCompletelyHidden() == false && change.isFlat() == false) {
 				final TextBlock state = createTextBlock(change.getState());
-				final Dimension2D dim = state.calculateDimension(stringBounder);
+				final XDimension2D dim = state.calculateDimension(stringBounder);
 				final double xtext;
 				if (i == changes.size() - 1) {
 					xtext = x + getMarginX();
@@ -299,7 +329,7 @@ public class Ribbon implements PDrawing {
 				state.drawU(ug.apply(new UTranslate(xtext, -dim.getHeight() / 2)));
 			}
 			final TextBlock commentTopBlock = getCommentTopBlock(change);
-			final Dimension2D dimComment = commentTopBlock.calculateDimension(stringBounder);
+			final XDimension2D dimComment = commentTopBlock.calculateDimension(stringBounder);
 			commentTopBlock
 					.drawU(ug.apply(new UTranslate(x + getMarginX(), -getRibbonHeight() / 2 - dimComment.getHeight())));
 		}

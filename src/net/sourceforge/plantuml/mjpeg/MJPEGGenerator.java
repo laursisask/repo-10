@@ -21,14 +21,16 @@ import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import net.sourceforge.plantuml.security.SImageIO;
 import net.sourceforge.plantuml.security.SFile;
+import net.sourceforge.plantuml.security.SImageIO;
 
 /**
  *
  * @author monceaux
  */
 public class MJPEGGenerator {
+    // ::remove folder when __HAXE__
+	// ::remove folder when __CORE__
 	/*
 	 * Info needed for MJPEG AVI
 	 *

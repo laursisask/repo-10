@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -49,18 +52,14 @@ import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import net.sourceforge.plantuml.cucadiagram.Display;
-import net.sourceforge.plantuml.cucadiagram.GroupRoot;
-import net.sourceforge.plantuml.cucadiagram.IEntity;
-import net.sourceforge.plantuml.cucadiagram.IGroup;
-import net.sourceforge.plantuml.cucadiagram.Link;
-import net.sourceforge.plantuml.cucadiagram.LinkDecor;
+import net.sourceforge.plantuml.abel.Entity;
+import net.sourceforge.plantuml.abel.Link;
+import net.sourceforge.plantuml.decoration.LinkDecor;
+import net.sourceforge.plantuml.klimt.creole.Display;
 import net.sourceforge.plantuml.statediagram.StateDiagram;
-import net.sourceforge.plantuml.utils.UniqueSequence;
-import net.sourceforge.plantuml.version.Version;
 import net.sourceforge.plantuml.xml.XmlFactories;
 
-public class XmiStateDiagram implements IXmiClassDiagram {
+public class XmiStateDiagram implements XmlDiagramTransformer {
 
 	private final StateDiagram diagram;
 	private final Document document;
@@ -90,48 +89,39 @@ public class XmiStateDiagram implements IXmiClassDiagram {
 		final Element content = document.createElement("XMI.content");
 		xmi.appendChild(content);
 
-		// <UML:Model xmi.id="UMLModel.4" name="Design Model"
-		// visibility="public" isSpecification="false" isRoot="false"
-		// isLeaf="false" isAbstract="false">
 		final Element model = document.createElement("UML:Model");
 		model.setAttribute("xmi.id", CucaDiagramXmiMaker.getModel(diagram));
-		model.setAttribute("name", "PlantUML "+Version.versionString());
+		model.setAttribute("name", "PlantUML");
 		content.appendChild(model);
 
 		// <UML:Namespace.ownedElement>
 		this.ownedElement = document.createElement("UML:Namespace.ownedElement");
 		model.appendChild(ownedElement);
 
-		for (final IGroup gr : diagram.getGroups(false)) {
-			if (gr.getParentContainer() instanceof GroupRoot) {
+		for (final Entity gr : diagram.getEntityFactory().groups())
+			if (gr.getParentContainer().isRoot())
 				addState(gr, ownedElement);
-			}
-		}
 
-		for (final IEntity ent : diagram.getLeafsvalues()) {
-			if (ent.getParentContainer() instanceof GroupRoot) {
+		for (final Entity ent : diagram.getEntityFactory().leafs())
+			if (ent.getParentContainer().isRoot())
 				addState(ent, ownedElement);
-			}
-		}
 
-		for (final Link link : diagram.getLinks()) {
+		for (final Link link : diagram.getLinks())
 			addLink(link);
-		}
+
 	}
 
-	private void addState(final IEntity tobeAdded, Element container) {
+	private void addState(final Entity tobeAdded, Element container) {
 		final Element elementState = createEntityNode(tobeAdded);
 		container.appendChild(elementState);
-		for (final IEntity ent : diagram.getGroups(false)) {
-			if (ent.getParentContainer() == tobeAdded) {
+		for (final Entity ent : diagram.getEntityFactory().groups())
+			if (ent.getParentContainer() == tobeAdded)
 				addState(ent, elementState);
-			}
-		}
-		for (final IEntity ent : diagram.getLeafsvalues()) {
-			if (ent.getParentContainer() == tobeAdded) {
+
+		for (final Entity ent : diagram.getEntityFactory().leafs())
+			if (ent.getParentContainer() == tobeAdded)
 				addState(ent, elementState);
-			}
-		}
+
 	}
 
 	public static String forXMI(String s) {
@@ -143,49 +133,48 @@ public class XmiStateDiagram implements IXmiClassDiagram {
 	}
 
 	private void addLink(Link link) {
-		final String assId = "ass" + UniqueSequence.getValue();
+		final String assId = "ass" + diagram.getUniqueSequence();
 
 		final Element association = document.createElement("UML:Association");
 		association.setAttribute("xmi.id", assId);
 		association.setAttribute("namespace", CucaDiagramXmiMaker.getModel(diagram));
-		if (Display.isNull(link.getLabel()) == false) {
+		if (Display.isNull(link.getLabel()) == false)
 			association.setAttribute("name", forXMI(link.getLabel()));
-		}
 
 		final Element connection = document.createElement("UML:Association.connection");
 		final Element end1 = document.createElement("UML:AssociationEnd");
-		end1.setAttribute("xmi.id", "end" + UniqueSequence.getValue());
+		end1.setAttribute("xmi.id", "end" + diagram.getUniqueSequence());
 		end1.setAttribute("association", assId);
 		end1.setAttribute("type", link.getEntity1().getUid());
-		if (link.getQualifier1() != null) {
-			end1.setAttribute("name", forXMI(link.getQualifier1()));
-		}
+		if (link.getQuantifier1() != null)
+			end1.setAttribute("name", forXMI(link.getQuantifier1()));
+
 		final Element endparticipant1 = document.createElement("UML:AssociationEnd.participant");
 
-		if (link.getType().getDecor2() == LinkDecor.COMPOSITION) {
+		if (link.getType().getDecor2() == LinkDecor.COMPOSITION)
 			end1.setAttribute("aggregation", "composite");
-		}
-		if (link.getType().getDecor2() == LinkDecor.AGREGATION) {
+
+		if (link.getType().getDecor2() == LinkDecor.AGREGATION)
 			end1.setAttribute("aggregation", "aggregate");
-		}
+
 		// }
 		end1.appendChild(endparticipant1);
 		connection.appendChild(end1);
 
 		final Element end2 = document.createElement("UML:AssociationEnd");
-		end2.setAttribute("xmi.id", "end" + UniqueSequence.getValue());
+		end2.setAttribute("xmi.id", "end" + diagram.getUniqueSequence());
 		end2.setAttribute("association", assId);
 		end2.setAttribute("type", link.getEntity2().getUid());
-		if (link.getQualifier2() != null) {
-			end2.setAttribute("name", forXMI(link.getQualifier2()));
-		}
+		if (link.getQuantifier2() != null)
+			end2.setAttribute("name", forXMI(link.getQuantifier2()));
+
 		final Element endparticipant2 = document.createElement("UML:AssociationEnd.participant");
-		if (link.getType().getDecor1() == LinkDecor.COMPOSITION) {
+		if (link.getType().getDecor1() == LinkDecor.COMPOSITION)
 			end2.setAttribute("aggregation", "composite");
-		}
-		if (link.getType().getDecor1() == LinkDecor.AGREGATION) {
+
+		if (link.getType().getDecor1() == LinkDecor.AGREGATION)
 			end2.setAttribute("aggregation", "aggregate");
-		}
+
 		// }
 		end2.appendChild(endparticipant2);
 		connection.appendChild(end2);
@@ -196,7 +185,7 @@ public class XmiStateDiagram implements IXmiClassDiagram {
 
 	}
 
-	private Element createEntityNode(IEntity entity) {
+	private Element createEntityNode(Entity entity) {
 		// <UML:Class xmi.id="UMLClass.5" name="Class1" visibility="public"
 		// isSpecification="false"
 		// namespace="UMLModel.4" isRoot="false" isLeaf="false"

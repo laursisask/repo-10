@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,14 +35,14 @@
  */
 package net.sourceforge.plantuml.png;
 
-import net.sourceforge.plantuml.ISkinSimple;
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
-import net.sourceforge.plantuml.cucadiagram.Display;
 import net.sourceforge.plantuml.cucadiagram.DisplaySection;
-import net.sourceforge.plantuml.graphic.StringBounder;
-import net.sourceforge.plantuml.graphic.TextBlock;
+import net.sourceforge.plantuml.klimt.color.HColorSet;
+import net.sourceforge.plantuml.klimt.creole.Display;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
+import net.sourceforge.plantuml.klimt.shape.TextBlock;
+import net.sourceforge.plantuml.style.ISkinSimple;
 import net.sourceforge.plantuml.style.Style;
-import net.sourceforge.plantuml.ugraphic.color.HColorSet;
 
 public class PngTitler {
 
@@ -57,7 +60,7 @@ public class PngTitler {
 
 	}
 
-	public Dimension2D getTextDimension(StringBounder stringBounder) {
+	public XDimension2D getTextDimension(StringBounder stringBounder) {
 		final TextBlock textBloc = getRibbonBlock();
 		if (textBloc == null)
 			return null;
@@ -70,6 +73,6 @@ public class PngTitler {
 		if (display == null)
 			return null;
 
-		return style.createTextBlockBordered(display, set, spriteContainer);
+		return style.createTextBlockBordered(display, set, spriteContainer, Style.ID_TITLE);
 	}
 }

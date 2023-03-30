@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -40,7 +43,7 @@ public class TimeScaleCompressed implements TimeScale {
 	private final TimeScale daily;
 
 	public TimeScaleCompressed(Day calendar, double scale) {
-		this.daily = new TimeScaleDaily(scale, calendar, null);
+		this.daily = new TimeScaleDaily(calendar, scale, null);
 	}
 
 	public double getStartingPosition(Day instant) {

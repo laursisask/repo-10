@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,20 +35,18 @@
  */
 package net.sourceforge.plantuml.skin;
 
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
-import java.awt.geom.Point2D;
-
-import net.sourceforge.plantuml.Dimension2DDouble;
-import net.sourceforge.plantuml.graphic.AbstractTextBlock;
-import net.sourceforge.plantuml.graphic.StringBounder;
-import net.sourceforge.plantuml.graphic.SymbolContext;
-import net.sourceforge.plantuml.graphic.TextBlock;
-import net.sourceforge.plantuml.ugraphic.UEllipse;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.ULine;
-import net.sourceforge.plantuml.ugraphic.UPath;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
-import net.sourceforge.plantuml.ugraphic.color.HColorNone;
+import net.sourceforge.plantuml.klimt.Fashion;
+import net.sourceforge.plantuml.klimt.UPath;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.color.HColors;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
+import net.sourceforge.plantuml.klimt.geom.XPoint2D;
+import net.sourceforge.plantuml.klimt.shape.AbstractTextBlock;
+import net.sourceforge.plantuml.klimt.shape.TextBlock;
+import net.sourceforge.plantuml.klimt.shape.UEllipse;
+import net.sourceforge.plantuml.klimt.shape.ULine;
 
 public class ActorStickMan extends AbstractTextBlock implements TextBlock {
 
@@ -56,10 +57,10 @@ public class ActorStickMan extends AbstractTextBlock implements TextBlock {
 	private final double legsY = 15;
 	private final double headDiam = 16;
 
-	private final SymbolContext symbolContext;
+	private final Fashion symbolContext;
 	private final boolean actorBusiness;
 
-	ActorStickMan(SymbolContext symbolContext, boolean actorBusiness) {
+	ActorStickMan(Fashion symbolContext, boolean actorBusiness) {
 		this.symbolContext = symbolContext;
 		this.actorBusiness = actorBusiness;
 	}
@@ -68,10 +69,10 @@ public class ActorStickMan extends AbstractTextBlock implements TextBlock {
 
 		final double startX = Math.max(armsLenght, legsX) - headDiam / 2.0 + thickness();
 
-		final UEllipse head = new UEllipse(headDiam, headDiam);
+		final UEllipse head = UEllipse.build(headDiam, headDiam);
 		final double centerX = startX + headDiam / 2;
 
-		final UPath path = new UPath();
+		final UPath path = UPath.none();
 		path.moveTo(0, 0);
 		path.lineTo(0, bodyLenght);
 		path.moveTo(-armsLenght, armsY);
@@ -90,21 +91,21 @@ public class ActorStickMan extends AbstractTextBlock implements TextBlock {
 		if (actorBusiness) {
 			specialBusiness(ug.apply(new UTranslate(startX + headDiam / 2, thickness() + headDiam / 2)));
 		}
-		ug.apply(new UTranslate(centerX, headDiam + thickness())).apply(new HColorNone().bg()).draw(path);
+		ug.apply(new UTranslate(centerX, headDiam + thickness())).apply(HColors.none().bg()).draw(path);
 	}
 
 	private void specialBusiness(UGraphic ug) {
 		final double alpha = 21 * Math.PI / 64;
-		final Point2D p1 = getOnCircle(Math.PI / 4 + alpha);
-		final Point2D p2 = getOnCircle(Math.PI / 4 - alpha);
-		ug = ug.apply(new UTranslate(p1));
+		final XPoint2D p1 = getOnCircle(Math.PI / 4 + alpha);
+		final XPoint2D p2 = getOnCircle(Math.PI / 4 - alpha);
+		ug = ug.apply(UTranslate.point(p1));
 		ug.draw(new ULine(p2.getX() - p1.getX(), p2.getY() - p1.getY()));
 	}
 
-	private Point2D getOnCircle(double alpha) {
+	private XPoint2D getOnCircle(double alpha) {
 		final double x = headDiam / 2 * Math.cos(alpha);
 		final double y = headDiam / 2 * Math.sin(alpha);
-		return new Point2D.Double(x, y);
+		return new XPoint2D(x, y);
 	}
 
 	private double thickness() {
@@ -119,7 +120,7 @@ public class ActorStickMan extends AbstractTextBlock implements TextBlock {
 		return headDiam + bodyLenght + legsY + 2 * thickness() + symbolContext.getDeltaShadow() + 1;
 	}
 
-	public Dimension2D calculateDimension(StringBounder stringBounder) {
-		return new Dimension2DDouble(getPreferredWidth(), getPreferredHeight());
+	public XDimension2D calculateDimension(StringBounder stringBounder) {
+		return new XDimension2D(getPreferredWidth(), getPreferredHeight());
 	}
 }

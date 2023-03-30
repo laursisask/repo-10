@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,33 +35,30 @@
  */
 package net.sourceforge.plantuml.svek.extremity;
 
-import java.awt.geom.Point2D;
-
-import net.sourceforge.plantuml.ugraphic.UEllipse;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.UStroke;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
-import net.sourceforge.plantuml.ugraphic.color.HColor;
+import net.sourceforge.plantuml.klimt.UStroke;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.color.HColor;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.geom.XPoint2D;
+import net.sourceforge.plantuml.klimt.shape.UEllipse;
 
 class MiddleCircle extends Extremity {
 
 	private final double radius = 6;
-	private final UEllipse circle = new UEllipse(2 * radius, 2 * radius);
+	private final UEllipse circle = UEllipse.build(2 * radius, 2 * radius);
 	private final HColor backColor;
-	
+
 	public MiddleCircle(HColor backColor) {
 		this.backColor = backColor;
 	}
 
-
 	@Override
-	public Point2D somePoint() {
+	public XPoint2D somePoint() {
 		return null;
 	}
 
-
 	public void drawU(UGraphic ug) {
-		ug.apply(backColor.bg()).apply(new UStroke(1.5)).apply(new UTranslate(-radius, -radius)).draw(circle);
+		ug.apply(backColor.bg()).apply(UStroke.withThickness(1.5)).apply(new UTranslate(-radius, -radius)).draw(circle);
 	}
 
 }

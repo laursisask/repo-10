@@ -4,12 +4,12 @@
  *
  * (C) Copyright 2009-2021, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  *
  * If you like this project or if you find it useful, you can support us at:
  *
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  *
  * This file is part of PlantUML.
  *
@@ -35,20 +35,21 @@
  */
 package net.sourceforge.plantuml.security.authentication.basicauth;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import net.sourceforge.plantuml.security.authentication.SecurityAuthentication;
 import net.sourceforge.plantuml.security.authentication.SecurityAuthorizeManager;
 import net.sourceforge.plantuml.security.authentication.SecurityCredentials;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
- * The {@link BasicAuthAuthorizeManager} creates the authentication on the fly from the credentials without
- * any access to other services.
+ * The {@link BasicAuthAuthorizeManager} creates the authentication on the fly
+ * from the credentials without any access to other services.
  *
  * @author Aljoscha Rittner
  */
 public class BasicAuthAuthorizeManager implements SecurityAuthorizeManager {
+    // ::remove folder when __HAXE__
 	@Override
 	public SecurityAuthentication create(SecurityCredentials credentials) {
 		String type = credentials.getType();

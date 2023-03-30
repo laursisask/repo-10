@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -48,6 +51,14 @@ public class Margins {
 	@Override
 	public String toString() {
 		return "MARGIN[" + x1 + "," + x2 + "," + y1 + "," + y2 + "]";
+	}
+
+	public Margins merge(Margins other) {
+		return new Margins(//
+				Math.max(this.x1, other.x1), //
+				Math.max(this.x2, other.x2), //
+				Math.max(this.y1, other.y1), //
+				Math.max(this.y2, other.y2));
 	}
 
 	public Margins(double x1, double x2, double y1, double y2) {

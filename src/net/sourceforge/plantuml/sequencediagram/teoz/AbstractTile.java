@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,14 +35,25 @@
  */
 package net.sourceforge.plantuml.sequencediagram.teoz;
 
-import net.sourceforge.plantuml.graphic.StringBounder;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
 import net.sourceforge.plantuml.sequencediagram.AbstractMessage;
 import net.sourceforge.plantuml.sequencediagram.Event;
 
 public abstract class AbstractTile extends CommonTile implements Tile {
 
+	public AbstractTile(StringBounder stringBounder, YGauge currentY) {
+		super(stringBounder);
+		if (YGauge.USE_ME)
+			System.err.println("CREATING " + getClass());
+	}
+
 	public AbstractTile(StringBounder stringBounder) {
 		super(stringBounder);
+	}
+
+	@Override
+	public YGauge getYGauge() {
+		throw new UnsupportedOperationException(getClass().toString());
 	}
 
 	public double getContactPointRelative() {
@@ -56,9 +70,9 @@ public abstract class AbstractTile extends CommonTile implements Tile {
 		final Event event = this.getEvent();
 		if (event instanceof AbstractMessage) {
 			final AbstractMessage msg = (AbstractMessage) event;
-			if (anchor.equals(msg.getAnchor())) {
+			if (anchor.equals(msg.getAnchor()))
 				return true;
-			}
+
 		}
 		return false;
 	}

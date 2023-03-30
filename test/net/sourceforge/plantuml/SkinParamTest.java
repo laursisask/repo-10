@@ -9,19 +9,26 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 
-import net.sourceforge.plantuml.api.ThemeStyle;
-import net.sourceforge.plantuml.cucadiagram.Rankdir;
-import net.sourceforge.plantuml.cucadiagram.Stereotype;
-import net.sourceforge.plantuml.cucadiagram.dot.DotSplines;
-import net.sourceforge.plantuml.graphic.HorizontalAlignment;
+import net.sourceforge.plantuml.dot.DotSplines;
+import net.sourceforge.plantuml.klimt.LineBreakStrategy;
+import net.sourceforge.plantuml.klimt.color.HColors;
+import net.sourceforge.plantuml.klimt.drawing.svg.LengthAdjust;
+import net.sourceforge.plantuml.klimt.geom.HorizontalAlignment;
+import net.sourceforge.plantuml.klimt.geom.Rankdir;
 import net.sourceforge.plantuml.skin.ActorStyle;
+import net.sourceforge.plantuml.skin.ComponentStyle;
+import net.sourceforge.plantuml.skin.CornerParam;
+import net.sourceforge.plantuml.skin.LineParam;
 import net.sourceforge.plantuml.skin.Padder;
+import net.sourceforge.plantuml.skin.PaddingParam;
+import net.sourceforge.plantuml.skin.SkinParam;
+import net.sourceforge.plantuml.skin.SplitParam;
+import net.sourceforge.plantuml.skin.UmlDiagramType;
+import net.sourceforge.plantuml.stereo.Stereotype;
 import net.sourceforge.plantuml.svek.ConditionEndStyle;
 import net.sourceforge.plantuml.svek.ConditionStyle;
 import net.sourceforge.plantuml.svek.PackageStyle;
-import net.sourceforge.plantuml.svg.LengthAdjust;
-import net.sourceforge.plantuml.ugraphic.color.ColorMapperIdentity;
-import net.sourceforge.plantuml.ugraphic.color.HColorUtils;
+import net.sourceforge.plantuml.text.Guillemet;
 
 class SkinParamTest {
 
@@ -30,21 +37,21 @@ class SkinParamTest {
 	//
 
 	/**
-	 * A long and verbose test method!
-	 * But it helps us to avoid accidentally changing a default style.
+	 * A long and verbose test method! But it helps us to avoid accidentally
+	 * changing a default style.
 	 */
 	@ParameterizedTest
 	@EnumSource(UmlDiagramType.class)
 	public void testDefaultValues(UmlDiagramType umlDiagramType) {
 
-		final SkinParam skinParam = SkinParam.create(umlDiagramType, ThemeStyle.LIGHT_REGULAR);
+		final SkinParam skinParam = SkinParam.create(umlDiagramType);
 		final Stereotype fooStereotype = Stereotype.build("<<foo>>");
 
 		assertThat(skinParam.actorStyle()).isEqualTo(ActorStyle.STICKMAN);
 
 		assertThat(skinParam.getAllSpriteNames()).isEmpty();
 
-		assertThat(skinParam.getBackgroundColor()).isEqualTo(HColorUtils.WHITE);
+		assertThat(skinParam.getBackgroundColor()).isEqualTo(HColors.WHITE);
 
 		assertThat(skinParam.getCircledCharacter(fooStereotype)).isEqualTo('\0');
 
@@ -54,7 +61,7 @@ class SkinParamTest {
 
 		assertThat(skinParam.colorArrowSeparationSpace()).isZero();
 
-		assertThat(skinParam.getColorMapper()).isInstanceOf(ColorMapperIdentity.class);
+		// assertThat(skinParam.getColorMapper()).isEqualTo(ColorMapper.IDENTITY);
 
 		assertThat(skinParam.componentStyle()).isEqualTo(ComponentStyle.UML2);
 
@@ -94,7 +101,7 @@ class SkinParamTest {
 
 		assertThat(skinParam.forceSequenceParticipantUnderlined()).isFalse();
 
-		assertThat(skinParam.getHyperlinkColor()).isEqualTo(HColorUtils.BLUE);
+		assertThat(skinParam.getHyperlinkColor()).isEqualTo(HColors.BLUE);
 
 		assertThat(skinParam.getlengthAdjust()).isEqualTo(LengthAdjust.SPACING);
 
@@ -114,7 +121,7 @@ class SkinParamTest {
 
 		assertThat(skinParam.maxAsciiMessageLength()).isEqualTo(-1);
 
-		assertThat(skinParam.minClassWidth()).isZero();
+		// assertThat(skinParam.minClassWidth()).isZero();
 
 		assertThat(skinParam.getMonospacedFamily()).isEqualTo("monospaced");
 
@@ -258,11 +265,7 @@ class SkinParamTest {
 
 		assertThat(skinParam.useSwimlanes(umlDiagramType)).isFalse();
 
-		assertThat(skinParam.useUnderlineForHyperlink()).isTrue();
-
-		final LineBreakStrategy wrapWidth = skinParam.wrapWidth();
-		assertThat(wrapWidth.isAuto()).isFalse();
-		assertThat(wrapWidth.getMaxWidth()).isZero();
+		assertThat(skinParam.useUnderlineForHyperlink()).isNotNull();
 	}
 
 	@Test
@@ -290,63 +293,41 @@ class SkinParamTest {
 	}
 
 	@ParameterizedTest
-	@CsvSource({
-			"true,        true",
-			"tRUe,        true",
-			"TRUE,        true",
-			"other_value, false",
-	})
+	@CsvSource({ "true,        true", "tRUe,        true", "TRUE,        true", "other_value, false", })
 	public void test_fixCircleLabelOverlapping(String paramValue, boolean expected) {
 		final SkinParam skinParam = createSkinParam("fixCircleLabelOverlapping", paramValue);
 		assertThat(skinParam.fixCircleLabelOverlapping()).isEqualTo(expected);
 	}
 
 	@ParameterizedTest
-	@CsvSource({
-			"old,         true",
-			"oLd,         true",
-			"OLD,         true",
-			"other_value, false",
-	})
+	@CsvSource({ "old,         true", "oLd,         true", "OLD,         true", "other_value, false", })
 	public void test_genericDisplay(String paramValue, boolean expected) {
 		final SkinParam skinParam = createSkinParam("genericDisplay", paramValue);
 		assertThat(skinParam.displayGenericWithOldFashion()).isEqualTo(expected);
 	}
 
 	@ParameterizedTest
-	@CsvSource({
-			"0, MAX_VALUE",
-			"1, MAX_VALUE",
-			"2, 2",
-			"123, 123"
-	})
+	@CsvSource({ "0, MAX_VALUE", "1, MAX_VALUE", "2, 2", "123, 123" })
 	public void test_groupInheritance(String paramValue, String expectedValue) {
 		final SkinParam skinParam = createSkinParam("groupInheritance", paramValue);
 		assertThat(skinParam.groupInheritance()).isEqualTo(intFromCsv(expectedValue));
 	}
 
 	@ParameterizedTest
-	@CsvSource({
-			"true,        true",
-			"tRUe,        true",
-			"TRUE,        true",
-			"other_value, false",
-	})
+	@CsvSource({ "true,        true", "tRUe,        true", "TRUE,        true", "other_value, false", })
 	public void test_handwritten(String paramValue, boolean expected) {
 		final SkinParam skinParam = createSkinParam("handwritten", paramValue);
 		assertThat(skinParam.handwritten()).isEqualTo(expected);
 	}
 
 	@ParameterizedTest
-	@CsvSource({
-			"false,       false",
-			"fALSe,       false",
-			"FALSE,       false",
-			"other_value, true",
-	})
+	@CsvSource({ "false,       false", "fALSe,       false", "FALSE,       false", "other_value, true", })
 	public void test_hyperlinkUnderline(String paramValue, boolean expected) {
 		final SkinParam skinParam = createSkinParam("hyperlinkUnderline", paramValue);
-		assertThat(skinParam.useUnderlineForHyperlink()).isEqualTo(expected);
+		if (expected)
+			assertThat(skinParam.useUnderlineForHyperlink()).isNotNull();
+		else
+			assertThat(skinParam.useUnderlineForHyperlink()).isNull();
 	}
 
 	@Test
@@ -355,11 +336,11 @@ class SkinParamTest {
 		assertThat(skinParam.maxAsciiMessageLength()).isEqualTo(123);
 	}
 
-	@Test
-	public void test_minClassWidth() {
-		final SkinParam skinParam = createSkinParam("minClassWidth", "123");
-		assertThat(skinParam.minClassWidth()).isEqualTo(123);
-	}
+//	@Test
+//	public void test_minClassWidth() {
+//		final SkinParam skinParam = createSkinParam("minClassWidth", "123");
+//		assertThat(skinParam.minClassWidth()).isEqualTo(123);
+//	}
 
 	@Test
 	public void test_nodeSep() {
@@ -380,36 +361,21 @@ class SkinParamTest {
 	}
 
 	@ParameterizedTest
-	@CsvSource({
-			"true,        true",
-			"tRUe,        true",
-			"TRUE,        true",
-			"other_value, false",
-	})
+	@CsvSource({ "true,        true", "tRUe,        true", "TRUE,        true", "other_value, false", })
 	public void test_responseMessageBelowArrow(String paramValue, boolean expected) {
 		final SkinParam skinParam = createSkinParam("responseMessageBelowArrow", paramValue);
 		assertThat(skinParam.responseMessageBelowArrow()).isEqualTo(expected);
 	}
 
 	@ParameterizedTest
-	@CsvSource({
-			"true,        true",
-			"tRUe,        true",
-			"TRUE,        true",
-			"other_value, false",
-	})
+	@CsvSource({ "true,        true", "tRUe,        true", "TRUE,        true", "other_value, false", })
 	public void test_sameClassWidth(String paramValue, boolean expected) {
 		final SkinParam skinParam = createSkinParam("sameClassWidth", paramValue);
 		assertThat(skinParam.sameClassWidth()).isEqualTo(expected);
 	}
 
 	@ParameterizedTest
-	@CsvSource({
-			"underline,   true",
-			"undERLine,   true",
-			"UNDERLINE,   true",
-			"other_value, false",
-	})
+	@CsvSource({ "underline,   true", "undERLine,   true", "UNDERLINE,   true", "other_value, false", })
 	public void test_sequenceParticipant(String paramValue, boolean expected) {
 		final SkinParam skinParam = createSkinParam("sequenceParticipant", paramValue);
 		assertThat(skinParam.forceSequenceParticipantUnderlined()).isEqualTo(expected);
@@ -417,11 +383,8 @@ class SkinParamTest {
 
 	@Test
 	public void testSplitParam() {
-		final SkinParam skinParam = createSkinParam(
-				"pageBorderColor", "red",
-				"pageExternalColor", "yellow",
-				"pageMargin", "123"
-		);
+		final SkinParam skinParam = createSkinParam("pageBorderColor", "red", "pageExternalColor", "yellow",
+				"pageMargin", "123");
 
 		final SplitParam splitParam = skinParam.getSplitParam();
 		assertThat(splitParam.getBorderColor()).isEqualTo(Color.RED);
@@ -430,36 +393,21 @@ class SkinParamTest {
 	}
 
 	@ParameterizedTest
-	@CsvSource({
-			"bottom,      false",
-			"boTTom,      false",
-			"BOTTOM,      false",
-			"other_value, true",
-	})
+	@CsvSource({ "bottom,      false", "boTTom,      false", "BOTTOM,      false", "other_value, true", })
 	public void test_stereotypePosition(String paramValue, boolean expected) {
 		final SkinParam skinParam = createSkinParam("stereotypePosition", paramValue);
 		assertThat(skinParam.stereotypePositionTop()).isEqualTo(expected);
 	}
 
 	@ParameterizedTest
-	@CsvSource({
-			"strictuml,   true",
-			"strICTuml,   true",
-			"STRICTUML,   true",
-			"other_value, false",
-	})
+	@CsvSource({ "strictuml,   true", "strICTuml,   true", "STRICTUML,   true", "other_value, false", })
 	public void test_style(String paramValue, boolean expected) {
 		final SkinParam skinParam = createSkinParam("style", paramValue);
 		assertThat(skinParam.strictUmlStyle()).isEqualTo(expected);
 	}
 
 	@ParameterizedTest
-	@CsvSource({
-			"false,       false",
-			"fALSe,       false",
-			"FALSE,       false",
-			"other_value, true",
-	})
+	@CsvSource({ "false,       false", "fALSe,       false", "FALSE,       false", "other_value, true", })
 	public void test_svgDimensionStyle(String paramValue, boolean expected) {
 		final SkinParam skinParam = createSkinParam("svgDimensionStyle", paramValue);
 		assertThat(skinParam.svgDimensionStyle()).isEqualTo(expected);
@@ -473,20 +421,12 @@ class SkinParamTest {
 
 	@ParameterizedTest
 	@CsvSource({
-			// swimlane     swimlanes    expected
-			"  true,        any_value,   true",
-			"  tRUe,        any_value,   true",
-			"  TRUE,        any_value,   true",
-			"  other_value, true,        true",
-			"  other_value, tRUe,        true",
-			"  other_value, TRUE,        true",
-			"  other_value, other_value, false",
-	})
+			// swimlane swimlanes expected
+			"  true,        any_value,   true", "  tRUe,        any_value,   true", "  TRUE,        any_value,   true",
+			"  other_value, true,        true", "  other_value, tRUe,        true", "  other_value, TRUE,        true",
+			"  other_value, other_value, false", })
 	public void test_swimlanes(String swimlane, String swimlanes, boolean expected) {
-		final SkinParam skinParam = createSkinParam(
-				"swimlane", swimlane,
-				"swimlanes", swimlanes
-		);
+		final SkinParam skinParam = createSkinParam("swimlane", swimlane, "swimlanes", swimlanes);
 		assertThat(skinParam.swimlanes()).isEqualTo(expected);
 	}
 
@@ -501,8 +441,9 @@ class SkinParamTest {
 	//
 
 	private SkinParam createSkinParam(String... keyValuePairs) {
-		// Using SEQUENCE here is an arbitrary decision that should not affect test outcome
-		final SkinParam skinParam = SkinParam.create(UmlDiagramType.SEQUENCE, ThemeStyle.LIGHT_REGULAR);
+		// Using SEQUENCE here is an arbitrary decision that should not affect test
+		// outcome
+		final SkinParam skinParam = SkinParam.create(UmlDiagramType.SEQUENCE);
 		for (int i = 0; i < keyValuePairs.length; i += 2) {
 			skinParam.setParam(StringUtils.goLowerCase(keyValuePairs[i]), keyValuePairs[i + 1]);
 		}

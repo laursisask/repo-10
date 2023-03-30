@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -42,6 +45,7 @@ import net.sourceforge.plantuml.activitydiagram3.ActivityDiagram3;
 import net.sourceforge.plantuml.core.Diagram;
 import net.sourceforge.plantuml.directdot.PSystemDot;
 import net.sourceforge.plantuml.error.PSystemErrorUtils;
+import net.sourceforge.plantuml.log.Logme;
 import net.sourceforge.plantuml.math.PSystemMath;
 import net.sourceforge.plantuml.salt.PSystemSalt;
 import net.sourceforge.plantuml.stats.api.Stats;
@@ -170,7 +174,7 @@ public class StatsUtilsIncrement {
 						lockHtml.unlock();
 					}
 			} catch (Exception e) {
-				e.printStackTrace();
+				Logme.error(e);
 			}
 
 		}

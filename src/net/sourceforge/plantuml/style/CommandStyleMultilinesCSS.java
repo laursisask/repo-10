@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
  * 
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  * 
  * This file is part of PlantUML.
  *
@@ -35,25 +35,31 @@
  */
 package net.sourceforge.plantuml.style;
 
-import net.sourceforge.plantuml.SkinParam;
 import net.sourceforge.plantuml.TitledDiagram;
-import net.sourceforge.plantuml.command.BlocLines;
 import net.sourceforge.plantuml.command.CommandExecutionResult;
 import net.sourceforge.plantuml.command.CommandMultilines2;
 import net.sourceforge.plantuml.command.MultilinesStrategy;
-import net.sourceforge.plantuml.command.regex.IRegex;
-import net.sourceforge.plantuml.command.regex.RegexConcat;
-import net.sourceforge.plantuml.command.regex.RegexLeaf;
+import net.sourceforge.plantuml.command.Trim;
+import net.sourceforge.plantuml.regex.IRegex;
+import net.sourceforge.plantuml.regex.RegexConcat;
+import net.sourceforge.plantuml.regex.RegexLeaf;
+import net.sourceforge.plantuml.skin.SkinParam;
+import net.sourceforge.plantuml.style.parser.StyleParser;
+import net.sourceforge.plantuml.style.parser.StyleParsingException;
+import net.sourceforge.plantuml.utils.BlocLines;
 
 public class CommandStyleMultilinesCSS extends CommandMultilines2<TitledDiagram> {
+    // ::remove file when __HAXE__
 
-	public CommandStyleMultilinesCSS() {
-		super(getRegexConcat(), MultilinesStrategy.REMOVE_STARTING_QUOTE);
+	public static final CommandStyleMultilinesCSS ME = new CommandStyleMultilinesCSS();
+
+	private CommandStyleMultilinesCSS() {
+		super(getRegexConcat(), MultilinesStrategy.REMOVE_STARTING_QUOTE, Trim.BOTH);
 	}
 
 	@Override
 	public String getPatternEnd() {
-		return "^[%s]*\\</style\\>[%s]*$";
+		return "^[%s]*\\</?style\\>[%s]*$";
 	}
 
 	private static IRegex getRegexConcat() {
@@ -66,13 +72,15 @@ public class CommandStyleMultilinesCSS extends CommandMultilines2<TitledDiagram>
 	protected CommandExecutionResult executeNow(TitledDiagram diagram, BlocLines lines) {
 		try {
 			final StyleBuilder styleBuilder = diagram.getSkinParam().getCurrentStyleBuilder();
-			for (Style modifiedStyle : StyleLoader.getDeclaredStyles(lines.subExtract(1, 1), styleBuilder))
+			for (Style modifiedStyle : StyleParser.parse(lines.subExtract(1, 1), styleBuilder))
 				diagram.getSkinParam().muteStyle(modifiedStyle);
 
 			((SkinParam) diagram.getSkinParam()).applyPendingStyleMigration();
 			return CommandExecutionResult.ok();
+		} catch (StyleParsingException e) {
+			return CommandExecutionResult.error("Error in style definition: " + e.getMessage());
 		} catch (NoStyleAvailableException e) {
-			// e.printStackTrace();
+			// Logme.error(e);
 			return CommandExecutionResult.error("General failure: no style available.");
 		}
 	}

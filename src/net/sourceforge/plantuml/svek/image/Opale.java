@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,19 +35,17 @@
  */
 package net.sourceforge.plantuml.svek.image;
 
-import java.awt.geom.Point2D;
-
-import net.sourceforge.plantuml.Dimension2DDouble;
-import net.sourceforge.plantuml.Direction;
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
-import net.sourceforge.plantuml.graphic.AbstractTextBlock;
-import net.sourceforge.plantuml.graphic.StringBounder;
-import net.sourceforge.plantuml.graphic.TextBlock;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.UPath;
-import net.sourceforge.plantuml.ugraphic.UStroke;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
-import net.sourceforge.plantuml.ugraphic.color.HColor;
+import net.sourceforge.plantuml.klimt.UPath;
+import net.sourceforge.plantuml.klimt.UStroke;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.color.HColor;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
+import net.sourceforge.plantuml.klimt.geom.XPoint2D;
+import net.sourceforge.plantuml.klimt.shape.AbstractTextBlock;
+import net.sourceforge.plantuml.klimt.shape.TextBlock;
+import net.sourceforge.plantuml.utils.Direction;
 import net.sourceforge.plantuml.utils.MathUtils;
 
 public class Opale extends AbstractTextBlock implements TextBlock {
@@ -57,8 +58,8 @@ public class Opale extends AbstractTextBlock implements TextBlock {
 	private final int marginY = 5;
 	private final double shadowing2;
 	private Direction strategy;
-	private Point2D pp1;
-	private Point2D pp2;
+	private XPoint2D pp1;
+	private XPoint2D pp2;
 	private final boolean withLink;
 	private double roundCorner;
 	private final UStroke stroke;
@@ -79,7 +80,7 @@ public class Opale extends AbstractTextBlock implements TextBlock {
 		this.roundCorner = roundCorner;
 	}
 
-	public void setOpale(Direction strategy, Point2D pp1, Point2D pp2) {
+	public void setOpale(Direction strategy, XPoint2D pp1, XPoint2D pp2) {
 		this.strategy = strategy;
 		this.pp1 = pp1;
 		this.pp2 = pp2;
@@ -90,33 +91,33 @@ public class Opale extends AbstractTextBlock implements TextBlock {
 	}
 
 	final private double getHeight(StringBounder stringBounder) {
-		final Dimension2D size = textBlock.calculateDimension(stringBounder);
+		final XDimension2D size = textBlock.calculateDimension(stringBounder);
 		return size.getHeight() + 2 * marginY;
 	}
 
-	public Dimension2D calculateDimension(StringBounder stringBounder) {
+	public XDimension2D calculateDimension(StringBounder stringBounder) {
 		final double height = getHeight(stringBounder);
 		final double width = getWidth(stringBounder);
-		return new Dimension2DDouble(width, height);
+		return new XDimension2D(width, height);
 	}
 
 	final public void drawU(UGraphic ug) {
 		final StringBounder stringBounder = ug.getStringBounder();
 		ug = ug.apply(noteBackgroundColor.bg()).apply(borderColor);
 		final UPath polygon;
-		if (withLink == false) {
+		if (withLink == false)
 			polygon = getPolygonNormal(stringBounder);
-		} else if (strategy == Direction.LEFT) {
+		else if (strategy == Direction.LEFT)
 			polygon = getPolygonLeft(stringBounder, pp1, pp2);
-		} else if (strategy == Direction.RIGHT) {
+		else if (strategy == Direction.RIGHT)
 			polygon = getPolygonRight(stringBounder, pp1, pp2);
-		} else if (strategy == Direction.UP) {
+		else if (strategy == Direction.UP)
 			polygon = getPolygonUp(stringBounder, pp1, pp2);
-		} else if (strategy == Direction.DOWN) {
+		else if (strategy == Direction.DOWN)
 			polygon = getPolygonDown(stringBounder, pp1, pp2);
-		} else {
+		else
 			throw new IllegalArgumentException();
-		}
+
 		polygon.setDeltaShadow(shadowing2);
 		if (stroke != null)
 			ug = ug.apply(stroke);
@@ -130,13 +131,13 @@ public class Opale extends AbstractTextBlock implements TextBlock {
 	}
 
 	public static UPath getCorner(double width, double roundCorner) {
-		final UPath path = new UPath();
+		final UPath path = UPath.none();
 		path.moveTo(width - cornersize, 0);
 		if (roundCorner == 0) {
 			path.lineTo(width - cornersize, cornersize);
 		} else {
 			path.lineTo(width - cornersize, cornersize - roundCorner / 4);
-			path.arcTo(new Point2D.Double(width - cornersize + roundCorner / 4, cornersize), roundCorner / 4, 0, 0);
+			path.arcTo(new XPoint2D(width - cornersize + roundCorner / 4, cornersize), roundCorner / 4, 0, 0);
 		}
 		path.lineTo(width, cornersize);
 		path.lineTo(width - cornersize, 0);
@@ -145,7 +146,7 @@ public class Opale extends AbstractTextBlock implements TextBlock {
 	}
 
 	public static UPath getPolygonNormal(double width, double height, double roundCorner) {
-		final UPath polygon = new UPath();
+		final UPath polygon = UPath.none();
 		if (roundCorner == 0) {
 			polygon.moveTo(0, 0);
 			polygon.lineTo(0, height);
@@ -156,13 +157,13 @@ public class Opale extends AbstractTextBlock implements TextBlock {
 		} else {
 			polygon.moveTo(0, roundCorner / 2);
 			polygon.lineTo(0, height - roundCorner / 2);
-			polygon.arcTo(new Point2D.Double(roundCorner / 2, height), roundCorner / 2, 0, 0);
+			polygon.arcTo(new XPoint2D(roundCorner / 2, height), roundCorner / 2, 0, 0);
 			polygon.lineTo(width - roundCorner / 2, height);
-			polygon.arcTo(new Point2D.Double(width, height - roundCorner / 2), roundCorner / 2, 0, 0);
+			polygon.arcTo(new XPoint2D(width, height - roundCorner / 2), roundCorner / 2, 0, 0);
 			polygon.lineTo(width, cornersize);
 			polygon.lineTo(width - cornersize, 0);
 			polygon.lineTo(roundCorner / 2, 0);
-			polygon.arcTo(new Point2D.Double(0, roundCorner / 2), roundCorner / 2, 0, 0);
+			polygon.arcTo(new XPoint2D(0, roundCorner / 2), roundCorner / 2, 0, 0);
 		}
 		polygon.closePath();
 		return polygon;
@@ -170,8 +171,8 @@ public class Opale extends AbstractTextBlock implements TextBlock {
 
 	private final double delta = 4;
 
-	private UPath getPolygonLeft(final StringBounder stringBounder, final Point2D pp1, final Point2D pp2) {
-		final UPath polygon = new UPath();
+	private UPath getPolygonLeft(final StringBounder stringBounder, final XPoint2D pp1, final XPoint2D pp2) {
+		final UPath polygon = UPath.none();
 		polygon.moveTo(0, roundCorner / 2);
 
 		double y1 = pp1.getY() - delta;
@@ -181,25 +182,25 @@ public class Opale extends AbstractTextBlock implements TextBlock {
 		polygon.lineTo(0, y1 + 2 * delta);
 
 		polygon.lineTo(0, getHeight(stringBounder) - roundCorner / 2);
-		polygon.arcTo(new Point2D.Double(roundCorner / 2, getHeight(stringBounder)), roundCorner / 2, 0, 0);
+		polygon.arcTo(new XPoint2D(roundCorner / 2, getHeight(stringBounder)), roundCorner / 2, 0, 0);
 		polygon.lineTo(getWidth(stringBounder) - roundCorner / 2, getHeight(stringBounder));
-		polygon.arcTo(new Point2D.Double(getWidth(stringBounder), getHeight(stringBounder) - roundCorner / 2),
+		polygon.arcTo(new XPoint2D(getWidth(stringBounder), getHeight(stringBounder) - roundCorner / 2),
 				roundCorner / 2, 0, 0);
 		polygon.lineTo(getWidth(stringBounder), cornersize);
 		polygon.lineTo(getWidth(stringBounder) - cornersize, 0);
 		polygon.lineTo(roundCorner / 2, 0);
-		polygon.arcTo(new Point2D.Double(0, roundCorner / 2), roundCorner / 2, 0, 0);
+		polygon.arcTo(new XPoint2D(0, roundCorner / 2), roundCorner / 2, 0, 0);
 		polygon.closePath();
 		return polygon;
 	}
 
-	private UPath getPolygonRight(final StringBounder stringBounder, final Point2D pp1, final Point2D pp2) {
-		final UPath polygon = new UPath();
+	private UPath getPolygonRight(final StringBounder stringBounder, final XPoint2D pp1, final XPoint2D pp2) {
+		final UPath polygon = UPath.none();
 		polygon.moveTo(0, roundCorner / 2);
 		polygon.lineTo(0, getHeight(stringBounder) - roundCorner / 2);
-		polygon.arcTo(new Point2D.Double(roundCorner / 2, getHeight(stringBounder)), roundCorner / 2, 0, 0);
+		polygon.arcTo(new XPoint2D(roundCorner / 2, getHeight(stringBounder)), roundCorner / 2, 0, 0);
 		polygon.lineTo(getWidth(stringBounder) - roundCorner / 2, getHeight(stringBounder));
-		polygon.arcTo(new Point2D.Double(getWidth(stringBounder), getHeight(stringBounder) - roundCorner / 2),
+		polygon.arcTo(new XPoint2D(getWidth(stringBounder), getHeight(stringBounder) - roundCorner / 2),
 				roundCorner / 2, 0, 0);
 
 		double y1 = pp1.getY() - delta;
@@ -211,18 +212,18 @@ public class Opale extends AbstractTextBlock implements TextBlock {
 		polygon.lineTo(getWidth(stringBounder), cornersize);
 		polygon.lineTo(getWidth(stringBounder) - cornersize, 0);
 		polygon.lineTo(roundCorner / 2, 0);
-		polygon.arcTo(new Point2D.Double(0, roundCorner / 2), roundCorner / 2, 0, 0);
+		polygon.arcTo(new XPoint2D(0, roundCorner / 2), roundCorner / 2, 0, 0);
 		polygon.closePath();
 		return polygon;
 	}
 
-	private UPath getPolygonUp(final StringBounder stringBounder, final Point2D pp1, final Point2D pp2) {
-		final UPath polygon = new UPath();
+	private UPath getPolygonUp(final StringBounder stringBounder, final XPoint2D pp1, final XPoint2D pp2) {
+		final UPath polygon = UPath.none();
 		polygon.moveTo(0, roundCorner / 2);
 		polygon.lineTo(0, getHeight(stringBounder) - roundCorner / 2);
-		polygon.arcTo(new Point2D.Double(roundCorner / 2, getHeight(stringBounder)), roundCorner / 2, 0, 0);
+		polygon.arcTo(new XPoint2D(roundCorner / 2, getHeight(stringBounder)), roundCorner / 2, 0, 0);
 		polygon.lineTo(getWidth(stringBounder) - roundCorner / 2, getHeight(stringBounder));
-		polygon.arcTo(new Point2D.Double(getWidth(stringBounder), getHeight(stringBounder) - roundCorner / 2),
+		polygon.arcTo(new XPoint2D(getWidth(stringBounder), getHeight(stringBounder) - roundCorner / 2),
 				roundCorner / 2, 0, 0);
 		polygon.lineTo(getWidth(stringBounder), cornersize);
 		polygon.lineTo(getWidth(stringBounder) - cornersize, 0);
@@ -234,16 +235,16 @@ public class Opale extends AbstractTextBlock implements TextBlock {
 
 		polygon.lineTo(x1, 0);
 		polygon.lineTo(roundCorner / 2, 0);
-		polygon.arcTo(new Point2D.Double(0, roundCorner / 2), roundCorner / 2, 0, 0);
+		polygon.arcTo(new XPoint2D(0, roundCorner / 2), roundCorner / 2, 0, 0);
 		polygon.closePath();
 		return polygon;
 	}
 
-	private UPath getPolygonDown(final StringBounder stringBounder, final Point2D pp1, final Point2D pp2) {
-		final UPath polygon = new UPath();
+	private UPath getPolygonDown(final StringBounder stringBounder, final XPoint2D pp1, final XPoint2D pp2) {
+		final UPath polygon = UPath.none();
 		polygon.moveTo(0, roundCorner / 2);
 		polygon.lineTo(0, getHeight(stringBounder) - roundCorner / 2);
-		polygon.arcTo(new Point2D.Double(roundCorner / 2, getHeight(stringBounder)), roundCorner / 2, 0, 0);
+		polygon.arcTo(new XPoint2D(roundCorner / 2, getHeight(stringBounder)), roundCorner / 2, 0, 0);
 
 		double x1 = pp1.getX() - delta;
 		x1 = MathUtils.limitation(x1, 0, getWidth(stringBounder));
@@ -252,12 +253,12 @@ public class Opale extends AbstractTextBlock implements TextBlock {
 		polygon.lineTo(x1 + 2 * delta, getHeight(stringBounder));
 
 		polygon.lineTo(getWidth(stringBounder) - roundCorner / 2, getHeight(stringBounder));
-		polygon.arcTo(new Point2D.Double(getWidth(stringBounder), getHeight(stringBounder) - roundCorner / 2),
+		polygon.arcTo(new XPoint2D(getWidth(stringBounder), getHeight(stringBounder) - roundCorner / 2),
 				roundCorner / 2, 0, 0);
 		polygon.lineTo(getWidth(stringBounder), cornersize);
 		polygon.lineTo(getWidth(stringBounder) - cornersize, 0);
 		polygon.lineTo(roundCorner / 2, 0);
-		polygon.arcTo(new Point2D.Double(0, roundCorner / 2), roundCorner / 2, 0, 0);
+		polygon.arcTo(new XPoint2D(0, roundCorner / 2), roundCorner / 2, 0, 0);
 		polygon.closePath();
 		return polygon;
 	}

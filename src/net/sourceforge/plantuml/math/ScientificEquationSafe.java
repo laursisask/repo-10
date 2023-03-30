@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,8 +35,7 @@
  */
 package net.sourceforge.plantuml.math;
 
-import static net.sourceforge.plantuml.ugraphic.ImageBuilder.plainImageBuilder;
-import static net.sourceforge.plantuml.ugraphic.ImageBuilder.plainPngBuilder;
+import static net.atmp.ImageBuilder.plainImageBuilder;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
@@ -42,19 +44,21 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Arrays;
 
+import net.atmp.ImageBuilder;
+import net.atmp.PixelImage;
 import net.sourceforge.plantuml.FileFormat;
 import net.sourceforge.plantuml.FileFormatOption;
-import net.sourceforge.plantuml.Log;
 import net.sourceforge.plantuml.api.ImageDataSimple;
 import net.sourceforge.plantuml.core.ImageData;
-import net.sourceforge.plantuml.eps.EpsGraphics;
-import net.sourceforge.plantuml.graphic.GraphicStrings;
+import net.sourceforge.plantuml.klimt.AffineTransformType;
+import net.sourceforge.plantuml.klimt.MutableImage;
+import net.sourceforge.plantuml.klimt.drawing.eps.EpsGraphics;
+import net.sourceforge.plantuml.klimt.shape.GraphicStrings;
+import net.sourceforge.plantuml.klimt.shape.TextBlock;
+import net.sourceforge.plantuml.klimt.shape.UImageSvg;
+import net.sourceforge.plantuml.log.Logme;
 import net.sourceforge.plantuml.security.SImageIO;
-import net.sourceforge.plantuml.svek.TextBlockBackcolored;
-import net.sourceforge.plantuml.ugraphic.AffineTransformType;
-import net.sourceforge.plantuml.ugraphic.MutableImage;
-import net.sourceforge.plantuml.ugraphic.PixelImage;
-import net.sourceforge.plantuml.ugraphic.UImageSvg;
+import net.sourceforge.plantuml.utils.Log;
 
 public class ScientificEquationSafe {
 
@@ -70,7 +74,7 @@ public class ScientificEquationSafe {
 		try {
 			return new ScientificEquationSafe(formula, new AsciiMath(formula));
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logme.error(e);
 			Log.info("Error parsing " + formula);
 			return new ScientificEquationSafe(formula, null);
 		}
@@ -80,7 +84,7 @@ public class ScientificEquationSafe {
 		try {
 			return new ScientificEquationSafe(formula, new LatexBuilder(formula));
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logme.error(e);
 			Log.info("Error parsing " + formula);
 			return new ScientificEquationSafe(formula, null);
 		}
@@ -114,7 +118,7 @@ public class ScientificEquationSafe {
 				printTrace(e);
 			}
 		try {
-			final byte[] bytes = plainPngBuilder(getRollback()).writeByteArray();
+			final byte[] bytes = ImageBuilder.plainPngBuilder(getRollback()).writeByteArray();
 			return new PixelImage(SImageIO.read(bytes), AffineTransformType.TYPE_BILINEAR);
 		} catch (IOException e1) {
 			return null;
@@ -126,10 +130,10 @@ public class ScientificEquationSafe {
 		if (equation != null) {
 			System.err.println("Latex=" + equation.getSource());
 		}
-		e.printStackTrace();
+		Logme.error(e);
 	}
 
-	private TextBlockBackcolored getRollback() {
+	private TextBlock getRollback() {
 		return GraphicStrings.createBlackOnWhiteMonospaced(Arrays.asList(formula));
 	}
 

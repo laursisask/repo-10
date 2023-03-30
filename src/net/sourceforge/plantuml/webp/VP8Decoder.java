@@ -21,6 +21,8 @@ import java.io.IOException;
 
 import javax.imageio.stream.ImageInputStream;
 
+import net.sourceforge.plantuml.log.Logme;
+
 public class VP8Decoder {
 	private int[][][][] coefProbs;
 	VP8Frame f;
@@ -30,8 +32,7 @@ public class VP8Decoder {
 		coefProbs = Globals.getDefaultCoefProbs();
 	}
 
-	public void decodeFrame(ImageInputStream stream)
-			throws IOException {
+	public void decodeFrame(ImageInputStream stream) throws IOException {
 		final boolean debug = false;
 		coefProbs = Globals.getDefaultCoefProbs();
 		f = new VP8Frame(stream, coefProbs);
@@ -53,7 +54,6 @@ public class VP8Decoder {
 		return f.getWidth();
 	}
 
-
 	public void writePGMFile(String fileName, VP8Frame frame) {
 
 		FileOutputStream out;
@@ -61,8 +61,8 @@ public class VP8Decoder {
 			int[][] yData = frame.getYBuffer();
 			int[][] uData = frame.getUBuffer();
 			int[][] vData = frame.getVBuffer();
-			int outStride = (f.getWidth()+1)& ~1;
-			int uvHeight = (f.getHeight() +1) / 2;
+			int outStride = (f.getWidth() + 1) & ~1;
+			int uvHeight = (f.getHeight() + 1) / 2;
 			out = new FileOutputStream(fileName);
 			out.write((byte) 'P');
 			out.write((byte) '5');
@@ -71,7 +71,7 @@ public class VP8Decoder {
 			out.write((byte) ' ');
 
 			out.write(("" + (f.getHeight() + uvHeight)).getBytes());
-			
+
 			out.write((byte) 0x0a);
 			out.write(("255").getBytes());
 			out.write((byte) 0xa);
@@ -79,7 +79,7 @@ public class VP8Decoder {
 				for (int x = 0; x < f.getWidth(); x++) {
 					out.write(yData[x][y]);
 				}
-				if((f.getWidth() & 1)==1)
+				if ((f.getWidth() & 1) == 1)
 					out.write(0x0);
 			}
 			for (int y = 0; y < (f.getHeight() + 1) / 2; y++) {
@@ -93,12 +93,12 @@ public class VP8Decoder {
 			}
 
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			Logme.error(e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			Logme.error(e);
 		}
 	}
-	
+
 	public void writeYV12File(String fileName, VP8Frame frame) {
 
 		FileOutputStream out;
@@ -132,9 +132,9 @@ public class VP8Decoder {
 					out.write(vData[x][y]);
 				}
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			Logme.error(e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			Logme.error(e);
 		}
 	}
 }

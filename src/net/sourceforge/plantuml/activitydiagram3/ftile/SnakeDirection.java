@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,12 +35,12 @@
  */
 package net.sourceforge.plantuml.activitydiagram3.ftile;
 
-import java.awt.geom.Point2D;
+import net.sourceforge.plantuml.klimt.geom.XPoint2D;
 
 public enum SnakeDirection {
 	VERTICAL_THEN_HORIZONTAL, HORIZONTAL_THEN_VERTICAL;
 
-	public static SnakeDirection getDirection(Point2D pt1, Point2D pt2) {
+	public static SnakeDirection getDirection(XPoint2D pt1, XPoint2D pt2) {
 		if (pt1.getX() == pt2.getX()) {
 			return VERTICAL_THEN_HORIZONTAL;
 		}

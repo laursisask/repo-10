@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -40,22 +43,24 @@ import java.util.zip.ZipInputStream;
 
 import net.sourceforge.plantuml.FileSystem;
 import net.sourceforge.plantuml.FileUtils;
-import net.sourceforge.plantuml.LineLocation;
-import net.sourceforge.plantuml.Log;
 import net.sourceforge.plantuml.TitledDiagram;
-import net.sourceforge.plantuml.command.regex.IRegex;
-import net.sourceforge.plantuml.command.regex.RegexConcat;
-import net.sourceforge.plantuml.command.regex.RegexLeaf;
-import net.sourceforge.plantuml.command.regex.RegexResult;
+import net.sourceforge.plantuml.klimt.sprite.Sprite;
+import net.sourceforge.plantuml.klimt.sprite.SpriteImage;
+import net.sourceforge.plantuml.klimt.sprite.SpriteSvg;
+import net.sourceforge.plantuml.regex.IRegex;
+import net.sourceforge.plantuml.regex.RegexConcat;
+import net.sourceforge.plantuml.regex.RegexLeaf;
+import net.sourceforge.plantuml.regex.RegexResult;
 import net.sourceforge.plantuml.security.SFile;
 import net.sourceforge.plantuml.security.SImageIO;
-import net.sourceforge.plantuml.sprite.Sprite;
-import net.sourceforge.plantuml.sprite.SpriteImage;
-import net.sourceforge.plantuml.sprite.SpriteSvg;
+import net.sourceforge.plantuml.utils.LineLocation;
+import net.sourceforge.plantuml.utils.Log;
 
 public class CommandSpriteFile extends SingleLineCommand2<TitledDiagram> {
 
-	public CommandSpriteFile() {
+	public static final CommandSpriteFile ME = new CommandSpriteFile();
+
+	private CommandSpriteFile() {
 		super(getRegexConcat());
 	}
 
@@ -66,48 +71,49 @@ public class CommandSpriteFile extends SingleLineCommand2<TitledDiagram> {
 				new RegexLeaf("\\$?"), //
 				new RegexLeaf("NAME", "([-%pLN_]+)"), //
 				RegexLeaf.spaceOneOrMore(), //
-				new RegexLeaf("FILE", "(.*)"), RegexLeaf.end());
+				new RegexLeaf("FILE", "([^<>%g#]*)"), RegexLeaf.end());
 	}
 
 	@Override
 	protected CommandExecutionResult executeArg(TitledDiagram system, LineLocation location, RegexResult arg) {
+		// ::comment when __CORE__
 		final String src = arg.get("FILE", 0);
 		final Sprite sprite;
 		try {
 			if (src.startsWith("jar:")) {
 				final String inner = src.substring(4) + ".png";
 				final InputStream is = SpriteImage.getInternalSprite(inner);
-				if (is == null) {
+				if (is == null)
 					return CommandExecutionResult.error("No such internal sprite: " + inner);
-				}
+
 				sprite = new SpriteImage(SImageIO.read(is));
 			} else if (src.contains("~")) {
 				final int idx = src.lastIndexOf("~");
 				final SFile f = FileSystem.getInstance().getFile(src.substring(0, idx));
-				if (f.exists() == false) {
+				if (f.exists() == false)
 					return CommandExecutionResult.error("Cannot read: " + src);
-				}
+
 				final String name = src.substring(idx + 1);
 				sprite = getImageFromZip(f, name);
-				if (sprite == null) {
+				if (sprite == null)
 					return CommandExecutionResult.error("Cannot read: " + src);
-				}
+
 			} else {
 				final SFile f = FileSystem.getInstance().getFile(src);
-				if (f.exists() == false) {
+				if (f.exists() == false)
 					return CommandExecutionResult.error("Cannot read: " + src);
-				}
+
 				if (isSvg(f.getName())) {
 					final String tmp = FileUtils.readSvg(f);
-					if (tmp == null) {
+					if (tmp == null)
 						return CommandExecutionResult.error("Cannot read: " + src);
-					}
+
 					sprite = new SpriteSvg(tmp);
 				} else {
 					final BufferedImage tmp = f.readRasterImageFromFile();
-					if (tmp == null) {
+					if (tmp == null)
 						return CommandExecutionResult.error("Cannot read: " + src);
-					}
+
 					sprite = new SpriteImage(tmp);
 				}
 			}
@@ -116,9 +122,11 @@ public class CommandSpriteFile extends SingleLineCommand2<TitledDiagram> {
 			return CommandExecutionResult.error("Cannot read: " + src);
 		}
 		system.addSprite(arg.get("NAME", 0), sprite);
+		// ::done
 		return CommandExecutionResult.ok();
 	}
 
+	// ::comment when __CORE__
 	private Sprite getImageFromZip(SFile f, String name) throws IOException {
 		final InputStream tmp = f.openFile();
 		if (tmp == null) {
@@ -133,11 +141,11 @@ public class CommandSpriteFile extends SingleLineCommand2<TitledDiagram> {
 				final String fileName = ze.getName();
 				if (ze.isDirectory()) {
 				} else if (fileName.equals(name)) {
-					if (isSvg(name)) {
+					if (isSvg(name))
 						return new SpriteSvg(FileUtils.readSvg(zis));
-					} else {
+					else
 						return new SpriteImage(SImageIO.read(zis));
-					}
+
 				}
 				ze = zis.getNextEntry();
 			}
@@ -153,4 +161,5 @@ public class CommandSpriteFile extends SingleLineCommand2<TitledDiagram> {
 	private boolean isSvg(String name) {
 		return name.toLowerCase().endsWith(".svg");
 	}
+	// ::done
 }

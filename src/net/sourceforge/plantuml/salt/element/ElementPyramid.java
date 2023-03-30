@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,26 +35,25 @@
  */
 package net.sourceforge.plantuml.salt.element;
 
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.sourceforge.plantuml.Dimension2DDouble;
-import net.sourceforge.plantuml.ISkinSimple;
-import net.sourceforge.plantuml.cucadiagram.Display;
-import net.sourceforge.plantuml.graphic.FontConfiguration;
-import net.sourceforge.plantuml.graphic.HorizontalAlignment;
-import net.sourceforge.plantuml.graphic.StringBounder;
-import net.sourceforge.plantuml.graphic.TextBlock;
-import net.sourceforge.plantuml.graphic.TextBlockUtils;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.creole.Display;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.font.FontConfiguration;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
+import net.sourceforge.plantuml.klimt.font.UFont;
+import net.sourceforge.plantuml.klimt.geom.HorizontalAlignment;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
+import net.sourceforge.plantuml.klimt.shape.TextBlock;
+import net.sourceforge.plantuml.klimt.shape.TextBlockUtils;
 import net.sourceforge.plantuml.salt.Cell;
 import net.sourceforge.plantuml.salt.Positionner2;
-import net.sourceforge.plantuml.ugraphic.UFont;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
+import net.sourceforge.plantuml.style.ISkinSimple;
 
 public class ElementPyramid extends AbstractElement {
 
@@ -90,13 +92,13 @@ public class ElementPyramid extends AbstractElement {
 
 	}
 
-	public Dimension2D getPreferredDimension(StringBounder stringBounder, double x, double y) {
+	public XDimension2D getPreferredDimension(StringBounder stringBounder, double x, double y) {
 		init(stringBounder);
-		return new Dimension2DDouble(colsStart[colsStart.length - 1],
+		return new XDimension2D(colsStart[colsStart.length - 1],
 				rowsStart[rowsStart.length - 1] + title.calculateDimension(stringBounder).getHeight());
 	}
 
-	public void drawU(UGraphic ug, int zIndex, Dimension2D dimToUse) {
+	public void drawU(UGraphic ug, int zIndex, XDimension2D dimToUse) {
 		ug = ug.apply(getBlack());
 
 		init(ug.getStringBounder());
@@ -111,7 +113,7 @@ public class ElementPyramid extends AbstractElement {
 			final double width = colsStart[cell.getMaxCol() + 1] - colsStart[cell.getMinCol()] - 1;
 			final double height = rowsStart[cell.getMaxRow() + 1] - rowsStart[cell.getMinRow()] - 1;
 			grid.addCell(cell);
-			elt.drawU(ug.apply(new UTranslate(xcell + 1, ycell + 1)), zIndex, new Dimension2DDouble(width, height));
+			elt.drawU(ug.apply(new UTranslate(xcell + 1, ycell + 1)), zIndex, new XDimension2D(width, height));
 		}
 		if (zIndex == 0)
 			grid.drawU(ug, 0, 0, getWhite());
@@ -133,14 +135,14 @@ public class ElementPyramid extends AbstractElement {
 		Collections.sort(all, new LeftFirst());
 		for (Cell cell : all) {
 			final Element elt = positions2.get(cell);
-			final Dimension2D dim = elt.getPreferredDimension(stringBounder, 0, 0);
+			final XDimension2D dim = elt.getPreferredDimension(stringBounder, 0, 0);
 			ensureColWidth(cell.getMinCol(), cell.getMaxCol() + 1, dim.getWidth() + 2);
 		}
 		Collections.sort(all, new TopFirst());
 		for (Cell cell : all) {
 			final Element elt = positions2.get(cell);
 			final double supY = cell.getMinRow() == 0 ? titleHeight / 2 : 0;
-			final Dimension2D dim = elt.getPreferredDimension(stringBounder, 0, 0);
+			final XDimension2D dim = elt.getPreferredDimension(stringBounder, 0, 0);
 			ensureRowHeight(cell.getMinRow(), cell.getMaxRow() + 1, dim.getHeight() + supY + 2);
 		}
 	}

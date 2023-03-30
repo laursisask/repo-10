@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,13 +35,11 @@
  */
 package net.sourceforge.plantuml.activitydiagram3.ftile;
 
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
-
-import net.sourceforge.plantuml.Dimension2DDouble;
 import net.sourceforge.plantuml.activitydiagram3.ftile.vertical.FtileDecorate;
-import net.sourceforge.plantuml.graphic.StringBounder;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
 
 public class FtileMinWidthCentered extends FtileDecorate {
 
@@ -73,17 +74,17 @@ public class FtileMinWidthCentered extends FtileDecorate {
 		return new FtileGeometry(getDimensionInternal(stringBounder), left, geo.getInY(), geo.getOutY());
 	}
 
-	private Dimension2D getDimensionInternal(StringBounder stringBounder) {
-		final Dimension2D dim = getFtileDelegated().calculateDimension(stringBounder);
+	private XDimension2D getDimensionInternal(StringBounder stringBounder) {
+		final XDimension2D dim = getFtileDelegated().calculateDimension(stringBounder);
 		if (dim.getWidth() < minWidth) {
-			return new Dimension2DDouble(minWidth, dim.getHeight());
+			return new XDimension2D(minWidth, dim.getHeight());
 		}
 		return dim;
 	}
 
 	private UTranslate getUTranslateInternal(final StringBounder stringBounder) {
-		final Dimension2D dimTile = getFtileDelegated().calculateDimension(stringBounder);
-		final Dimension2D dimTotal = getDimensionInternal(stringBounder);
+		final XDimension2D dimTile = getFtileDelegated().calculateDimension(stringBounder);
+		final XDimension2D dimTotal = getDimensionInternal(stringBounder);
 		final UTranslate change = UTranslate.dx((dimTotal.getWidth() - dimTile.getWidth()) / 2);
 		return change;
 	}
@@ -96,7 +97,7 @@ public class FtileMinWidthCentered extends FtileDecorate {
 	}
 
 	private double getPoint2(double x, StringBounder stringBounder) {
-		final Dimension2D dim = getFtileDelegated().calculateDimension(stringBounder);
+		final XDimension2D dim = getFtileDelegated().calculateDimension(stringBounder);
 		if (dim.getWidth() < minWidth) {
 			final double diff = minWidth - dim.getWidth();
 			return x + diff / 2;

@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,13 +35,13 @@
  */
 package net.sourceforge.plantuml.braille;
 
-import java.awt.geom.CubicCurve2D;
-import java.awt.geom.Point2D;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import net.sourceforge.plantuml.posimo.DotPath;
+import net.sourceforge.plantuml.klimt.geom.XCubicCurve2D;
+import net.sourceforge.plantuml.klimt.geom.XPoint2D;
+import net.sourceforge.plantuml.klimt.shape.DotPath;
 
 public class BrailleGrid {
 
@@ -138,29 +141,29 @@ public class BrailleGrid {
 	}
 
 	public void drawDotPath(double x, double y, DotPath shape) {
-		for (CubicCurve2D.Double bez : shape.getBeziers()) {
+		for (XCubicCurve2D bez : shape.getBeziers()) {
 			drawCubic(x, y, bez);
 
 		}
 	}
 
-	private void drawCubic(double x, double y, CubicCurve2D.Double bez) {
+	private void drawCubic(double x, double y, XCubicCurve2D bez) {
 		drawPointInternal(x, y, bez.getP1());
 		drawPointInternal(x, y, bez.getP2());
 		if (bez.getP1().distance(bez.getP2()) > quanta) {
-			final CubicCurve2D.Double part1 = new CubicCurve2D.Double();
-			final CubicCurve2D.Double part2 = new CubicCurve2D.Double();
+			final XCubicCurve2D part1 = XCubicCurve2D.none();
+			final XCubicCurve2D part2 = XCubicCurve2D.none();
 			bez.subdivide(part1, part2);
 			drawCubic(x, y, part1);
 			drawCubic(x, y, part2);
 		}
 	}
 
-	private void drawPointInternal(double x, double y, Point2D pt) {
+	private void drawPointInternal(double x, double y, XPoint2D pt) {
 		setStateDouble(x + pt.getX(), y + pt.getY(), true);
 	}
 
-	public void drawPolygon(List<Point2D> points) {
+	public void drawPolygon(List<XPoint2D> points) {
 		for (int i = 0; i < points.size() - 1; i++) {
 			drawLineInternal(points.get(i), points.get(i + 1));
 		}
@@ -168,11 +171,11 @@ public class BrailleGrid {
 
 	}
 
-	private void drawLineInternal(Point2D a, Point2D b) {
+	private void drawLineInternal(XPoint2D a, XPoint2D b) {
 		drawPointInternal(0, 0, a);
 		drawPointInternal(0, 0, b);
 		if (a.distance(b) > quanta) {
-			final Point2D middle = new Point2D.Double((a.getX() + b.getX()) / 2, (a.getY() + b.getY()) / 2);
+			final XPoint2D middle = new XPoint2D((a.getX() + b.getX()) / 2, (a.getY() + b.getY()) / 2);
 			drawLineInternal(a, middle);
 			drawLineInternal(middle, b);
 

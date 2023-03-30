@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,6 +35,10 @@
  */
 package net.sourceforge.plantuml.cucadiagram;
 
+import net.sourceforge.plantuml.abel.Entity;
+import net.sourceforge.plantuml.stereo.Stereotag;
+import net.sourceforge.plantuml.stereo.Stereotype;
+
 public class HideOrShow2 {
 
 	private final String what;
@@ -42,48 +49,54 @@ public class HideOrShow2 {
 		return what + " (" + show + ")";
 	}
 
-	private boolean isApplyable(ILeaf leaf) {
-		if (what.startsWith("$")) {
+	private boolean isApplyable(Entity leaf) {
+		if (what.startsWith("$"))
 			return isApplyableTag(leaf, what.substring(1));
-		}
-		if (what.startsWith("<<") && what.endsWith(">>")) {
-			return isApplyableStereotype(leaf, what.substring(2, what.length() - 2).trim());
-		}
-		if (what.equalsIgnoreCase("@unlinked")) {
+
+		if (what.startsWith("<<") && what.endsWith(">>"))
+			return isApplyableStereotype(leaf.getStereotype(), what.substring(2, what.length() - 2).trim());
+
+		if (isAboutUnlinked())
 			return isApplyableUnlinked(leaf);
-		}
-		final String fullName = leaf.getCodeGetName();
+
+		final String fullName = leaf.getName();
 		// System.err.println("fullName=" + fullName);
 		return match(fullName, what);
 	}
 
-	private boolean isApplyableUnlinked(ILeaf leaf) {
-		if (leaf.isAloneAndUnlinked()) {
+	private boolean isApplyable(Stereotype stereotype) {
+		if (what.startsWith("<<") && what.endsWith(">>"))
+			return isApplyableStereotype(stereotype, what.substring(2, what.length() - 2).trim());
+		return false;
+	}
+
+	public boolean isAboutUnlinked() {
+		return what.equalsIgnoreCase("@unlinked");
+	}
+
+	private boolean isApplyableUnlinked(Entity leaf) {
+		if (leaf.isAloneAndUnlinked())
 			return true;
-		}
+
 		return false;
 	}
 
-	private boolean isApplyableStereotype(ILeaf leaf, String pattern) {
-		final Stereotype stereotype = leaf.getStereotype();
-		if (stereotype == null) {
+	private boolean isApplyableStereotype(Stereotype stereotype, String pattern) {
+		if (stereotype == null)
 			return false;
-		}
-		for (String label : stereotype.getMultipleLabels()) {
-			if (match(label, pattern)) {
-				return true;
-			}
 
-		}
+		for (String label : stereotype.getMultipleLabels())
+			if (match(label, pattern))
+				return true;
+
 		return false;
 	}
 
-	private boolean isApplyableTag(ILeaf leaf, String pattern) {
-		for (Stereotag tag : leaf.stereotags()) {
-			if (match(tag.getName(), pattern)) {
+	private boolean isApplyableTag(Entity leaf, String pattern) {
+		for (Stereotag tag : leaf.stereotags())
+			if (match(tag.getName(), pattern))
 				return true;
-			}
-		}
+
 		return false;
 	}
 
@@ -104,10 +117,17 @@ public class HideOrShow2 {
 		this.show = show;
 	}
 
-	public boolean apply(boolean hidden, ILeaf leaf) {
-		if (isApplyable(leaf)) {
+	public boolean apply(boolean hidden, Entity leaf) {
+		if (isApplyable(leaf))
 			return !show;
-		}
+
+		return hidden;
+	}
+
+	public boolean apply(boolean hidden, Stereotype stereotype) {
+		if (isApplyable(stereotype))
+			return !show;
+
 		return hidden;
 	}
 

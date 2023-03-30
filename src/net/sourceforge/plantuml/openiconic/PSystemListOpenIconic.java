@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
  * 
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  * 
  * This file is part of PlantUML.
  *
@@ -46,14 +46,15 @@ import net.sourceforge.plantuml.FileFormatOption;
 import net.sourceforge.plantuml.PlainDiagram;
 import net.sourceforge.plantuml.core.DiagramDescription;
 import net.sourceforge.plantuml.core.UmlSource;
-import net.sourceforge.plantuml.graphic.TextBlock;
-import net.sourceforge.plantuml.graphic.TextBlockHorizontal;
-import net.sourceforge.plantuml.graphic.UDrawable;
-import net.sourceforge.plantuml.graphic.VerticalAlignment;
+import net.sourceforge.plantuml.klimt.geom.VerticalAlignment;
+import net.sourceforge.plantuml.klimt.shape.TextBlock;
+import net.sourceforge.plantuml.klimt.shape.TextBlockHorizontal;
+import net.sourceforge.plantuml.klimt.shape.UDrawable;
 import net.sourceforge.plantuml.openiconic.data.DummyIcon;
-import net.sourceforge.plantuml.graphic.AbstractTextBlock;
+import net.sourceforge.plantuml.klimt.sprite.PSystemListInternalSprites;
 
 public class PSystemListOpenIconic extends PlainDiagram {
+	// ::remove file when __CORE__
 
 	public PSystemListOpenIconic(UmlSource source) {
 		super(source);
@@ -66,7 +67,7 @@ public class PSystemListOpenIconic extends PlainDiagram {
 		lines.add("<i>Credit to");
 		lines.add("https://useiconic.com/open");
 		lines.add(" ");
-		try (BufferedReader br = new BufferedReader(new InputStreamReader(getRessourceAllTxt()))) {
+		try (BufferedReader br = new BufferedReader(new InputStreamReader(getResourceAllTxt()))) {
 			String s = null;
 			while ((s = br.readLine()) != null) {
 				// lines.add("<&yen> " + s);
@@ -75,11 +76,11 @@ public class PSystemListOpenIconic extends PlainDiagram {
 			}
 		}
 		
-		final List<TextBlock> cols = AbstractTextBlock.getCols(lines, 7, 0);
+		final List<TextBlock> cols = PSystemListInternalSprites.getCols(lines, 7, 0);
 		return new TextBlockHorizontal(cols, VerticalAlignment.TOP);
 	}
 
-	private InputStream getRessourceAllTxt() {
+	private InputStream getResourceAllTxt() {
 		return DummyIcon.class.getResourceAsStream("all.txt");
 	}
 

@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -38,14 +41,13 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import net.sourceforge.plantuml.Dimension2DDouble;
 import net.sourceforge.plantuml.activitydiagram3.ftile.Ftile;
 import net.sourceforge.plantuml.activitydiagram3.ftile.FtileGeometry;
 import net.sourceforge.plantuml.activitydiagram3.ftile.Swimlane;
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
-import net.sourceforge.plantuml.graphic.StringBounder;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
 
 public class FtileIfNude extends FtileDimensionMemoize {
 
@@ -59,7 +61,7 @@ public class FtileIfNude extends FtileDimensionMemoize {
 		this.tile2 = tile2;
 		this.in = in;
 	}
-	
+
 	@Override
 	public Collection<Ftile> getMyChildren() {
 		return Arrays.asList(tile1, tile2);
@@ -98,8 +100,8 @@ public class FtileIfNude extends FtileDimensionMemoize {
 	}
 
 	protected UTranslate getTranslate2(StringBounder stringBounder) {
-		final Dimension2D dimTotal = calculateDimensionInternal(stringBounder);
-		final Dimension2D dim2 = tile2.calculateDimension(stringBounder);
+		final XDimension2D dimTotal = calculateDimensionInternal(stringBounder);
+		final XDimension2D dim2 = tile2.calculateDimension(stringBounder);
 
 		final double x2 = dimTotal.getWidth() - dim2.getWidth();
 		final double y2 = 0;
@@ -143,7 +145,7 @@ public class FtileIfNude extends FtileDimensionMemoize {
 		final double innerMargin = widthInner(stringBounder);
 		final double width = dim1.getLeft() + innerMargin + (dim2.getWidth() - dim2.getLeft());
 
-		final Dimension2D dim12 = Dimension2DDouble.mergeLR(dim1, dim2);
+		final XDimension2D dim12 = dim1.mergeLR(dim2);
 
 		return new FtileGeometry(width, dim12.getHeight(), dim1.getLeft() + innerMargin / 2, 0);
 	}

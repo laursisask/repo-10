@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,22 +35,22 @@
  */
 package net.sourceforge.plantuml.project.draw;
 
-import net.sourceforge.plantuml.SpriteContainerEmpty;
-import net.sourceforge.plantuml.cucadiagram.Display;
-import net.sourceforge.plantuml.graphic.FontConfiguration;
-import net.sourceforge.plantuml.graphic.HorizontalAlignment;
-import net.sourceforge.plantuml.graphic.TextBlock;
-import net.sourceforge.plantuml.graphic.UDrawable;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.color.HColor;
+import net.sourceforge.plantuml.klimt.color.HColors;
+import net.sourceforge.plantuml.klimt.creole.Display;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.font.FontConfiguration;
+import net.sourceforge.plantuml.klimt.font.UFont;
+import net.sourceforge.plantuml.klimt.geom.HorizontalAlignment;
+import net.sourceforge.plantuml.klimt.shape.TextBlock;
+import net.sourceforge.plantuml.klimt.shape.UDrawable;
+import net.sourceforge.plantuml.klimt.shape.ULine;
+import net.sourceforge.plantuml.klimt.sprite.SpriteContainerEmpty;
 import net.sourceforge.plantuml.project.GanttDiagram;
 import net.sourceforge.plantuml.project.core.Resource;
 import net.sourceforge.plantuml.project.time.Day;
 import net.sourceforge.plantuml.project.timescale.TimeScale;
-import net.sourceforge.plantuml.ugraphic.UFont;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.ULine;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
-import net.sourceforge.plantuml.ugraphic.color.HColor;
-import net.sourceforge.plantuml.ugraphic.color.HColorUtils;
 
 public class ResourceDraw implements UDrawable {
 
@@ -72,7 +75,7 @@ public class ResourceDraw implements UDrawable {
 				HorizontalAlignment.LEFT, new SpriteContainerEmpty());
 		title.drawU(ug);
 		final ULine line = ULine.hline(timeScale.getEndingPosition(max) - timeScale.getStartingPosition(min));
-		ug.apply(HColorUtils.BLACK).apply(UTranslate.dy(title.calculateDimension(ug.getStringBounder()).getHeight()))
+		ug.apply(HColors.BLACK).apply(UTranslate.dy(title.calculateDimension(ug.getStringBounder()).getHeight()))
 				.draw(line);
 
 		double startingPosition = -1;
@@ -86,7 +89,7 @@ public class ResourceDraw implements UDrawable {
 				if (totalLoad > 0) {
 					final boolean over = totalLoad > totalLimit;
 					final FontConfiguration fontConfiguration = getFontConfiguration(9,
-							over ? HColorUtils.RED : HColorUtils.BLACK);
+							over ? HColors.RED : HColors.BLACK);
 					final TextBlock value = Display.getWithNewlines("" + totalLoad).create(fontConfiguration,
 							HorizontalAlignment.LEFT, new SpriteContainerEmpty());
 					if (startingPosition == -1)
@@ -108,12 +111,12 @@ public class ResourceDraw implements UDrawable {
 	}
 
 	private FontConfiguration getFontConfiguration(int size) {
-		return getFontConfiguration(size, HColorUtils.BLACK);
+		return getFontConfiguration(size, HColors.BLACK);
 	}
 
 	private FontConfiguration getFontConfiguration(int size, HColor color) {
 		final UFont font = UFont.serif(size);
-		return FontConfiguration.create(font, color, color, false);
+		return FontConfiguration.create(font, color, color, null);
 	}
 
 	public double getHeight() {

@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -34,27 +37,25 @@ package net.sourceforge.plantuml.activitydiagram3.ftile;
 
 import static net.sourceforge.plantuml.utils.ObjectUtils.instanceOfAny;
 
-import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sourceforge.plantuml.annotation.HaxeIgnored;
-import net.sourceforge.plantuml.graphic.StringBounder;
-import net.sourceforge.plantuml.ugraphic.MinMax;
-import net.sourceforge.plantuml.ugraphic.UBackground;
-import net.sourceforge.plantuml.ugraphic.UChange;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.UGraphicNo;
-import net.sourceforge.plantuml.ugraphic.ULine;
-import net.sourceforge.plantuml.ugraphic.UPolygon;
-import net.sourceforge.plantuml.ugraphic.URectangle;
-import net.sourceforge.plantuml.ugraphic.UShape;
-import net.sourceforge.plantuml.ugraphic.UStroke;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
-import net.sourceforge.plantuml.ugraphic.color.HColor;
-import net.sourceforge.plantuml.ugraphic.color.HColorUtils;
+import net.sourceforge.plantuml.klimt.UBackground;
+import net.sourceforge.plantuml.klimt.UChange;
+import net.sourceforge.plantuml.klimt.UShape;
+import net.sourceforge.plantuml.klimt.UStroke;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.color.HColor;
+import net.sourceforge.plantuml.klimt.color.HColors;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.drawing.UGraphicNo;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
+import net.sourceforge.plantuml.klimt.geom.MinMax;
+import net.sourceforge.plantuml.klimt.geom.XLine2D;
+import net.sourceforge.plantuml.klimt.shape.ULine;
+import net.sourceforge.plantuml.klimt.shape.UPolygon;
+import net.sourceforge.plantuml.klimt.shape.URectangle;
 
-@HaxeIgnored
 public class CollisionDetector extends UGraphicNo {
 
 	@Override
@@ -65,7 +66,7 @@ public class CollisionDetector extends UGraphicNo {
 	private final Context context;
 
 	private static CollisionDetector create(StringBounder stringBounder) {
-		return new CollisionDetector(stringBounder, new UTranslate(), new Context());
+		return new CollisionDetector(stringBounder, UTranslate.none(), new Context());
 	}
 
 	private CollisionDetector(StringBounder stringBounder, UTranslate translate, Context context) {
@@ -95,21 +96,21 @@ public class CollisionDetector extends UGraphicNo {
 				if (collision(minmax))
 					minmax.drawGray(ug);
 
-			final HColor color = HColorUtils.BLACK;
-			ug = ug.apply(color).apply(new UStroke(5));
+			final HColor color = HColors.BLACK;
+			ug = ug.apply(color).apply(UStroke.withThickness(5));
 			for (Snake snake : snakes)
-				for (Line2D line : snake.getHorizontalLines())
+				for (XLine2D line : snake.getHorizontalLines())
 					if (collision(line))
 						drawLine(ug, line);
 
 		}
 
-		private void drawLine(UGraphic ug, Line2D line) {
+		private void drawLine(UGraphic ug, XLine2D line) {
 			ug = ug.apply(new UTranslate(line.getX1(), line.getY1()));
 			ug.draw(new ULine(line.getX2() - line.getX1(), line.getY2() - line.getY1()));
 		}
 
-		private boolean collision(Line2D hline) {
+		private boolean collision(XLine2D hline) {
 			for (MinMax r : rectangles)
 				if (collisionCheck(r, hline))
 					return true;
@@ -119,7 +120,7 @@ public class CollisionDetector extends UGraphicNo {
 
 		private boolean collision(MinMax r) {
 			for (Snake snake : snakes) {
-				for (Line2D hline : snake.getHorizontalLines()) {
+				for (XLine2D hline : snake.getHorizontalLines()) {
 					if (collisionCheck(r, hline)) {
 						return true;
 					}
@@ -130,7 +131,7 @@ public class CollisionDetector extends UGraphicNo {
 
 	}
 
-	private static boolean collisionCheck(MinMax rect, Line2D hline) {
+	private static boolean collisionCheck(MinMax rect, XLine2D hline) {
 		if (hline.getY1() != hline.getY2())
 			throw new IllegalArgumentException();
 

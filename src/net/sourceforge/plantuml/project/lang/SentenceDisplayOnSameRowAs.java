@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
  * 
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  * 
  * This file is part of PlantUML.
  *
@@ -42,16 +42,16 @@ import net.sourceforge.plantuml.project.core.Task;
 public class SentenceDisplayOnSameRowAs extends SentenceSimple {
 
 	public SentenceDisplayOnSameRowAs() {
-		super(new SubjectTask(), Verbs.displayOnSameRowAs(), new ComplementNamed());
+		super(SubjectTask.ME, Verbs.displayOnSameRowAs, new ComplementNamed());
 	}
 
 	@Override
 	public CommandExecutionResult execute(GanttDiagram project, Object subject, Object complement) {
 		final Task task1 = (Task) subject;
 		final Task task2 = project.getExistingTask((String) complement);
-		if (task2 == null) {
+		if (task2 == null)
 			return CommandExecutionResult.error("No such task " + task2);
-		}
+
 		task1.putInSameRowAs(task2);
 		return CommandExecutionResult.ok();
 	}

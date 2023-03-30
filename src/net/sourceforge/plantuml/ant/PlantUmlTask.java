@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -56,7 +59,8 @@ import net.sourceforge.plantuml.Option;
 import net.sourceforge.plantuml.OptionFlags;
 import net.sourceforge.plantuml.SourceFileReader;
 import net.sourceforge.plantuml.Splash;
-import net.sourceforge.plantuml.cucadiagram.dot.GraphvizUtils;
+import net.sourceforge.plantuml.dot.GraphvizUtils;
+import net.sourceforge.plantuml.log.Logme;
 import net.sourceforge.plantuml.preproc.Defines;
 import net.sourceforge.plantuml.stats.StatsUtils;
 
@@ -73,6 +77,7 @@ import net.sourceforge.plantuml.stats.StatsUtils;
 // Carriage Return in UTF-8 XML: &#13;
 // Line Feed in UTF-8 XML: &#10;
 public class PlantUmlTask extends Task {
+    // ::remove folder when __HAXE__
 
 	private String dir = null;
 	private final Option option = new Option();
@@ -127,10 +132,10 @@ public class PlantUmlTask extends Task {
 			}
 			this.log("Nb images generated: " + nbFiles.get());
 		} catch (IOException e) {
-			e.printStackTrace();
+			Logme.error(e);
 			throw new BuildException(e.toString());
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+			Logme.error(e);
 			throw new BuildException(e.toString());
 		}
 

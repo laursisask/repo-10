@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -35,7 +38,9 @@ package net.sourceforge.plantuml.cucadiagram;
 import java.util.ArrayList;
 import java.util.List;
 
-class MagmaList {
+import net.sourceforge.plantuml.abel.Entity;
+
+public class MagmaList {
 
 	private final List<Magma> all = new ArrayList<>();
 
@@ -43,7 +48,7 @@ class MagmaList {
 		all.add(magma);
 	}
 
-	public MagmaList getMagmas(IGroup group) {
+	public MagmaList getMagmas(Entity group) {
 		final MagmaList result = new MagmaList();
 		for (Magma m : all) {
 			if (m.getContainer() == group) {

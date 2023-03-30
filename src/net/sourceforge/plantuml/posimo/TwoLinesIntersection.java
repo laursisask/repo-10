@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -33,11 +36,12 @@
 package net.sourceforge.plantuml.posimo;
 
 import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
+
+import net.sourceforge.plantuml.klimt.geom.XPoint2D;
 
 public class TwoLinesIntersection {
 
-	private final Point2D inter;
+	private final XPoint2D inter;
 
 	public TwoLinesIntersection(Line2D lineA, Line2D lineB) {
 		final double x1 = lineA.getX1();
@@ -60,10 +64,10 @@ public class TwoLinesIntersection {
 		final double x = x1 + uA * (x2 - x1);
 		final double y = y1 + uA * (y2 - y1);
 
-		inter = new Point2D.Double(x, y);
+		inter = new XPoint2D(x, y);
 	}
 
-	public final Point2D getIntersection() {
+	public final XPoint2D getIntersection() {
 		return inter;
 	}
 

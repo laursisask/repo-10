@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
  * 
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  * 
  * This file is part of PlantUML.
  *
@@ -35,17 +35,15 @@
  */
 package net.sourceforge.plantuml.skin;
 
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
-
-import net.sourceforge.plantuml.Dimension2DDouble;
-import net.sourceforge.plantuml.graphic.AbstractTextBlock;
-import net.sourceforge.plantuml.graphic.StringBounder;
-import net.sourceforge.plantuml.graphic.TextBlock;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.URectangle;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
-import net.sourceforge.plantuml.ugraphic.color.HColor;
-import net.sourceforge.plantuml.ugraphic.color.HColorNone;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.color.HColor;
+import net.sourceforge.plantuml.klimt.color.HColors;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
+import net.sourceforge.plantuml.klimt.shape.AbstractTextBlock;
+import net.sourceforge.plantuml.klimt.shape.TextBlock;
+import net.sourceforge.plantuml.klimt.shape.URectangle;
 
 public class Padder {
 
@@ -111,26 +109,25 @@ public class Padder {
 			return orig;
 		}
 		return new AbstractTextBlock() {
-			public Dimension2D calculateDimension(StringBounder stringBounder) {
-				return Dimension2DDouble.delta(orig.calculateDimension(stringBounder), 2 * (margin + padding));
+			public XDimension2D calculateDimension(StringBounder stringBounder) {
+				return orig.calculateDimension(stringBounder).delta(2 * (margin + padding));
 			}
 
 			public void drawU(UGraphic ug) {
 				ug = ug.apply(new UTranslate(margin, margin));
 				UGraphic ug2 = ug;
 				if (borderColor == null) {
-					ug2 = ug2.apply(new HColorNone());
+					ug2 = ug2.apply(HColors.none());
 				} else {
 					ug2 = ug2.apply(borderColor);
 				}
 				if (backgroundColor == null) {
-					ug2 = ug2.apply(new HColorNone().bg());
+					ug2 = ug2.apply(HColors.none().bg());
 				} else {
 					ug2 = ug2.apply(backgroundColor.bg());
 				}
-				final Dimension2D originalDim = orig.calculateDimension(ug.getStringBounder());
-				final URectangle rect = new URectangle(Dimension2DDouble.delta(originalDim, 2 * padding))
-						.rounded(roundCorner);
+				final XDimension2D originalDim = orig.calculateDimension(ug.getStringBounder());
+				final URectangle rect = URectangle.build(originalDim.delta(2 * padding)).rounded(roundCorner);
 				ug2.draw(rect);
 				orig.drawU(ug.apply(new UTranslate(padding, padding)));
 			}

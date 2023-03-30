@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,14 +35,18 @@
  */
 package net.sourceforge.plantuml.skin.rose;
 
-import java.awt.geom.Point2D;
-
-import net.sourceforge.plantuml.ISkinSimple;
-import net.sourceforge.plantuml.LineBreakStrategy;
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
-import net.sourceforge.plantuml.cucadiagram.Display;
-import net.sourceforge.plantuml.graphic.HorizontalAlignment;
-import net.sourceforge.plantuml.graphic.StringBounder;
+import net.sourceforge.plantuml.klimt.LineBreakStrategy;
+import net.sourceforge.plantuml.klimt.UStroke;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.creole.Display;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
+import net.sourceforge.plantuml.klimt.geom.HorizontalAlignment;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
+import net.sourceforge.plantuml.klimt.geom.XPoint2D;
+import net.sourceforge.plantuml.klimt.shape.UEllipse;
+import net.sourceforge.plantuml.klimt.shape.ULine;
+import net.sourceforge.plantuml.klimt.shape.UPolygon;
 import net.sourceforge.plantuml.skin.Area;
 import net.sourceforge.plantuml.skin.ArrowConfiguration;
 import net.sourceforge.plantuml.skin.ArrowDecoration;
@@ -47,13 +54,8 @@ import net.sourceforge.plantuml.skin.ArrowDirection;
 import net.sourceforge.plantuml.skin.ArrowDressing;
 import net.sourceforge.plantuml.skin.ArrowHead;
 import net.sourceforge.plantuml.skin.ArrowPart;
+import net.sourceforge.plantuml.style.ISkinSimple;
 import net.sourceforge.plantuml.style.Style;
-import net.sourceforge.plantuml.ugraphic.UEllipse;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.ULine;
-import net.sourceforge.plantuml.ugraphic.UPolygon;
-import net.sourceforge.plantuml.ugraphic.UStroke;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
 
 public class ComponentRoseArrow extends AbstractComponentRoseArrow {
 
@@ -80,15 +82,16 @@ public class ComponentRoseArrow extends AbstractComponentRoseArrow {
 
 	@Override
 	public void drawInternalU(UGraphic ug, Area area) {
-		if (getArrowConfiguration().isHidden())
+		final ArrowConfiguration arrowConfiguration = getArrowConfiguration();
+		if (arrowConfiguration.isHidden())
 			return;
 
-		final Dimension2D dimensionToUse = area.getDimensionToUse();
+		final XDimension2D dimensionToUse = area.getDimensionToUse();
 		final StringBounder stringBounder = ug.getStringBounder();
 		ug = ug.apply(getForegroundColor());
 
-		final ArrowDressing dressing1 = getArrowConfiguration().getDressing1();
-		final ArrowDressing dressing2 = getArrowConfiguration().getDressing2();
+		final ArrowDressing dressing1 = arrowConfiguration.getDressing1();
+		final ArrowDressing dressing2 = arrowConfiguration.getDressing2();
 
 		double start = 0;
 		double len = dimensionToUse.getWidth() - 1;
@@ -97,19 +100,17 @@ public class ComponentRoseArrow extends AbstractComponentRoseArrow {
 		final double pos1 = start + 1;
 		final double pos2 = len - 1;
 
-		if (getArrowConfiguration().getDecoration2() == ArrowDecoration.CIRCLE && dressing2.getHead() == ArrowHead.NONE)
+		if (arrowConfiguration.getDecoration2() == ArrowDecoration.CIRCLE && dressing2.getHead() == ArrowHead.NONE)
 			len -= diamCircle / 2;
 
-		if (getArrowConfiguration().getDecoration2() == ArrowDecoration.CIRCLE && dressing2.getHead() != ArrowHead.NONE)
+		if (arrowConfiguration.getDecoration2() == ArrowDecoration.CIRCLE && dressing2.getHead() != ArrowHead.NONE)
 			len -= diamCircle / 2 + thinCircle;
 
-		if (getArrowConfiguration().getDecoration1() == ArrowDecoration.CIRCLE
-				&& dressing1.getHead() == ArrowHead.NONE) {
+		if (arrowConfiguration.getDecoration1() == ArrowDecoration.CIRCLE && dressing1.getHead() == ArrowHead.NONE) {
 			start += diamCircle / 2;
 			len -= diamCircle / 2;
 		}
-		if (getArrowConfiguration().getDecoration1() == ArrowDecoration.CIRCLE
-				&& dressing1.getHead() == ArrowHead.NORMAL) {
+		if (arrowConfiguration.getDecoration1() == ArrowDecoration.CIRCLE && dressing1.getHead() == ArrowHead.NORMAL) {
 			start += diamCircle + thinCircle;
 			len -= diamCircle + thinCircle;
 		}
@@ -141,17 +142,16 @@ public class ComponentRoseArrow extends AbstractComponentRoseArrow {
 		}
 
 		drawDressing1(ug.apply(new UTranslate(pos1, posArrow + inclination1)), dressing1,
-				getArrowConfiguration().getDecoration1(), lenFull);
+				arrowConfiguration.getDecoration1(), lenFull);
 		drawDressing2(ug.apply(new UTranslate(pos2, posArrow + inclination2)), dressing2,
-				getArrowConfiguration().getDecoration2(), lenFull);
+				arrowConfiguration.getDecoration2(), lenFull);
 
 		if (inclination1 == 0 && inclination2 == 0)
-			getArrowConfiguration().applyStroke(ug).apply(new UTranslate(start, posArrow)).draw(new ULine(len, 0));
-		else if (inclination1 != 0) {
-			drawLine(getArrowConfiguration().applyStroke(ug), start + len, posArrow, 0, posArrow + inclination1);
-		} else if (inclination2 != 0) {
-			drawLine(getArrowConfiguration().applyStroke(ug), start, posArrow, pos2, posArrow + inclination2);
-		}
+			arrowConfiguration.applyStroke(ug).apply(new UTranslate(start, posArrow)).draw(new ULine(len, 0));
+		else if (inclination1 != 0)
+			drawLine(arrowConfiguration.applyStroke(ug), start + len, posArrow, 0, posArrow + inclination1);
+		else if (inclination2 != 0)
+			drawLine(arrowConfiguration.applyStroke(ug), start, posArrow, pos2, posArrow + inclination2);
 
 		final ArrowDirection direction2 = getDirection2();
 		final double textPos;
@@ -191,8 +191,8 @@ public class ComponentRoseArrow extends AbstractComponentRoseArrow {
 	private void drawDressing1(UGraphic ug, ArrowDressing dressing, ArrowDecoration decoration, double lenFull) {
 
 		if (decoration == ArrowDecoration.CIRCLE) {
-			final UEllipse circle = new UEllipse(diamCircle, diamCircle);
-			ug.apply(new UStroke(thinCircle)).apply(getForegroundColor())
+			final UEllipse circle = UEllipse.build(diamCircle, diamCircle);
+			ug.apply(UStroke.withThickness(thinCircle)).apply(getForegroundColor())
 					.apply(new UTranslate(-diamCircle / 2 - thinCircle, -diamCircle / 2 - thinCircle / 2)).draw(circle);
 			if (dressing.getHead() != ArrowHead.CROSSX)
 				ug = ug.apply(UTranslate.dx(diamCircle / 2 + thinCircle));
@@ -200,13 +200,15 @@ public class ComponentRoseArrow extends AbstractComponentRoseArrow {
 
 		if (dressing.getHead() == ArrowHead.ASYNC) {
 			if (dressing.getPart() != ArrowPart.BOTTOM_PART)
-				getArrowConfiguration().applyThicknessOnly(ug).draw(new ULine(getArrowDeltaX(), -getArrowDeltaY()));
+				getArrowConfiguration().applyThicknessOnly(ug).draw(
+						new ULine(getArrowDeltaX(), -getArrowDeltaY()).rotate(Math.atan2(-inclination1, lenFull)));
 
 			if (dressing.getPart() != ArrowPart.TOP_PART)
-				getArrowConfiguration().applyThicknessOnly(ug).draw(new ULine(getArrowDeltaX(), getArrowDeltaY()));
+				getArrowConfiguration().applyThicknessOnly(ug)
+						.draw(new ULine(getArrowDeltaX(), getArrowDeltaY()).rotate(Math.atan2(-inclination1, lenFull)));
 
 		} else if (dressing.getHead() == ArrowHead.CROSSX) {
-			ug = ug.apply(new UStroke(2));
+			ug = ug.apply(UStroke.withThickness(2));
 			ug.apply(new UTranslate(spaceCrossX, -getArrowDeltaX() / 2))
 					.draw(new ULine(getArrowDeltaX(), getArrowDeltaX()));
 			ug.apply(new UTranslate(spaceCrossX, getArrowDeltaX() / 2))
@@ -225,22 +227,24 @@ public class ComponentRoseArrow extends AbstractComponentRoseArrow {
 	private void drawDressing2(UGraphic ug, ArrowDressing dressing, ArrowDecoration decoration, double lenFull) {
 
 		if (decoration == ArrowDecoration.CIRCLE) {
-			ug = ug.apply(new UStroke(thinCircle)).apply(getForegroundColor());
-			final UEllipse circle = new UEllipse(diamCircle, diamCircle);
+			ug = ug.apply(UStroke.withThickness(thinCircle)).apply(getForegroundColor());
+			final UEllipse circle = UEllipse.build(diamCircle, diamCircle);
 			ug.apply(new UTranslate(-diamCircle / 2 + thinCircle, -diamCircle / 2 - thinCircle / 2)).draw(circle);
-			ug = ug.apply(new UStroke());
+			ug = ug.apply(UStroke.simple());
 			ug = ug.apply(UTranslate.dx(-diamCircle / 2 - thinCircle));
 		}
 
 		if (dressing.getHead() == ArrowHead.ASYNC) {
 			if (dressing.getPart() != ArrowPart.BOTTOM_PART)
-				getArrowConfiguration().applyThicknessOnly(ug).draw(new ULine(-getArrowDeltaX(), -getArrowDeltaY()));
+				getArrowConfiguration().applyThicknessOnly(ug).draw(
+						new ULine(-getArrowDeltaX(), -getArrowDeltaY()).rotate(Math.atan2(inclination2, lenFull)));
 
 			if (dressing.getPart() != ArrowPart.TOP_PART)
-				getArrowConfiguration().applyThicknessOnly(ug).draw(new ULine(-getArrowDeltaX(), getArrowDeltaY()));
+				getArrowConfiguration().applyThicknessOnly(ug)
+						.draw(new ULine(-getArrowDeltaX(), getArrowDeltaY()).rotate(Math.atan2(inclination2, lenFull)));
 
 		} else if (dressing.getHead() == ArrowHead.CROSSX) {
-			ug = ug.apply(new UStroke(2));
+			ug = ug.apply(UStroke.withThickness(2));
 			ug.apply(new UTranslate(-spaceCrossX - getArrowDeltaX(), -getArrowDeltaX() / 2))
 					.draw(new ULine(getArrowDeltaX(), getArrowDeltaX()));
 			ug.apply(new UTranslate(-spaceCrossX - getArrowDeltaX(), getArrowDeltaX() / 2))
@@ -297,20 +301,20 @@ public class ComponentRoseArrow extends AbstractComponentRoseArrow {
 		return polygon;
 	}
 
-	public Point2D getStartPoint(StringBounder stringBounder, Dimension2D dimensionToUse) {
+	public XPoint2D getStartPoint(StringBounder stringBounder, XDimension2D dimensionToUse) {
 		final double y = getYPoint(stringBounder);
 		if (getDirection2() == ArrowDirection.LEFT_TO_RIGHT_NORMAL)
-			return new Point2D.Double(getPaddingX(), y + inclination2);
+			return new XPoint2D(getPaddingX(), y + inclination2);
 
-		return new Point2D.Double(dimensionToUse.getWidth() + getPaddingX(), y + inclination2);
+		return new XPoint2D(dimensionToUse.getWidth() + getPaddingX(), y + inclination2);
 	}
 
-	public Point2D getEndPoint(StringBounder stringBounder, Dimension2D dimensionToUse) {
+	public XPoint2D getEndPoint(StringBounder stringBounder, XDimension2D dimensionToUse) {
 		final double y = getYPoint(stringBounder);
 		if (getDirection2() == ArrowDirection.LEFT_TO_RIGHT_NORMAL)
-			return new Point2D.Double(dimensionToUse.getWidth() + getPaddingX(), y);
+			return new XPoint2D(dimensionToUse.getWidth() + getPaddingX(), y);
 
-		return new Point2D.Double(getPaddingX(), y);
+		return new XPoint2D(getPaddingX(), y);
 	}
 
 	@Override

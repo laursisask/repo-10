@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,16 +35,15 @@
  */
 package net.sourceforge.plantuml.svek;
 
-import net.sourceforge.plantuml.Dimension2DDouble;
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
-import net.sourceforge.plantuml.graphic.AbstractTextBlock;
-import net.sourceforge.plantuml.graphic.StringBounder;
-import net.sourceforge.plantuml.graphic.SymbolContext;
-import net.sourceforge.plantuml.ugraphic.UEllipse;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.UPath;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
-import net.sourceforge.plantuml.ugraphic.color.HColorNone;
+import net.sourceforge.plantuml.klimt.Fashion;
+import net.sourceforge.plantuml.klimt.UPath;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.color.HColors;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
+import net.sourceforge.plantuml.klimt.shape.AbstractTextBlock;
+import net.sourceforge.plantuml.klimt.shape.UEllipse;
 
 public class Boundary extends AbstractTextBlock {
 
@@ -49,10 +51,10 @@ public class Boundary extends AbstractTextBlock {
 
 	private final double radius = 12;
 	private final double left = 17;
-	
-	private final SymbolContext symbolContext;
 
-	public Boundary(SymbolContext symbolContext) {
+	private final Fashion symbolContext;
+
+	public Boundary(Fashion symbolContext) {
 		this.symbolContext = symbolContext;
 	}
 
@@ -62,21 +64,21 @@ public class Boundary extends AbstractTextBlock {
 		x += margin;
 		y += margin;
 		ug = symbolContext.apply(ug);
-		final UEllipse circle = new UEllipse(radius * 2, radius * 2);
+		final UEllipse circle = UEllipse.build(radius * 2, radius * 2);
 		circle.setDeltaShadow(symbolContext.getDeltaShadow());
 
-		final UPath path1 = new UPath();
+		final UPath path1 = UPath.none();
 		path1.moveTo(0, 0);
 		path1.lineTo(0, radius * 2);
 		path1.setDeltaShadow(symbolContext.getDeltaShadow());
 
-		final UPath path = new UPath();
+		final UPath path = UPath.none();
 		path.moveTo(0, 0);
 		path.lineTo(0, radius * 2);
 		path.moveTo(0, radius);
 		path.lineTo(left, radius);
 		path.setDeltaShadow(symbolContext.getDeltaShadow());
-		ug.apply(new UTranslate(x, y)).apply(new HColorNone().bg()).draw(path);
+		ug.apply(new UTranslate(x, y)).apply(HColors.none().bg()).draw(path);
 
 		// final ULine line1 = ULine.dy(radius * 2);
 		// line1.setDeltaShadow(deltaShadow);
@@ -89,8 +91,8 @@ public class Boundary extends AbstractTextBlock {
 
 	}
 
-	public Dimension2D calculateDimension(StringBounder stringBounder) {
-		return new Dimension2DDouble(radius * 2 + left + 2 * margin, radius * 2 + 2 * margin);
+	public XDimension2D calculateDimension(StringBounder stringBounder) {
+		return new XDimension2D(radius * 2 + left + 2 * margin, radius * 2 + 2 * margin);
 	}
 
 }

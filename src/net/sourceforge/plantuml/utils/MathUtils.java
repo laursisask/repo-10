@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,12 +35,13 @@
  */
 package net.sourceforge.plantuml.utils;
 
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
-import java.awt.geom.Point2D;
-
-import net.sourceforge.plantuml.Dimension2DDouble;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
 
 public class MathUtils {
+
+    public static int abs(int a) {
+        return (a < 0) ? -a : a;
+    }
 
 	public static double max(double a, double b) {
 		return Math.max(a, b);
@@ -77,31 +81,23 @@ public class MathUtils {
 			return v;
 			// throw new IllegalArgumentException("min="+min+" max="+max+" v="+v);
 		}
-		if (v < min) {
+		if (v < min) 
 			return min;
-		}
-		if (v > max) {
+		
+		if (v > max) 
 			return max;
-		}
+		
 		return v;
 	}
 
-	public static Dimension2D max(Dimension2D dim1, Dimension2D dim2) {
-		return new Dimension2DDouble(Math.max(dim1.getWidth(), dim2.getWidth()),
+	public static XDimension2D maxDim(XDimension2D dim1, XDimension2D dim2) {
+		return new XDimension2D(Math.max(dim1.getWidth(), dim2.getWidth()),
 				Math.max(dim1.getHeight(), dim2.getHeight()));
 	}
 
-	public static Dimension2D max(Dimension2D dim1, Dimension2D dim2, Dimension2D dim3) {
-		return new Dimension2DDouble(MathUtils.max(dim1.getWidth(), dim2.getWidth(), dim3.getWidth()),
+	public static XDimension2D maxDim(XDimension2D dim1, XDimension2D dim2, XDimension2D dim3) {
+		return new XDimension2D(MathUtils.max(dim1.getWidth(), dim2.getWidth(), dim3.getWidth()),
 				MathUtils.max(dim1.getHeight(), dim2.getHeight(), dim3.getHeight()));
-	}
-
-	public static Point2D max(Point2D pt1, Point2D pt2) {
-		return new Point2D.Double(Math.max(pt1.getX(), pt2.getX()), Math.max(pt1.getY(), pt2.getY()));
-	}
-
-	public static Point2D max(Point2D pt1, Point2D pt2, Point2D pt3) {
-		return new Point2D.Double(max(pt1.getX(), pt2.getX(), pt3.getX()), max(pt1.getY(), pt2.getY(), pt3.getY()));
 	}
 
 }

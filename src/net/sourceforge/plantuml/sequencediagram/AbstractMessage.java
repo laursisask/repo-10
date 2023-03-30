@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -38,10 +41,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import net.sourceforge.plantuml.Url;
-import net.sourceforge.plantuml.cucadiagram.Display;
-import net.sourceforge.plantuml.cucadiagram.Stereotype;
+import net.sourceforge.plantuml.klimt.creole.Display;
 import net.sourceforge.plantuml.skin.ArrowConfiguration;
+import net.sourceforge.plantuml.stereo.Stereotype;
 import net.sourceforge.plantuml.style.PName;
 import net.sourceforge.plantuml.style.SName;
 import net.sourceforge.plantuml.style.Style;
@@ -49,8 +51,9 @@ import net.sourceforge.plantuml.style.StyleBuilder;
 import net.sourceforge.plantuml.style.StyleSignature;
 import net.sourceforge.plantuml.style.StyleSignatureBasic;
 import net.sourceforge.plantuml.style.WithStyle;
+import net.sourceforge.plantuml.url.Url;
 
-public abstract class AbstractMessage implements EventWithDeactivate, WithStyle {
+public abstract class AbstractMessage extends AbstractEvent implements EventWithDeactivate, WithStyle {
 
 	private Stereotype stereotype;
 
@@ -151,10 +154,12 @@ public abstract class AbstractMessage implements EventWithDeactivate, WithStyle 
 		return lifeEventsType.contains(LifeEventType.CREATE);
 	}
 
+	@Deprecated
 	public boolean isActivate() {
 		return lifeEventsType.contains(LifeEventType.ACTIVATE);
 	}
 
+	@Deprecated
 	public boolean isDeactivate() {
 		return lifeEventsType.contains(LifeEventType.DEACTIVATE);
 	}
@@ -163,6 +168,7 @@ public abstract class AbstractMessage implements EventWithDeactivate, WithStyle 
 		return lifeEventsType.contains(LifeEventType.DESTROY);
 	}
 
+	@Deprecated
 	private boolean isDeactivateOrDestroy() {
 		return isDeactivate() || isDestroy();
 	}

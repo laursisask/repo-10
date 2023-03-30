@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,24 +35,31 @@
  */
 package net.sourceforge.plantuml.sequencediagram.teoz;
 
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
 import net.sourceforge.plantuml.real.Real;
 import net.sourceforge.plantuml.sequencediagram.Event;
 import net.sourceforge.plantuml.sequencediagram.HSpace;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
 
 public class HSpaceTile extends AbstractTile implements Tile {
 
 	private final HSpace hspace;
-	private final Real origin;
+	private final Real xorigin;
+	private final YGauge yGauge;
 
 	public Event getEvent() {
 		return hspace;
 	}
 
-	public HSpaceTile(HSpace hspace, TileArguments tileArguments) {
-		super(tileArguments.getStringBounder());
+	public HSpaceTile(HSpace hspace, TileArguments tileArguments, YGauge currentY) {
+		super(tileArguments.getStringBounder(), currentY);
 		this.hspace = hspace;
-		this.origin = tileArguments.getOrigin();
+		this.xorigin = tileArguments.getXOrigin();
+		this.yGauge = YGauge.create(currentY.getMax(), getPreferredHeight());
+	}
+
+	@Override
+	public YGauge getYGauge() {
+		return yGauge;
 	}
 
 	public void drawU(UGraphic ug) {
@@ -63,11 +73,11 @@ public class HSpaceTile extends AbstractTile implements Tile {
 	}
 
 	public Real getMinX() {
-		return origin;
+		return xorigin;
 	}
 
 	public Real getMaxX() {
-		return origin.addFixed(10);
+		return xorigin.addFixed(10);
 	}
 
 }

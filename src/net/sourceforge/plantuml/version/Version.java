@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -34,14 +37,16 @@ package net.sourceforge.plantuml.version;
 
 import java.util.Date;
 
+import net.sourceforge.plantuml.log.Logme;
 import net.sourceforge.plantuml.security.SURL;
 
 public class Version {
+    // ::remove folder when __HAXE__
 
 	private static final int MAJOR_SEPARATOR = 1000000;
 
 	public static int version() {
-		return 1202206;
+		return 1202305;
 	}
 
 	public static int versionPatched() {
@@ -77,7 +82,7 @@ public class Version {
 	}
 
 	public static int beta() {
-		final int beta = 0;
+		final int beta = 1;
 		return beta;
 	}
 
@@ -90,7 +95,7 @@ public class Version {
 	}
 
 	public static long compileTime() {
-		return 1655832889469L;
+		return 1679680470757L;
 	}
 
 	public static String compileTimeString() {
@@ -100,6 +105,7 @@ public class Version {
 		return new Date(Version.compileTime()).toString();
 	}
 
+	// ::comment when __CORE__
 	public static String getJarPath() {
 		try {
 			final ClassLoader loader = Version.class.getClassLoader();
@@ -114,9 +120,10 @@ public class Version {
 			fullpath = fullpath.replaceAll("net/sourceforge/plantuml/version/Version\\.class", "");
 			return fullpath;
 		} catch (Throwable t) {
-			t.printStackTrace();
+			Logme.error(t);
 			return t.toString();
 		}
 	}
+	// ::done
 
 }

@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,15 +35,16 @@
  */
 package net.sourceforge.plantuml.sequencediagram.command;
 
-import net.sourceforge.plantuml.LineLocation;
 import net.sourceforge.plantuml.command.CommandExecutionResult;
 import net.sourceforge.plantuml.command.SingleLineCommand2;
-import net.sourceforge.plantuml.command.regex.IRegex;
-import net.sourceforge.plantuml.command.regex.RegexConcat;
-import net.sourceforge.plantuml.command.regex.RegexLeaf;
-import net.sourceforge.plantuml.command.regex.RegexOptional;
-import net.sourceforge.plantuml.command.regex.RegexResult;
-import net.sourceforge.plantuml.cucadiagram.Display;
+import net.sourceforge.plantuml.klimt.color.HColorSet;
+import net.sourceforge.plantuml.klimt.color.NoSuchColorException;
+import net.sourceforge.plantuml.klimt.creole.Display;
+import net.sourceforge.plantuml.regex.IRegex;
+import net.sourceforge.plantuml.regex.RegexConcat;
+import net.sourceforge.plantuml.regex.RegexLeaf;
+import net.sourceforge.plantuml.regex.RegexOptional;
+import net.sourceforge.plantuml.regex.RegexResult;
 import net.sourceforge.plantuml.sequencediagram.AbstractMessage;
 import net.sourceforge.plantuml.sequencediagram.EventWithDeactivate;
 import net.sourceforge.plantuml.sequencediagram.LifeEventType;
@@ -49,8 +53,7 @@ import net.sourceforge.plantuml.sequencediagram.MessageExo;
 import net.sourceforge.plantuml.sequencediagram.SequenceDiagram;
 import net.sourceforge.plantuml.skin.ArrowBody;
 import net.sourceforge.plantuml.skin.ArrowConfiguration;
-import net.sourceforge.plantuml.ugraphic.color.HColorSet;
-import net.sourceforge.plantuml.ugraphic.color.NoSuchColorException;
+import net.sourceforge.plantuml.utils.LineLocation;
 
 public class CommandReturn extends SingleLineCommand2<SequenceDiagram> {
 
@@ -80,18 +83,17 @@ public class CommandReturn extends SingleLineCommand2<SequenceDiagram> {
 		boolean doDeactivation = true;
 		if (message1 == null) {
 			final EventWithDeactivate last = diagram.getLastEventWithDeactivate();
-			if (last instanceof Message == false) {
+			if (last instanceof Message == false)
 				return CommandExecutionResult.error("Nowhere to return to.");
-			}
+
 			message1 = (Message) last;
 			doDeactivation = false;
 		}
 
 		ArrowConfiguration arrow = message1.getArrowConfiguration().withBody(ArrowBody.DOTTED);
 		final String color = arg.get("COLOR", 0);
-		if (color != null) {
-			arrow = arrow.withColor(HColorSet.instance().getColor(diagram.getSkinParam().getThemeStyle(), color));
-		}
+		if (color != null)
+			arrow = arrow.withColor(HColorSet.instance().getColor(color));
 
 		final Display display = Display.getWithNewlines(arg.get("MESSAGE", 0));
 		final AbstractMessage message2;
@@ -103,17 +105,19 @@ public class CommandReturn extends SingleLineCommand2<SequenceDiagram> {
 			message2 = new Message(diagram.getSkinParam().getCurrentStyleBuilder(), message1.getParticipant2(),
 					message1.getParticipant1(), display, arrow, diagram.getNextMessageNumber());
 			final boolean parallel = arg.get("PARALLEL", 0) != null;
-			if (parallel) {
+			if (parallel)
 				message2.goParallel();
-			}
+
 		}
-		diagram.addMessage(message2);
+		final CommandExecutionResult status = diagram.addMessage(message2);
+		if (status.isOk() == false)
+			return status;
 
 		if (doDeactivation) {
 			final String error = diagram.activate(message1.getParticipant2(), LifeEventType.DEACTIVATE, null);
-			if (error != null) {
+			if (error != null)
 				return CommandExecutionResult.error(error);
-			}
+
 		}
 		return CommandExecutionResult.ok();
 

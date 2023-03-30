@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,13 +35,12 @@
  */
 package net.sourceforge.plantuml.svek;
 
-import net.sourceforge.plantuml.Dimension2DDouble;
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
-import net.sourceforge.plantuml.graphic.StringBounder;
-import net.sourceforge.plantuml.graphic.TextBlock;
-import net.sourceforge.plantuml.graphic.TextBlockEmpty;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
+import net.sourceforge.plantuml.klimt.shape.TextBlock;
+import net.sourceforge.plantuml.klimt.shape.TextBlockEmpty;
 import net.sourceforge.plantuml.utils.MathUtils;
 
 public class HeaderLayout {
@@ -62,26 +64,26 @@ public class HeaderLayout {
 		return block;
 	}
 
-	public Dimension2D getDimension(StringBounder stringBounder) {
-		final Dimension2D nameDim = name.calculateDimension(stringBounder);
-		final Dimension2D genericDim = generic.calculateDimension(stringBounder);
-		final Dimension2D stereoDim = stereo.calculateDimension(stringBounder);
-		final Dimension2D circleDim = circledCharacter.calculateDimension(stringBounder);
+	public XDimension2D getDimension(StringBounder stringBounder) {
+		final XDimension2D nameDim = name.calculateDimension(stringBounder);
+		final XDimension2D genericDim = generic.calculateDimension(stringBounder);
+		final XDimension2D stereoDim = stereo.calculateDimension(stringBounder);
+		final XDimension2D circleDim = circledCharacter.calculateDimension(stringBounder);
 
 		final double width = circleDim.getWidth() + Math.max(stereoDim.getWidth(), nameDim.getWidth())
 				+ genericDim.getWidth();
 		final double height = MathUtils.max(circleDim.getHeight(), stereoDim.getHeight() + nameDim.getHeight() + 10,
 				genericDim.getHeight());
-		return new Dimension2DDouble(width, height);
+		return new XDimension2D(width, height);
 	}
 
 	public void drawU(UGraphic ug, double width, double height) {
 
 		final StringBounder stringBounder = ug.getStringBounder();
-		final Dimension2D nameDim = name.calculateDimension(stringBounder);
-		final Dimension2D genericDim = generic.calculateDimension(stringBounder);
-		final Dimension2D stereoDim = stereo.calculateDimension(stringBounder);
-		final Dimension2D circleDim = circledCharacter.calculateDimension(stringBounder);
+		final XDimension2D nameDim = name.calculateDimension(stringBounder);
+		final XDimension2D genericDim = generic.calculateDimension(stringBounder);
+		final XDimension2D stereoDim = stereo.calculateDimension(stringBounder);
+		final XDimension2D circleDim = circledCharacter.calculateDimension(stringBounder);
 
 		final double widthStereoAndName = Math.max(stereoDim.getWidth(), nameDim.getWidth());
 		final double suppWith = Math.max(0, width - circleDim.getWidth() - widthStereoAndName - genericDim.getWidth());

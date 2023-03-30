@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -39,37 +42,37 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.sourceforge.plantuml.AnnotatedWorker;
+import net.sourceforge.plantuml.AnnotatedBuilder;
 import net.sourceforge.plantuml.FileFormatOption;
-import net.sourceforge.plantuml.FontParam;
-import net.sourceforge.plantuml.ISkinParam;
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
 import net.sourceforge.plantuml.core.ImageData;
-import net.sourceforge.plantuml.cucadiagram.Display;
 import net.sourceforge.plantuml.cucadiagram.DisplaySection;
-import net.sourceforge.plantuml.graphic.StringBounder;
-import net.sourceforge.plantuml.graphic.TextBlock;
-import net.sourceforge.plantuml.graphic.TextBlockUtils;
-import net.sourceforge.plantuml.graphic.UDrawable;
-import net.sourceforge.plantuml.graphic.VerticalAlignment;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.color.HColor;
+import net.sourceforge.plantuml.klimt.creole.Display;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.font.FontParam;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
+import net.sourceforge.plantuml.klimt.geom.VerticalAlignment;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
+import net.sourceforge.plantuml.klimt.shape.TextBlock;
+import net.sourceforge.plantuml.klimt.shape.TextBlockUtils;
+import net.sourceforge.plantuml.klimt.shape.UDrawable;
 import net.sourceforge.plantuml.png.PngTitler;
 import net.sourceforge.plantuml.sequencediagram.Event;
 import net.sourceforge.plantuml.sequencediagram.Newpage;
 import net.sourceforge.plantuml.sequencediagram.Participant;
 import net.sourceforge.plantuml.sequencediagram.SequenceDiagram;
 import net.sourceforge.plantuml.skin.rose.Rose;
+import net.sourceforge.plantuml.style.ISkinParam;
 import net.sourceforge.plantuml.style.SName;
 import net.sourceforge.plantuml.style.Style;
 import net.sourceforge.plantuml.style.StyleSignatureBasic;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
-import net.sourceforge.plantuml.ugraphic.color.HColor;
 
 public class SequenceDiagramFileMakerPuma2 implements FileMaker {
 
 	private final SequenceDiagram diagram;
 	private final DrawableSet drawableSet;
-	private final Dimension2D fullDimension;
+	private final XDimension2D fullDimension;
 	private final List<Page> pages;
 	private final FileFormatOption fileFormatOption;
 	private final StringBounder stringBounder;
@@ -130,14 +133,30 @@ public class SequenceDiagramFileMakerPuma2 implements FileMaker {
 				newpageHeight, title);
 	}
 
-	public ImageData createOne(OutputStream os, final int index, boolean isWithMetadata) throws IOException {
+	@Override
+	public void createOneGraphic(UGraphic ug) {
+		final UDrawable drawable = createUDrawable(0);
+		drawable.drawU(ug);
 
+	}
+
+	@Override
+	public ImageData createOne(OutputStream os, final int index, boolean isWithMetadata) throws IOException {
+		final UDrawable drawable = createUDrawable(index);
+		return diagram.createImageBuilder(fileFormatOption).drawable(drawable).write(os);
+	}
+
+	private UDrawable createUDrawable(final int index) {
 		final Page page = pages.get(index);
-		final SequenceDiagramArea area = new SequenceDiagramArea(fullDimension.getWidth(), page.getHeight());
+		final AnnotatedBuilder builder = new AnnotatedBuilder(diagram, diagram.getSkinParam(), stringBounder);
+		double pageHeight = page.getHeight();
+		if (builder.hasMainFrame())
+			pageHeight += builder.mainFrameSuppHeight();
+
+		final SequenceDiagramArea area = new SequenceDiagramArea(fullDimension.getWidth(), pageHeight);
 
 		final TextBlock compTitle;
-		final AnnotatedWorker annotatedWorker = new AnnotatedWorker(diagram, diagram.getSkinParam(), stringBounder);
-		final TextBlock caption = annotatedWorker.getCaption();
+		final TextBlock caption = builder.getCaption();
 		area.setCaptionArea(caption.calculateDimension(stringBounder));
 
 		if (Display.isNull(page.getTitle())) {
@@ -146,8 +165,8 @@ public class SequenceDiagramFileMakerPuma2 implements FileMaker {
 			final Style style = StyleSignatureBasic.of(SName.root, SName.document, SName.title)
 					.getMergedStyle(diagram.getSkinParam().getCurrentStyleBuilder());
 			compTitle = style.createTextBlockBordered(page.getTitle(), diagram.getSkinParam().getIHtmlColorSet(),
-					diagram.getSkinParam());
-			final Dimension2D dimTitle = compTitle.calculateDimension(stringBounder);
+					diagram.getSkinParam(), Style.ID_TITLE);
+			final XDimension2D dimTitle = compTitle.calculateDimension(stringBounder);
 			area.setTitleArea(dimTitle.getWidth(), dimTitle.getHeight());
 		}
 		area.initFooter(getPngTitler(FontParam.FOOTER, index), stringBounder);
@@ -160,9 +179,9 @@ public class SequenceDiagramFileMakerPuma2 implements FileMaker {
 			final Style style = StyleSignatureBasic.of(SName.root, SName.document, SName.legend)
 					.getMergedStyle(diagram.getSkinParam().getCurrentStyleBuilder());
 			legendBlock = style.createTextBlockBordered(diagram.getLegend().getDisplay(),
-					diagram.getSkinParam().getIHtmlColorSet(), diagram.getSkinParam());
+					diagram.getSkinParam().getIHtmlColorSet(), diagram.getSkinParam(), Style.ID_LEGEND);
 		}
-		final Dimension2D dimLegend = legendBlock.calculateDimension(stringBounder);
+		final XDimension2D dimLegend = legendBlock.calculateDimension(stringBounder);
 		area.setLegend(dimLegend, isLegendTop(), diagram.getLegend().getHorizontalAlignment());
 
 		final UDrawable drawable = new UDrawable() {
@@ -187,7 +206,7 @@ public class SequenceDiagramFileMakerPuma2 implements FileMaker {
 						area.getSequenceAreaY());
 				TextBlock core = drawableSet.asTextBlock(delta, fullDimension.getWidth(), page,
 						diagram.isShowFootbox());
-				core = annotatedWorker.addFrame(core);
+				core = builder.decoreWithFrame(core);
 				core.drawU(ug.apply(forCore));
 
 				drawHeader(area, ug, index);
@@ -199,7 +218,7 @@ public class SequenceDiagramFileMakerPuma2 implements FileMaker {
 			}
 
 		};
-		return diagram.createImageBuilder(fileFormatOption).drawable(drawable).write(os);
+		return drawable;
 	}
 
 	private void drawFooter(SequenceDiagramArea area, UGraphic ug, int page) {

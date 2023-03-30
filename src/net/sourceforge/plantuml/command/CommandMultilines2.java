@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,25 +35,29 @@
  */
 package net.sourceforge.plantuml.command;
 
-import net.sourceforge.plantuml.StringLocated;
-import net.sourceforge.plantuml.command.regex.IRegex;
-import net.sourceforge.plantuml.command.regex.Matcher2;
-import net.sourceforge.plantuml.command.regex.MyPattern;
 import net.sourceforge.plantuml.core.Diagram;
-import net.sourceforge.plantuml.ugraphic.color.NoSuchColorException;
+import net.sourceforge.plantuml.klimt.color.NoSuchColorException;
+import net.sourceforge.plantuml.regex.IRegex;
+import net.sourceforge.plantuml.regex.Matcher2;
+import net.sourceforge.plantuml.regex.MyPattern;
+import net.sourceforge.plantuml.text.StringLocated;
+import net.sourceforge.plantuml.utils.BlocLines;
 
 public abstract class CommandMultilines2<S extends Diagram> implements Command<S> {
 
 	private final IRegex starting;
 
+	private final Trim trimEnd;
+
 	private final MultilinesStrategy strategy;
 
-	public CommandMultilines2(IRegex patternStart, MultilinesStrategy strategy) {
-		if (patternStart.getPattern().startsWith("^") == false || patternStart.getPattern().endsWith("$") == false) {
+	public CommandMultilines2(IRegex patternStart, MultilinesStrategy strategy, Trim trimEnd) {
+		if (patternStart.getPattern().startsWith("^") == false || patternStart.getPattern().endsWith("$") == false)
 			throw new IllegalArgumentException("Bad pattern " + patternStart.getPattern());
-		}
+
 		this.strategy = strategy;
 		this.starting = patternStart;
+		this.trimEnd = trimEnd;
 	}
 
 	public boolean syntaxWithFinalBracket() {
@@ -89,7 +96,7 @@ public abstract class CommandMultilines2<S extends Diagram> implements Command<S
 		if (lines.size() == 1)
 			return CommandControl.OK_PARTIAL;
 
-		final Matcher2 m1 = MyPattern.cmpile(getPatternEnd()).matcher(lines.getLast().getTrimmed().getString());
+		final Matcher2 m1 = MyPattern.cmpile(getPatternEnd()).matcher(trimEnd.trim(lines.getLast()));
 		if (m1.matches() == false)
 			return CommandControl.OK_PARTIAL;
 

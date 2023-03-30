@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
  * 
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  * 
  * This file is part of PlantUML.
  *
@@ -34,7 +34,7 @@
  */
 package net.sourceforge.plantuml.version;
 
-import static net.sourceforge.plantuml.graphic.GraphicPosition.BACKGROUND_CORNER_BOTTOM_RIGHT;
+import static net.sourceforge.plantuml.klimt.geom.GraphicPosition.BACKGROUND_CORNER_BOTTOM_RIGHT;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -49,11 +49,12 @@ import net.sourceforge.plantuml.PlainStringsDiagram;
 import net.sourceforge.plantuml.Run;
 import net.sourceforge.plantuml.core.DiagramDescription;
 import net.sourceforge.plantuml.core.UmlSource;
-import net.sourceforge.plantuml.cucadiagram.dot.GraphvizUtils;
+import net.sourceforge.plantuml.dot.GraphvizUtils;
+import net.sourceforge.plantuml.log.Logme;
 import net.sourceforge.plantuml.preproc.Stdlib;
 import net.sourceforge.plantuml.preproc2.PreprocessorUtils;
-import net.sourceforge.plantuml.security.SImageIO;
 import net.sourceforge.plantuml.security.SFile;
+import net.sourceforge.plantuml.security.SImageIO;
 import net.sourceforge.plantuml.security.SecurityProfile;
 import net.sourceforge.plantuml.security.SecurityUtils;
 import net.sourceforge.plantuml.svek.GraphvizCrash;
@@ -63,9 +64,13 @@ public class PSystemVersion extends PlainStringsDiagram {
 	PSystemVersion(UmlSource source, boolean withImage, List<String> args) {
 		super(source);
 		this.strings.addAll(args);
-		if (withImage) {
-			this.image = getPlantumlImage();
-			this.imagePosition = BACKGROUND_CORNER_BOTTOM_RIGHT;
+		try {
+			if (withImage) {
+				this.image = getPlantumlImage();
+				this.imagePosition = BACKGROUND_CORNER_BOTTOM_RIGHT;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 
@@ -80,10 +85,6 @@ public class PSystemVersion extends PlainStringsDiagram {
 		return getImage("logo.png");
 	}
 
-	public static BufferedImage getCharlieImage() {
-		return getImage("charlie.png");
-	}
-
 	public static BufferedImage getTime01() {
 		return getImage("time01.png");
 	}
@@ -92,10 +93,15 @@ public class PSystemVersion extends PlainStringsDiagram {
 		return getImage("time15.png");
 	}
 
+	public static BufferedImage getCharlieImage() {
+		return getImage("charlie.png");
+	}
+
 	public static BufferedImage getPlantumlSmallIcon() {
 		return getImage("favicon.png");
 	}
 
+	// ::comment when __CORE__
 	public static BufferedImage getArecibo() {
 		return getImage("arecibo.png");
 	}
@@ -111,6 +117,7 @@ public class PSystemVersion extends PlainStringsDiagram {
 	public static BufferedImage getApple2Image() {
 		return getImageWebp("apple2.png");
 	}
+	// ::done
 
 	private static BufferedImage getImage(final String name) {
 		try {
@@ -119,14 +126,16 @@ public class PSystemVersion extends PlainStringsDiagram {
 			is.close();
 			return image;
 		} catch (IOException e) {
-			e.printStackTrace();
+			Logme.error(e);
 		}
 		return new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB);
 	}
 
+	// ::comment when __CORE__
 	private static BufferedImage getImageWebp(final String name) {
 		return new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB);
 	}
+	// ::done
 
 	private static BufferedImage transparentIcon;
 
@@ -153,11 +162,13 @@ public class PSystemVersion extends PlainStringsDiagram {
 	public static PSystemVersion createShowVersion2(UmlSource source) {
 		final List<String> strings = new ArrayList<>();
 		strings.add("<b>PlantUML version " + Version.versionString() + "</b> (" + Version.compileTimeString() + ")");
+
+		// :: comment when __CORE__
 		GraphvizCrash.checkOldVersionWarning(strings);
 		if (OptionFlags.ALLOW_INCLUDE) {
-			if (SecurityUtils.getSecurityProfile() == SecurityProfile.UNSECURE) {
+			if (SecurityUtils.getSecurityProfile() == SecurityProfile.UNSECURE)
 				strings.add("Loaded from " + Version.getJarPath());
-			}
+
 			if (OptionFlags.getInstance().isWord()) {
 				strings.add("Word Mode");
 				strings.add("Command Line: " + Run.getCommandLine());
@@ -166,22 +177,21 @@ public class PSystemVersion extends PlainStringsDiagram {
 			}
 		}
 		strings.add(" ");
-		// strings.add("<b>Stdlib:");
-		// Stdlib.addInfoVersion(strings, false);
-		// strings.add(" ");
 
 		GraphvizUtils.addDotStatus(strings, true);
 		strings.add(" ");
-		for (String name : OptionPrint.interestingProperties()) {
+		for (String name : OptionPrint.interestingProperties())
 			strings.add(name);
-		}
-		for (String v : OptionPrint.interestingValues()) {
+
+		for (String v : OptionPrint.interestingValues())
 			strings.add(v);
-		}
-		
+
+		// ::done
+
 		return new PSystemVersion(source, true, strings);
 	}
 
+	// :: comment when __CORE__
 	public static PSystemVersion createStdLib(UmlSource source) {
 		final List<String> strings = new ArrayList<>();
 		Stdlib.addInfoVersion(strings, true);
@@ -189,6 +199,7 @@ public class PSystemVersion extends PlainStringsDiagram {
 
 		return new PSystemVersion(source, true, strings);
 	}
+	// ::done
 
 	public static PSystemVersion createShowAuthors2(UmlSource source) {
 		// Duplicate in OptionPrint
@@ -213,6 +224,7 @@ public class PSystemVersion extends PlainStringsDiagram {
 		add(strings, "<u>Stdlib Icons</u>: tupadr3", withTag);
 		add(strings, "<u>Site design</u>: Raphael Cotisson", withTag);
 		add(strings, "<u>Logo</u>: Benjamin Croizet", withTag);
+		add(strings, "<u>Web Assembly</u>: Sakir Temel", withTag);
 
 		add(strings, " ", withTag);
 		add(strings, "https://plantuml.com", withTag);
@@ -221,19 +233,21 @@ public class PSystemVersion extends PlainStringsDiagram {
 	}
 
 	private static void add(List<String> result, String s, boolean withTag) {
-		if (withTag == false) {
+		if (withTag == false)
 			s = s.replaceAll("\\</?\\w+\\>", "");
-		}
+
 		result.add(s);
 
 	}
 
+	// ::comment when __CORE__
 	public static PSystemVersion createTestDot(UmlSource source) throws IOException {
 		final List<String> strings = new ArrayList<>();
 		strings.add(Version.fullDescription());
 		GraphvizUtils.addDotStatus(strings, true);
 		return new PSystemVersion(source, false, strings);
 	}
+	// ::done
 
 //	public static PSystemVersion createDumpStackTrace() throws IOException {
 //		final List<String> strings = new ArrayList<>();
@@ -245,10 +259,12 @@ public class PSystemVersion extends PlainStringsDiagram {
 //		return new PSystemVersion(false, strings);
 //	}
 
+	// ::comment when __CORE__
 	public static PSystemVersion createKeyDistributor(UmlSource source) throws IOException {
 		final List<String> strings = new ArrayList<>();
 		return new PSystemVersion(source, strings, null);
 	}
+	// ::done
 
 //	public static PSystemVersion createPath(UmlSource source) throws IOException {
 //		final List<String> strings = new ArrayList<>();

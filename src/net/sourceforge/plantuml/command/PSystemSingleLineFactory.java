@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,17 +35,17 @@
  */
 package net.sourceforge.plantuml.command;
 
+import java.util.Map;
+
 import net.sourceforge.plantuml.AbstractPSystem;
 import net.sourceforge.plantuml.ErrorUml;
 import net.sourceforge.plantuml.ErrorUmlType;
-import net.sourceforge.plantuml.ISkinSimple;
-import net.sourceforge.plantuml.LineLocation;
-import net.sourceforge.plantuml.StringLocated;
-import net.sourceforge.plantuml.api.ThemeStyle;
 import net.sourceforge.plantuml.core.Diagram;
 import net.sourceforge.plantuml.core.DiagramType;
 import net.sourceforge.plantuml.core.UmlSource;
 import net.sourceforge.plantuml.error.PSystemErrorUtils;
+import net.sourceforge.plantuml.text.StringLocated;
+import net.sourceforge.plantuml.utils.LineLocation;
 import net.sourceforge.plantuml.utils.StartUtils;
 import net.sourceforge.plantuml.version.IteratorCounter2;
 
@@ -55,7 +58,7 @@ public abstract class PSystemSingleLineFactory extends PSystemAbstractFactory {
 	}
 
 	@Override
-	final public Diagram createSystem(ThemeStyle style, UmlSource source, ISkinSimple skinParam) {
+	final public Diagram createSystem(UmlSource source, Map<String, String> skinParam) {
 
 		if (source.getTotalLineCount() != 3)
 			return null;

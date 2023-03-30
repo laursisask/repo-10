@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,11 +35,10 @@
  */
 package net.sourceforge.plantuml.sdot;
 
-import java.awt.geom.CubicCurve2D;
-import java.awt.geom.Point2D;
-
-import net.sourceforge.plantuml.posimo.DotPath;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.geom.XCubicCurve2D;
+import net.sourceforge.plantuml.klimt.geom.XPoint2D;
+import net.sourceforge.plantuml.klimt.shape.DotPath;
 
 public class YMirror {
 
@@ -53,14 +55,14 @@ public class YMirror {
 		return max - v;
 	}
 
-	public Point2D getMirrored(Point2D pt) {
+	public XPoint2D getMirrored(XPoint2D pt) {
 		// return pt;
-		return new Point2D.Double(pt.getX(), max - pt.getY());
+		return new XPoint2D(pt.getX(), max - pt.getY());
 	}
 
 	public DotPath getMirrored(DotPath path) {
 		DotPath result = new DotPath();
-		for (CubicCurve2D.Double bez : path.getBeziers()) {
+		for (XCubicCurve2D bez : path.getBeziers()) {
 			result = result.addCurve(getMirrored(bez.getP1()), getMirrored(bez.getCtrlP1()),
 					getMirrored(bez.getCtrlP2()), getMirrored(bez.getP2()));
 		}

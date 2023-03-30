@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,32 +35,32 @@
  */
 package net.sourceforge.plantuml.descdiagram.command;
 
-import net.sourceforge.plantuml.Direction;
-import net.sourceforge.plantuml.LineLocation;
 import net.sourceforge.plantuml.StringUtils;
+import net.sourceforge.plantuml.abel.Entity;
+import net.sourceforge.plantuml.abel.LeafType;
+import net.sourceforge.plantuml.abel.Link;
+import net.sourceforge.plantuml.abel.LinkArg;
 import net.sourceforge.plantuml.command.CommandExecutionResult;
 import net.sourceforge.plantuml.command.SingleLineCommand2;
-import net.sourceforge.plantuml.command.regex.IRegex;
-import net.sourceforge.plantuml.command.regex.RegexConcat;
-import net.sourceforge.plantuml.command.regex.RegexLeaf;
-import net.sourceforge.plantuml.command.regex.RegexOptional;
-import net.sourceforge.plantuml.command.regex.RegexResult;
-import net.sourceforge.plantuml.cucadiagram.Code;
-import net.sourceforge.plantuml.cucadiagram.Display;
-import net.sourceforge.plantuml.cucadiagram.IEntity;
-import net.sourceforge.plantuml.cucadiagram.ILeaf;
-import net.sourceforge.plantuml.cucadiagram.Ident;
-import net.sourceforge.plantuml.cucadiagram.LeafType;
-import net.sourceforge.plantuml.cucadiagram.Link;
-import net.sourceforge.plantuml.cucadiagram.LinkDecor;
-import net.sourceforge.plantuml.cucadiagram.LinkType;
-import net.sourceforge.plantuml.cucadiagram.Stereotype;
+import net.sourceforge.plantuml.decoration.LinkDecor;
+import net.sourceforge.plantuml.decoration.LinkType;
+import net.sourceforge.plantuml.decoration.symbol.USymbol;
+import net.sourceforge.plantuml.decoration.symbol.USymbols;
 import net.sourceforge.plantuml.descdiagram.DescriptionDiagram;
-import net.sourceforge.plantuml.graphic.USymbol;
-import net.sourceforge.plantuml.graphic.USymbols;
-import net.sourceforge.plantuml.graphic.color.ColorParser;
-import net.sourceforge.plantuml.graphic.color.ColorType;
-import net.sourceforge.plantuml.ugraphic.color.NoSuchColorException;
+import net.sourceforge.plantuml.klimt.color.ColorParser;
+import net.sourceforge.plantuml.klimt.color.ColorType;
+import net.sourceforge.plantuml.klimt.color.NoSuchColorException;
+import net.sourceforge.plantuml.klimt.creole.Display;
+import net.sourceforge.plantuml.plasma.Quark;
+import net.sourceforge.plantuml.regex.IRegex;
+import net.sourceforge.plantuml.regex.RegexConcat;
+import net.sourceforge.plantuml.regex.RegexLeaf;
+import net.sourceforge.plantuml.regex.RegexOptional;
+import net.sourceforge.plantuml.regex.RegexResult;
+import net.sourceforge.plantuml.skin.ActorStyle;
+import net.sourceforge.plantuml.stereo.Stereotype;
+import net.sourceforge.plantuml.utils.Direction;
+import net.sourceforge.plantuml.utils.LineLocation;
 
 public class CommandLinkElement extends SingleLineCommand2<DescriptionDiagram> {
 
@@ -75,22 +78,31 @@ public class CommandLinkElement extends SingleLineCommand2<DescriptionDiagram> {
 	static IRegex getRegexConcat() {
 		return RegexConcat.build(CommandLinkElement.class.getName(), RegexLeaf.start(), //
 				getGroup("ENT1"), //
+
 				RegexLeaf.spaceZeroOrMore(), //
 				new RegexOptional(new RegexLeaf("FIRST_LABEL", "[%g]([^%g]+)[%g]")), //
 				RegexLeaf.spaceZeroOrMore(), //
+//				new RegexOptional(new RegexLeaf("STEREO1", "(\\<\\<.*\\>\\>)")), //
+//				RegexLeaf.spaceZeroOrMore(), //
+
 				new RegexLeaf("HEAD2", "(0\\)|<<|<_|[<^*+#0@)]|<\\|[\\|\\:]?|[%s]+o)?"), //
 				new RegexLeaf("BODY1", "([-=.~]+)"), //
 				new RegexLeaf("ARROW_STYLE1", "(?:\\[(" + LINE_STYLE_MUTILPLES + ")\\])?"), //
-				new RegexOptional(new RegexLeaf("DIRECTION", "(left|right|up|down|le?|ri?|up?|do?)(?=[-=.~0()])")), //
+				new RegexOptional(new RegexLeaf("DIRECTION", "(left|right|up|down|le?|ri?|up?|do?)(?=[-=.~0()\\[])")), //
 				new RegexOptional(new RegexLeaf("INSIDE", "(0|\\(0\\)|\\(0|0\\))(?=[-=.~])")), //
 				new RegexLeaf("ARROW_STYLE2", "(?:\\[(" + LINE_STYLE + ")\\])?"), //
 				new RegexLeaf("BODY2", "([-=.~]*)"), //
 				new RegexLeaf("HEAD1", "(\\(0|>>|_>|[>^*+#0@(]|[\\:\\|]?\\|>|\\\\\\\\|o[%s]+)?"), //
+
 				RegexLeaf.spaceZeroOrMore(), //
 				new RegexOptional(new RegexLeaf("SECOND_LABEL", "[%g]([^%g]+)[%g]")), //
 				RegexLeaf.spaceZeroOrMore(), //
+
 				getGroup("ENT2"), //
 				RegexLeaf.spaceZeroOrMore(), //
+//				new RegexOptional(new RegexLeaf("STEREO2", "(\\<\\<.*\\>\\>)")), //
+//				RegexLeaf.spaceZeroOrMore(), //
+
 				color().getRegex(), //
 				RegexLeaf.spaceZeroOrMore(), //
 				new RegexLeaf("STEREOTYPE", "(\\<\\<.*\\>\\>)?"), //
@@ -218,21 +230,30 @@ public class CommandLinkElement extends SingleLineCommand2<DescriptionDiagram> {
 	}
 
 	private static RegexLeaf getGroup(String name) {
-		return new RegexLeaf(name,
-				"([%pLN_.]+|\\(\\)[%s]*[%pLN_.]+|\\(\\)[%s]*[%g][^%g]+[%g]|:[^:]+:|(?!\\[\\*\\])\\[[^\\[\\]]+\\]|\\((?!\\*\\))[^)]+\\))");
+		return new RegexLeaf(name, "(" + //
+				"[%pLN_.]+" + //
+				"|" + //
+				"[%g][^%g]+[%g]" + //
+				"|" + //
+				"\\(\\)[%s]*[%pLN_.]+" + //
+				"|" + //
+				"\\(\\)[%s]*[%g][^%g]+[%g]" + //
+				"|" + //
+				":[^:]+:/?" + //
+				"|" + //
+				"(?!\\[\\*\\])\\[[^\\[\\]]+\\]" + //
+				"|" + //
+				"\\((?!\\*\\))[^)]+\\)/?" + //
+				")");
 	}
 
 	@Override
 	protected CommandExecutionResult executeArg(DescriptionDiagram diagram, LineLocation location, RegexResult arg)
 			throws NoSuchColorException {
-		final String ent1String = arg.get("ENT1", 0);
-		final String ent2String = arg.get("ENT2", 0);
-		final Ident ident1 = diagram.buildFullyQualified(ent1String);
-		final Ident ident2 = diagram.buildFullyQualified(ent2String);
-		Ident ident1pure = Ident.empty().add(ent1String, diagram.getNamespaceSeparator());
-		Ident ident2pure = Ident.empty().add(ent2String, diagram.getNamespaceSeparator());
-		final Code code1 = diagram.V1972() ? ident1 : diagram.buildCode(ent1String);
-		final Code code2 = diagram.V1972() ? ident2 : diagram.buildCode(ent2String);
+		final String ent1 = arg.get("ENT1", 0);
+		final String ent2 = arg.get("ENT2", 0);
+		final String ent1clean = diagram.cleanId(ent1);
+		final String ent2clean = diagram.cleanId(ent2);
 
 		final LinkType linkType = getLinkType(arg);
 		final Direction dir = getDirection(arg);
@@ -244,27 +265,26 @@ public class CommandLinkElement extends SingleLineCommand2<DescriptionDiagram> {
 
 		final Labels labels = new Labels(arg);
 
-		final IEntity cl1;
-		final IEntity cl2;
-		if (diagram.isGroup(code1) && diagram.isGroup(code2)) {
-			cl1 = diagram.V1972() ? diagram.getGroupStrict(diagram.buildLeafIdent(ent1String))
-					: diagram.getGroup(diagram.buildCode(ent1String));
-			cl2 = diagram.V1972() ? diagram.getGroupStrict(diagram.buildLeafIdent(ent2String))
-					: diagram.getGroup(diagram.buildCode(ent2String));
+		final Entity cl1;
+		final Entity cl2;
+		if (diagram.isGroup(ent1clean) && diagram.isGroup(ent2clean)) {
+			cl1 = diagram.getGroup(ent1clean);
+			cl2 = diagram.getGroup(ent2clean);
 		} else {
-			cl1 = getFoo1(diagram, code1, ident1, ident1pure);
-			cl2 = getFoo1(diagram, code2, ident2, ident2pure);
+			cl1 = getDummy(diagram, ent1);
+			cl2 = getDummy(diagram, ent2);
 		}
-		Link link = new Link(cl1, cl2, linkType, Display.getWithNewlines(labels.getLabelLink()), queue.length(),
-				labels.getFirstLabel(), labels.getSecondLabel(), diagram.getLabeldistance(), diagram.getLabelangle(),
-				diagram.getSkinParam().getCurrentStyleBuilder());
+		final LinkArg linkArg = LinkArg.build(Display.getWithNewlines(labels.getLabelLink()), queue.length(),
+				diagram.getSkinParam().classAttributeIconSize() > 0);
+		Link link = new Link(diagram.getEntityFactory(), diagram.getSkinParam().getCurrentStyleBuilder(), cl1, cl2,
+				linkType, linkArg.withQuantifier(labels.getFirstLabel(), labels.getSecondLabel())
+						.withDistanceAngle(diagram.getLabeldistance(), diagram.getLabelangle()));
 		link.setLinkArrow(labels.getLinkArrow());
 		if (dir == Direction.LEFT || dir == Direction.UP)
 			link = link.getInv();
 
-		link.setColors(color().getColor(diagram.getSkinParam().getThemeStyle(), arg,
-				diagram.getSkinParam().getIHtmlColorSet()));
-		link.applyStyle(diagram.getSkinParam().getThemeStyle(), arg.getLazzy("ARROW_STYLE", 0));
+		link.setColors(color().getColor(arg, diagram.getSkinParam().getIHtmlColorSet()));
+		link.applyStyle(arg.getLazzy("ARROW_STYLE", 0));
 		if (arg.get("STEREOTYPE", 0) != null) {
 			final Stereotype stereotype = Stereotype.build(arg.get("STEREOTYPE", 0));
 			link.setStereotype(stereotype);
@@ -273,46 +293,52 @@ public class CommandLinkElement extends SingleLineCommand2<DescriptionDiagram> {
 		return CommandExecutionResult.ok();
 	}
 
-	private IEntity getFoo1(DescriptionDiagram diagram, Code code, Ident ident, Ident pure) {
-		if (!diagram.V1972() && diagram.isGroup(code))
-			return diagram.getGroup(code);
+//	private String removeStartingParenthesis(String s) {
+//		if (s.startsWith("()"))
+//			return s.substring(2);
+//		return s;
+//	}
 
-		if (diagram.V1972() && diagram.isGroupStrict(ident))
-			return diagram.getGroupStrict(ident);
-
-		final String codeString = code.getName();
-		if (ident.getLast().startsWith("()")) {
-			ident = ident.removeStartingParenthesis();
-			return getOrCreateLeaf1972(diagram, ident, ident.toCode(diagram), LeafType.DESCRIPTION, USymbols.INTERFACE,
-					pure);
+	private Entity getDummy(DescriptionDiagram diagram, String ident) {
+		if (ident.startsWith("()")) {
+			ident = diagram.cleanId(ident);
+			final Quark<Entity> quark = diagram.quarkInContext(true, ident);
+			if (quark.getData() != null)
+				return quark.getData();
+			return diagram.reallyCreateLeaf(quark, Display.getWithNewlines(quark.getName()), LeafType.DESCRIPTION,
+					USymbols.INTERFACE);
 		}
-		final char codeChar = codeString.length() > 2 ? codeString.charAt(0) : 0;
-		final String tmp3 = StringUtils.eventuallyRemoveStartingAndEndingDoubleQuote(codeString, "\"([:");
-		final Ident ident3 = diagram.buildFullyQualified(tmp3);
-		final Code code3 = diagram.V1972() ? ident3 : diagram.buildCode(tmp3);
+
+		final char codeChar = ident.length() > 2 ? ident.charAt(0) : 0;
+		final boolean endWithSlash = ident.endsWith("/");
+		ident = diagram.cleanId(ident);
+		final Quark<Entity> quark = diagram.quarkInContext(true, ident);
+
+		if (diagram.isGroup(quark))
+			return quark.getData();
+		if (quark.getData() != null)
+			return quark.getData();
+		final Display display = Display.getWithNewlines(quark.getName());
+
 		if (codeChar == '(') {
-			return getOrCreateLeaf1972(diagram, ident3, code3, LeafType.USECASE, USymbols.USECASE, pure);
+			if (endWithSlash)
+				return diagram.reallyCreateLeaf(quark, display, LeafType.USECASE_BUSINESS, USymbols.USECASE);
+			else
+				return diagram.reallyCreateLeaf(quark, display, LeafType.USECASE, USymbols.USECASE);
 		} else if (codeChar == ':') {
-			return getOrCreateLeaf1972(diagram, ident3, code3, LeafType.DESCRIPTION,
-					diagram.getSkinParam().actorStyle().toUSymbol(), pure);
+			if (endWithSlash)
+				return diagram.reallyCreateLeaf(quark, display, LeafType.DESCRIPTION,
+						ActorStyle.STICKMAN_BUSINESS.toUSymbol());
+			else
+				return diagram.reallyCreateLeaf(quark, display, LeafType.DESCRIPTION,
+						diagram.getSkinParam().actorStyle().toUSymbol());
+
 		} else if (codeChar == '[') {
 			final USymbol sym = diagram.getSkinParam().componentStyle().toUSymbol();
-			return getOrCreateLeaf1972(diagram, ident3, code3, LeafType.DESCRIPTION, sym, pure);
+			return diagram.reallyCreateLeaf(quark, display, LeafType.DESCRIPTION, sym);
 		}
 
-		return getOrCreateLeaf1972(diagram, ident, code, null, null, pure);
-	}
-
-	private ILeaf getOrCreateLeaf1972(DescriptionDiagram diagram, Ident ident, Code code, LeafType type, USymbol symbol,
-			Ident pure) {
-		if (diagram.V1972()) {
-			final ILeaf result = pure.size() == 1 ? diagram.getLeafVerySmart(ident) : diagram.getLeafStrict(ident);
-			// final ILeaf result = diagram.getLeafSmart(ident);
-			if (result != null)
-				return result;
-
-		}
-		return diagram.getOrCreateLeaf(ident, code, type, symbol);
+		return diagram.reallyCreateLeaf(quark, display, LeafType.STILL_UNKNOWN, null);
 	}
 
 }

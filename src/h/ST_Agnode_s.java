@@ -2,11 +2,13 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
-
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of Smetana.
  * Smetana is a partial translation of Graphviz/Dot sources from C to Java.
  *
@@ -57,14 +59,14 @@ final public class ST_Agnode_s extends ST_Agobj_s {
 
 	public String NAME;
 
-	@Override
-	public String toString() {
-		try {
-			return NAME + " rank=" + ND_rank(this) + " order=" + ND_order(this);
-		} catch (Exception e) {
-			return NAME;
-		}
-	}
+//	@Override
+//	public String toString() {
+//		try {
+//			return NAME + " rank=" + ND_rank(this) + " order=" + ND_order(this);
+//		} catch (Exception e) {
+//			return NAME;
+//		}
+//	}
 
 	@Override
 	public void ___(__struct__ arg) {

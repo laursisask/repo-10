@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,8 +35,6 @@
  */
 package net.sourceforge.plantuml.golem;
 
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -41,14 +42,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import net.sourceforge.plantuml.Dimension2DDouble;
-import net.sourceforge.plantuml.graphic.AbstractTextBlock;
-import net.sourceforge.plantuml.graphic.StringBounder;
-import net.sourceforge.plantuml.graphic.TextBlock;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.ULine;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
-import net.sourceforge.plantuml.ugraphic.color.HColorUtils;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.color.HColors;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
+import net.sourceforge.plantuml.klimt.geom.XPoint2D;
+import net.sourceforge.plantuml.klimt.shape.AbstractTextBlock;
+import net.sourceforge.plantuml.klimt.shape.TextBlock;
+import net.sourceforge.plantuml.klimt.shape.ULine;
 
 public class TilesField extends AbstractTextBlock implements TextBlock {
 
@@ -237,7 +239,7 @@ public class TilesField extends AbstractTextBlock implements TextBlock {
 		double y = 0;
 		final int xmin = getXmin();
 		final int ymin = getYmin();
-		final Dimension2D dimSingle = root.calculateDimension(ug.getStringBounder());
+		final XDimension2D dimSingle = root.calculateDimension(ug.getStringBounder());
 		x -= xmin * dimSingle.getWidth() / 2;
 		y -= ymin * dimSingle.getHeight() / 2;
 		for (Map.Entry<Tile, Position> ent : positions.entrySet()) {
@@ -247,18 +249,18 @@ public class TilesField extends AbstractTextBlock implements TextBlock {
 			final double yt = p.getYmin() * dimSingle.getHeight() / 2;
 			t.drawU(ug.apply(new UTranslate((x + xt), (y + yt))));
 		}
-		ug = ug.apply(HColorUtils.RED);
+		ug = ug.apply(HColors.RED);
 		for (Path p : paths) {
 			final TileArea start = p.getStart();
 			final TileArea dest = p.getDest();
-			final Point2D pstart = getPoint2D(dimSingle, start);
-			final Point2D pdest = getPoint2D(dimSingle, dest);
-			ug.apply(new UTranslate(x + pstart.getX(), y + pstart.getY())).draw(new ULine(pdest.getX() - pstart.getX(), pdest.getY()
-			- pstart.getY()));
+			final XPoint2D pstart = getPoint2D(dimSingle, start);
+			final XPoint2D pdest = getPoint2D(dimSingle, dest);
+			ug.apply(new UTranslate(x + pstart.getX(), y + pstart.getY()))
+					.draw(new ULine(pdest.getX() - pstart.getX(), pdest.getY() - pstart.getY()));
 		}
 	}
 
-	private Point2D getPoint2D(Dimension2D dimSingle, TileArea area) {
+	private XPoint2D getPoint2D(XDimension2D dimSingle, TileArea area) {
 		final Position p = getPosition(area.getTile());
 		double xt = p.getXmin() * dimSingle.getWidth() / 2;
 		double yt = p.getYmin() * dimSingle.getHeight() / 2;
@@ -281,18 +283,18 @@ public class TilesField extends AbstractTextBlock implements TextBlock {
 		default:
 			throw new IllegalStateException();
 		}
-		return new Point2D.Double(xt, yt);
+		return new XPoint2D(xt, yt);
 	}
 
-	public Dimension2D calculateDimension(StringBounder stringBounder) {
+	public XDimension2D calculateDimension(StringBounder stringBounder) {
 		final int xmin = getXmin();
 		final int xmax = getXmax();
 		final int ymin = getYmin();
 		final int ymax = getYmax();
 		final int width = (xmax - xmin) / 2 + 1;
 		final int height = (ymax - ymin) / 2 + 1;
-		final Dimension2D dimSingle = root.calculateDimension(stringBounder);
-		return new Dimension2DDouble(width * dimSingle.getWidth(), height * dimSingle.getHeight());
+		final XDimension2D dimSingle = root.calculateDimension(stringBounder);
+		return new XDimension2D(width * dimSingle.getWidth(), height * dimSingle.getHeight());
 	}
 
 }

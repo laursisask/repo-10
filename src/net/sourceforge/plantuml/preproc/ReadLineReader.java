@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -36,10 +39,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
 
-import net.sourceforge.plantuml.LineLocation;
-import net.sourceforge.plantuml.LineLocationImpl;
-import net.sourceforge.plantuml.Log;
-import net.sourceforge.plantuml.StringLocated;
+import net.sourceforge.plantuml.text.StringLocated;
+import net.sourceforge.plantuml.utils.LineLocation;
+import net.sourceforge.plantuml.utils.LineLocationImpl;
+import net.sourceforge.plantuml.utils.Log;
 
 public class ReadLineReader implements ReadLine {
 
@@ -48,9 +51,9 @@ public class ReadLineReader implements ReadLine {
 	private final String description;
 
 	private ReadLineReader(Reader reader, String description, LineLocation parent) {
-		if (description == null) {
+		if (description == null)
 			description = "?";
-		}
+
 		this.br = new BufferedReader(reader);
 		this.location = new LineLocationImpl(description, parent);
 		this.description = description;
@@ -77,16 +80,16 @@ public class ReadLineReader implements ReadLine {
 	public StringLocated readLine() throws IOException {
 		String s = br.readLine();
 		location = location.oneLineRead();
-		if (s == null) {
+		if (s == null)
 			return null;
-		}
+
 		// if (s.length() > LIMIT) {
 		// Log.debug("Line truncated from " + s.length() + " to " + LIMIT);
 		// s = s.substring(0, LIMIT);
 		// }
-		if (s.startsWith("\uFEFF")) {
+		if (s.startsWith("\uFEFF"))
 			s = s.substring(1);
-		}
+
 		s = s.replace('\u2013', '-');
 		// s = BackSlash.convertHiddenNewLine(s);
 		// s = s.replace('\u00A0', ' ');

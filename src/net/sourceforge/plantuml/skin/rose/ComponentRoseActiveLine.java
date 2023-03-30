@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,35 +35,33 @@
  */
 package net.sourceforge.plantuml.skin.rose;
 
-import net.sourceforge.plantuml.api.ThemeStyle;
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
-import net.sourceforge.plantuml.graphic.StringBounder;
-import net.sourceforge.plantuml.graphic.SymbolContext;
+import net.sourceforge.plantuml.klimt.Fashion;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.color.HColorSet;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
+import net.sourceforge.plantuml.klimt.shape.ULine;
+import net.sourceforge.plantuml.klimt.shape.URectangle;
 import net.sourceforge.plantuml.skin.AbstractComponent;
 import net.sourceforge.plantuml.skin.Area;
 import net.sourceforge.plantuml.style.Style;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.ULine;
-import net.sourceforge.plantuml.ugraphic.URectangle;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
-import net.sourceforge.plantuml.ugraphic.color.HColorSet;
 
 public class ComponentRoseActiveLine extends AbstractComponent {
 
-	private final SymbolContext symbolContext;
+	private final Fashion symbolContext;
 	private final boolean closeUp;
 	private final boolean closeDown;
 
-	public ComponentRoseActiveLine(ThemeStyle themeStyle, Style style, boolean closeUp, boolean closeDown,
-			HColorSet set) {
+	public ComponentRoseActiveLine(Style style, boolean closeUp, boolean closeDown, HColorSet set) {
 		super(style);
-		this.symbolContext = style.getSymbolContext(themeStyle, set);
+		this.symbolContext = style.getSymbolContext(set);
 		this.closeUp = closeUp;
 		this.closeDown = closeDown;
 	}
 
 	protected void drawInternalU(UGraphic ug, Area area) {
-		final Dimension2D dimensionToUse = area.getDimensionToUse();
+		final XDimension2D dimensionToUse = area.getDimensionToUse();
 		final StringBounder stringBounder = ug.getStringBounder();
 		final int x = (int) (dimensionToUse.getWidth() - getPreferredWidth(stringBounder)) / 2;
 
@@ -68,7 +69,7 @@ public class ComponentRoseActiveLine extends AbstractComponent {
 			return;
 		}
 
-		final URectangle rect = new URectangle(getPreferredWidth(stringBounder), dimensionToUse.getHeight());
+		final URectangle rect = URectangle.build(getPreferredWidth(stringBounder), dimensionToUse.getHeight());
 		if (symbolContext.isShadowing()) {
 			rect.setDeltaShadow(1);
 		}

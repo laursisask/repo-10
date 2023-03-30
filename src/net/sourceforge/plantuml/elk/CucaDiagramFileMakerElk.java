@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
  * 
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  * 
  * This file is part of PlantUML.
  *
@@ -35,7 +35,6 @@
  */
 package net.sourceforge.plantuml.elk;
 
-import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -46,24 +45,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import net.sourceforge.plantuml.AlignmentParam;
 import net.sourceforge.plantuml.FileFormatOption;
-import net.sourceforge.plantuml.FontParam;
-import net.sourceforge.plantuml.ISkinParam;
 import net.sourceforge.plantuml.StringUtils;
 import net.sourceforge.plantuml.UmlDiagram;
-import net.sourceforge.plantuml.UmlDiagramType;
+import net.sourceforge.plantuml.abel.CucaNote;
+import net.sourceforge.plantuml.abel.Entity;
+import net.sourceforge.plantuml.abel.GroupType;
+import net.sourceforge.plantuml.abel.LeafType;
+import net.sourceforge.plantuml.abel.Link;
 import net.sourceforge.plantuml.api.ImageDataSimple;
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
 import net.sourceforge.plantuml.core.ImageData;
-import net.sourceforge.plantuml.cucadiagram.CucaDiagram;
-import net.sourceforge.plantuml.cucadiagram.Display;
-import net.sourceforge.plantuml.cucadiagram.GroupType;
-import net.sourceforge.plantuml.cucadiagram.IEntity;
-import net.sourceforge.plantuml.cucadiagram.IGroup;
-import net.sourceforge.plantuml.cucadiagram.ILeaf;
-import net.sourceforge.plantuml.cucadiagram.Link;
-import net.sourceforge.plantuml.cucadiagram.entity.EntityFactory;
+import net.sourceforge.plantuml.cucadiagram.ICucaDiagram;
+import net.sourceforge.plantuml.decoration.symbol.USymbolFolder;
 
 /*
  * You can choose between real "org.eclipse.elk..." classes or proxied "net.sourceforge.plantuml.elk.proxy..."
@@ -103,16 +96,33 @@ import net.sourceforge.plantuml.elk.proxy.graph.ElkEdge;
 import net.sourceforge.plantuml.elk.proxy.graph.ElkLabel;
 import net.sourceforge.plantuml.elk.proxy.graph.ElkNode;
 import net.sourceforge.plantuml.elk.proxy.graph.util.ElkGraphUtil;
-import net.sourceforge.plantuml.graphic.AbstractTextBlock;
-import net.sourceforge.plantuml.graphic.FontConfiguration;
-import net.sourceforge.plantuml.graphic.HorizontalAlignment;
-import net.sourceforge.plantuml.graphic.QuoteUtils;
-import net.sourceforge.plantuml.graphic.StringBounder;
-import net.sourceforge.plantuml.graphic.TextBlock;
-import net.sourceforge.plantuml.graphic.TextBlockUtils;
+import net.sourceforge.plantuml.klimt.UStroke;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.color.HColor;
+import net.sourceforge.plantuml.klimt.color.HColors;
+import net.sourceforge.plantuml.klimt.creole.Display;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.font.FontConfiguration;
+import net.sourceforge.plantuml.klimt.font.FontParam;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
+import net.sourceforge.plantuml.klimt.geom.HorizontalAlignment;
+import net.sourceforge.plantuml.klimt.geom.MinMax;
+import net.sourceforge.plantuml.klimt.geom.RectangleArea;
+import net.sourceforge.plantuml.klimt.geom.VerticalAlignment;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
+import net.sourceforge.plantuml.klimt.geom.XPoint2D;
+import net.sourceforge.plantuml.klimt.shape.AbstractTextBlock;
+import net.sourceforge.plantuml.klimt.shape.TextBlock;
+import net.sourceforge.plantuml.klimt.shape.TextBlockUtils;
+import net.sourceforge.plantuml.klimt.shape.URectangle;
+import net.sourceforge.plantuml.log.Logme;
+import net.sourceforge.plantuml.skin.AlignmentParam;
+import net.sourceforge.plantuml.skin.UmlDiagramType;
+import net.sourceforge.plantuml.style.ISkinParam;
 import net.sourceforge.plantuml.style.PName;
 import net.sourceforge.plantuml.style.SName;
 import net.sourceforge.plantuml.style.Style;
+import net.sourceforge.plantuml.style.StyleSignatureBasic;
 import net.sourceforge.plantuml.svek.Bibliotekon;
 import net.sourceforge.plantuml.svek.Cluster;
 import net.sourceforge.plantuml.svek.ClusterDecoration;
@@ -122,14 +132,8 @@ import net.sourceforge.plantuml.svek.GeneralImageBuilder;
 import net.sourceforge.plantuml.svek.GraphvizCrash;
 import net.sourceforge.plantuml.svek.IEntityImage;
 import net.sourceforge.plantuml.svek.PackageStyle;
-import net.sourceforge.plantuml.svek.TextBlockBackcolored;
-import net.sourceforge.plantuml.ugraphic.MinMax;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.URectangle;
-import net.sourceforge.plantuml.ugraphic.UStroke;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
-import net.sourceforge.plantuml.ugraphic.color.HColor;
-import net.sourceforge.plantuml.ugraphic.color.HColorUtils;
+import net.sourceforge.plantuml.svek.image.EntityImageNoteLink;
+import net.sourceforge.plantuml.utils.Position;
 
 /*
  * Some notes:
@@ -143,38 +147,61 @@ https://rtsys.informatik.uni-kiel.de/~biblio/downloads/theses/yab-bt.pdf
 https://rtsys.informatik.uni-kiel.de/~biblio/downloads/theses/thw-bt.pdf
  */
 public class CucaDiagramFileMakerElk implements CucaDiagramFileMaker {
+	// ::remove folder when __CORE__
 
-	private final CucaDiagram diagram;
+	private final ICucaDiagram diagram;
 	private final StringBounder stringBounder;
 	private final DotStringFactory dotStringFactory;
 
-	private final Map<ILeaf, ElkNode> nodes = new LinkedHashMap<ILeaf, ElkNode>();
-	private final Map<IGroup, ElkNode> clusters = new LinkedHashMap<IGroup, ElkNode>();
+	private final Map<Entity, ElkNode> nodes = new LinkedHashMap<Entity, ElkNode>();
+	private final Map<Entity, ElkNode> clusters = new LinkedHashMap<Entity, ElkNode>();
 	private final Map<Link, ElkEdge> edges = new LinkedHashMap<Link, ElkEdge>();
 
-	public CucaDiagramFileMakerElk(CucaDiagram diagram, StringBounder stringBounder) {
+	public CucaDiagramFileMakerElk(ICucaDiagram diagram, StringBounder stringBounder) {
 		this.diagram = diagram;
 		this.stringBounder = stringBounder;
 		this.dotStringFactory = new DotStringFactory(stringBounder, diagram);
 
 	}
 
-	private TextBlock getLabel(Link link) {
-		if (Display.isNull(link.getLabel())) {
-			return null;
-		}
-		final ISkinParam skinParam = diagram.getSkinParam();
-		final FontConfiguration labelFont = FontConfiguration.create(skinParam, FontParam.ARROW, null);
-		final TextBlock label = link.getLabel().create(labelFont,
-				skinParam.getDefaultTextAlignment(HorizontalAlignment.CENTER), skinParam);
-		if (TextBlockUtils.isEmpty(label, stringBounder))
-			return null;
-
-		return label;
+	// Duplicate from CucaDiagramFileMakerSmetana
+	private Style getStyle() {
+		return StyleSignatureBasic
+				.of(SName.root, SName.element, diagram.getUmlDiagramType().getStyleName(), SName.arrow)
+				.getMergedStyle(diagram.getSkinParam().getCurrentStyleBuilder());
 	}
 
-	private TextBlock getQualifier(Link link, int n) {
-		final String tmp = n == 1 ? link.getQualifier1() : link.getQualifier2();
+	private TextBlock getLabel(Link link) {
+		ISkinParam skinParam = diagram.getSkinParam();
+		final double marginLabel = 1; // startUid.equals(endUid) ? 6 : 1;
+		final Style style = getStyle();
+
+		final FontConfiguration labelFont = style.getFontConfiguration(skinParam.getIHtmlColorSet());
+		TextBlock labelOnly = link.getLabel().create(labelFont,
+				skinParam.getDefaultTextAlignment(HorizontalAlignment.CENTER), skinParam);
+
+		final CucaNote note = link.getNote();
+		if (note == null) {
+			if (TextBlockUtils.isEmpty(labelOnly, stringBounder) == false)
+				labelOnly = TextBlockUtils.withMargin(labelOnly, marginLabel, marginLabel);
+			return labelOnly;
+		}
+		final TextBlock noteOnly = new EntityImageNoteLink(note.getDisplay(), note.getColors(), skinParam,
+				link.getStyleBuilder());
+
+		if (note.getPosition() == Position.LEFT)
+			return TextBlockUtils.mergeLR(noteOnly, labelOnly, VerticalAlignment.CENTER);
+		else if (note.getPosition() == Position.RIGHT)
+			return TextBlockUtils.mergeLR(labelOnly, noteOnly, VerticalAlignment.CENTER);
+		else if (note.getPosition() == Position.TOP)
+			return TextBlockUtils.mergeTB(noteOnly, labelOnly, HorizontalAlignment.CENTER);
+		else
+			return TextBlockUtils.mergeTB(labelOnly, noteOnly, HorizontalAlignment.CENTER);
+
+	}
+
+	private TextBlock getQuantifier(Link link, int n) {
+		final String tmp = n == 1 ? link.getQuantifier1() : link.getQuantifier2();
 		if (tmp == null)
 			return null;
 
@@ -189,7 +216,7 @@ public class CucaDiagramFileMakerElk implements CucaDiagramFileMaker {
 	}
 
 	// Retrieve the real position of a node, depending on its parents
-	private Point2D getPosition(ElkNode elkNode) {
+	private XPoint2D getPosition(ElkNode elkNode) {
 		final ElkNode parent = elkNode.getParent();
 
 		final double x = elkNode.getX();
@@ -197,17 +224,17 @@ public class CucaDiagramFileMakerElk implements CucaDiagramFileMaker {
 
 		// This nasty test checks that parent is "root"
 		if (parent == null || parent.getLabels().size() == 0) {
-			return new Point2D.Double(x, y);
+			return new XPoint2D(x, y);
 		}
 
 		// Right now, this is recursive
-		final Point2D parentPosition = getPosition(parent);
-		return new Point2D.Double(parentPosition.getX() + x, parentPosition.getY() + y);
+		final XPoint2D parentPosition = getPosition(parent);
+		return new XPoint2D(parentPosition.getX() + x, parentPosition.getY() + y);
 
 	}
 
 	// The Drawing class does the real drawing
-	class Drawing extends AbstractTextBlock implements TextBlockBackcolored {
+	class Drawing extends AbstractTextBlock {
 
 		// min and max of all coord
 		private final MinMax minMax;
@@ -223,13 +250,13 @@ public class CucaDiagramFileMakerElk implements CucaDiagramFileMaker {
 		}
 
 		private void drawAllClusters(UGraphic ug) {
-			for (Entry<IGroup, ElkNode> ent : clusters.entrySet())
+			for (Entry<Entity, ElkNode> ent : clusters.entrySet())
 				drawSingleCluster(ug, ent.getKey(), ent.getValue());
 
 		}
 
 		private void drawAllNodes(UGraphic ug) {
-			for (Entry<ILeaf, ElkNode> ent : nodes.entrySet())
+			for (Entry<Entity, ElkNode> ent : nodes.entrySet())
 				drawSingleNode(ug, ent.getKey(), ent.getValue());
 
 		}
@@ -244,9 +271,9 @@ public class CucaDiagramFileMakerElk implements CucaDiagramFileMaker {
 			}
 		}
 
-		private void drawSingleCluster(UGraphic ug, IGroup group, ElkNode elkNode) {
-			final Point2D corner = getPosition(elkNode);
-			final URectangle rect = new URectangle(elkNode.getWidth(), elkNode.getHeight());
+		private void drawSingleCluster(UGraphic ug, Entity group, ElkNode elkNode) {
+			final XPoint2D corner = getPosition(elkNode);
+			final URectangle rect = URectangle.build(elkNode.getWidth(), elkNode.getHeight());
 
 			PackageStyle packageStyle = group.getPackageStyle();
 			final ISkinParam skinParam = diagram.getSkinParam();
@@ -261,8 +288,8 @@ public class CucaDiagramFileMakerElk implements CucaDiagramFileMaker {
 			final UStroke stroke = Cluster.getStrokeInternal(group, style);
 
 			HColor backColor = getBackColor(umlDiagramType);
-			backColor = Cluster.getBackColor(backColor, skinParam, group.getStereotype(), umlDiagramType.getStyleName(),
-					group.getUSymbol());
+			backColor = Cluster.getBackColor(backColor, group.getStereotype(), umlDiagramType.getStyleName(),
+					group.getUSymbol(), skinParam.getCurrentStyleBuilder(), skinParam.getIHtmlColorSet());
 
 			final double roundCorner = style.value(PName.RoundCorner).asDouble();
 //			final double roundCorner = group.getUSymbol() == null ? 0
@@ -271,19 +298,20 @@ public class CucaDiagramFileMakerElk implements CucaDiagramFileMaker {
 			final TextBlock ztitle = getTitleBlock(group);
 			final TextBlock zstereo = TextBlockUtils.empty(0, 0);
 
+			final RectangleArea rectangleArea = new RectangleArea(0, 0, elkNode.getWidth(), elkNode.getHeight());
 			final ClusterDecoration decoration = new ClusterDecoration(packageStyle, group.getUSymbol(), ztitle,
-					zstereo, 0, 0, elkNode.getWidth(), elkNode.getHeight(), stroke);
+					zstereo, rectangleArea, stroke);
 
-			final HColor borderColor = HColorUtils.BLACK;
-			decoration.drawU(ug.apply(new UTranslate(corner)), backColor, borderColor, shadowing, roundCorner,
+			final HColor borderColor = HColors.BLACK;
+			decoration.drawU(ug.apply(UTranslate.point(corner)), backColor, borderColor, shadowing, roundCorner,
 					skinParam.getHorizontalAlignment(AlignmentParam.packageTitleAlignment, null, false, null),
 					skinParam.getStereotypeAlignment(), 0);
 
 //			// Print a simple rectangle right now
-//			ug.apply(HColorUtils.BLACK).apply(new UStroke(1.5)).apply(new UTranslate(corner)).draw(rect);
+//			ug.apply(HColorUtils.BLACK).apply(UStroke.withThickness(1.5)).apply(new UTranslate(corner)).draw(rect);
 		}
 
-		private TextBlock getTitleBlock(IGroup g) {
+		private TextBlock getTitleBlock(Entity g) {
 			final Display label = g.getDisplay();
 			if (label == null)
 				return TextBlockUtils.empty(0, 0);
@@ -297,25 +325,33 @@ public class CucaDiagramFileMakerElk implements CucaDiagramFileMaker {
 			return null;
 		}
 
-		private void drawSingleNode(UGraphic ug, ILeaf leaf, ElkNode elkNode) {
+		private void drawSingleNode(UGraphic ug, Entity leaf, ElkNode elkNode) {
 			final IEntityImage image = printEntityInternal(leaf);
 			// Retrieve coord from ELK
-			final Point2D corner = getPosition(elkNode);
+			final XPoint2D corner = getPosition(elkNode);
 
 			// Print the node image at right coord
-			image.drawU(ug.apply(new UTranslate(corner)));
+			image.drawU(ug.apply(UTranslate.point(corner)));
 		}
 
 		private void drawSingleEdge(UGraphic ug, Link link, ElkEdge edge) {
 			// Unfortunately, we have to translate "edge" in its own "cluster" coordinate
-			final Point2D translate = getPosition(edge.getContainingNode());
+			final XPoint2D translate = getPosition(edge.getContainingNode());
 
+			final double magicY2 = 0;
+			final Entity dest = link.getEntity2();
+			if (dest.getUSymbol() instanceof USymbolFolder) {
+//				System.err.println("dest=" + dest);
+//				final IEntityImage image = printEntityInternal((ILeaf) dest);
+//				System.err.println("image=" + image);
+
+			}
 			final ElkPath elkPath = new ElkPath(diagram, SName.classDiagram, link, edge, getLabel(link),
-					getQualifier(link, 1), getQualifier(link, 2));
-			elkPath.drawU(ug.apply(new UTranslate(translate)));
+					getQuantifier(link, 1), getQuantifier(link, 2), magicY2);
+			elkPath.drawU(ug.apply(UTranslate.point(translate)));
 		}
 
-		public Dimension2D calculateDimension(StringBounder stringBounder) {
+		public XDimension2D calculateDimension(StringBounder stringBounder) {
 			if (minMax == null)
 				throw new UnsupportedOperationException();
 
@@ -328,16 +364,16 @@ public class CucaDiagramFileMakerElk implements CucaDiagramFileMaker {
 
 	}
 
-	private Collection<ILeaf> getUnpackagedEntities() {
-		final List<ILeaf> result = new ArrayList<>();
-		for (ILeaf ent : diagram.getLeafsvalues())
+	private Collection<Entity> getUnpackagedEntities() {
+		final List<Entity> result = new ArrayList<>();
+		for (Entity ent : diagram.getEntityFactory().leafs())
 			if (diagram.getEntityFactory().getRootGroup() == ent.getParentContainer())
 				result.add(ent);
 
 		return result;
 	}
 
-	private ElkNode getElkNode(final IEntity entity) {
+	private ElkNode getElkNode(final Entity entity) {
 		ElkNode node = nodes.get(entity);
 		if (node == null)
 			node = clusters.get(entity);
@@ -377,15 +413,13 @@ public class CucaDiagramFileMakerElk implements CucaDiagramFileMaker {
 
 	}
 
-	private void printAllSubgroups(ElkNode cluster, IGroup group) {
-		for (IGroup g : diagram.getChildrenGroups(group)) {
+	private void printAllSubgroups(ElkNode cluster, Entity group) {
+		for (Entity g : diagram.getChildrenGroups(group)) {
 			if (g.isRemoved()) {
 				continue;
 			}
 			if (diagram.isEmpty(g) && g.getGroupType() == GroupType.PACKAGE) {
-				final ISkinParam skinParam = diagram.getSkinParam();
-				final EntityFactory entityFactory = diagram.getEntityFactory();
-				final ILeaf folder = entityFactory.createLeafForEmptyGroup(g, skinParam);
+				g.muteToType(LeafType.EMPTY_PACKAGE);
 				System.err.println("STILL IN PROGRESS");
 				// printEntityNew(folder);
 			} else {
@@ -407,17 +441,17 @@ public class CucaDiagramFileMakerElk implements CucaDiagramFileMaker {
 
 	}
 
-	private void printSingleGroup(IGroup g) {
+	private void printSingleGroup(Entity g) {
 		if (g.getGroupType() == GroupType.CONCURRENT_STATE)
 			return;
 
-		this.printEntities(clusters.get(g), g.getLeafsDirect());
+		this.printEntities(clusters.get(g), g.leafs());
 		printAllSubgroups(clusters.get(g), g);
 	}
 
-	private void printEntities(ElkNode parent, Collection<ILeaf> entities) {
+	private void printEntities(ElkNode parent, Collection<Entity> entities) {
 		// Convert all "leaf" to ELK node
-		for (ILeaf ent : entities) {
+		for (Entity ent : entities) {
 			if (ent.isRemoved())
 				continue;
 
@@ -432,11 +466,11 @@ public class CucaDiagramFileMakerElk implements CucaDiagramFileMaker {
 
 	}
 
-	private void manageSingleNode(final ElkNode root, ILeaf leaf) {
+	private void manageSingleNode(final ElkNode root, Entity leaf) {
 		final IEntityImage image = printEntityInternal(leaf);
 
 		// Expected dimension of the node
-		final Dimension2D dimension = image.calculateDimension(stringBounder);
+		final XDimension2D dimension = image.calculateDimension(stringBounder);
 
 		// Here, we try to tell ELK to use this dimension as node dimension
 		final ElkNode node = ElkGraphUtil.createNode(root);
@@ -478,16 +512,16 @@ public class CucaDiagramFileMakerElk implements CucaDiagramFileMaker {
 		final TextBlock labelLink = getLabel(link);
 		if (labelLink != null) {
 			final ElkLabel edgeLabel = ElkGraphUtil.createLabel(edge);
-			final Dimension2D dim = labelLink.calculateDimension(stringBounder);
+			final XDimension2D dim = labelLink.calculateDimension(stringBounder);
 			edgeLabel.setText("X");
 			edgeLabel.setDimensions(dim.getWidth(), dim.getHeight());
 			// Duplicated, with qualifier, but who cares?
 			edge.setProperty(CoreOptions.EDGE_LABELS_INLINE, true);
 			// edge.setProperty(CoreOptions.EDGE_TYPE, EdgeType.ASSOCIATION);
 		}
-		if (link.getQualifier1() != null) {
+		if (link.getQuantifier1() != null) {
 			final ElkLabel edgeLabel = ElkGraphUtil.createLabel(edge);
-			final Dimension2D dim = getQualifier(link, 1).calculateDimension(stringBounder);
+			final XDimension2D dim = getQuantifier(link, 1).calculateDimension(stringBounder);
 			// Nasty trick, we store the kind of label in the text
 			edgeLabel.setText("1");
 			edgeLabel.setDimensions(dim.getWidth(), dim.getHeight());
@@ -496,9 +530,9 @@ public class CucaDiagramFileMakerElk implements CucaDiagramFileMaker {
 			edge.setProperty(CoreOptions.EDGE_LABELS_INLINE, true);
 			// edge.setProperty(CoreOptions.EDGE_TYPE, EdgeType.ASSOCIATION);
 		}
-		if (link.getQualifier2() != null) {
+		if (link.getQuantifier2() != null) {
 			final ElkLabel edgeLabel = ElkGraphUtil.createLabel(edge);
-			final Dimension2D dim = getQualifier(link, 2).calculateDimension(stringBounder);
+			final XDimension2D dim = getQuantifier(link, 2).calculateDimension(stringBounder);
 			// Nasty trick, we store the kind of label in the text
 			edgeLabel.setText("2");
 			edgeLabel.setDimensions(dim.getWidth(), dim.getHeight());
@@ -512,18 +546,16 @@ public class CucaDiagramFileMakerElk implements CucaDiagramFileMaker {
 	}
 
 	static private List<String> getFailureText3(Throwable exception) {
-		exception.printStackTrace();
+		Logme.error(exception);
 		final List<String> strings = new ArrayList<>();
 		strings.add("An error has occured : " + exception);
-		final String quote = StringUtils.rot(QuoteUtils.getSomeQuote());
-		strings.add("<i>" + quote);
 		strings.add(" ");
 		GraphvizCrash.addProperties(strings);
 		strings.add(" ");
 		strings.add("Sorry, ELK intregration is really alpha feature...");
 		strings.add(" ");
 		strings.add("You should send this diagram and this image to <b>plantuml@gmail.com</b> or");
-		strings.add("post to <b>http://plantuml.com/qa</b> to solve this issue.");
+		strings.add("post to <b>https://plantuml.com/qa</b> to solve this issue.");
 		strings.add(" ");
 		return strings;
 	}
@@ -532,7 +564,7 @@ public class CucaDiagramFileMakerElk implements CucaDiagramFileMaker {
 		return dotStringFactory.getBibliotekon();
 	}
 
-	private IEntityImage printEntityInternal(ILeaf ent) {
+	private IEntityImage printEntityInternal(Entity ent) {
 		if (ent.isRemoved())
 			throw new IllegalStateException();
 
@@ -545,6 +577,11 @@ public class CucaDiagramFileMakerElk implements CucaDiagramFileMaker {
 					diagram, getBibliotekon(), null, diagram.getUmlDiagramType(), diagram.getLinks());
 		}
 		return ent.getSvekImage();
+	}
+
+	@Override
+	public void createOneGraphic(UGraphic ug) {
+		throw new UnsupportedOperationException();
 	}
 
 }

@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,13 +35,12 @@
  */
 package net.sourceforge.plantuml.posimo;
 
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
-import net.sourceforge.plantuml.Dimension2DDouble;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
+import net.sourceforge.plantuml.klimt.geom.XPoint2D;
 
 public class Cluster implements Clusterable {
 
@@ -52,7 +54,7 @@ public class Cluster implements Clusterable {
 	private double y;
 	private double width;
 	private double height;
-	
+
 	private final double titleWidth;
 	private final double titleHeight;
 
@@ -117,13 +119,13 @@ public class Cluster implements Clusterable {
 		}
 		return null;
 	}
-	
-	public Point2D getPosition() {
-		return new Point2D.Double(x, y);
+
+	public XPoint2D getPosition() {
+		return new XPoint2D(x, y);
 	}
 
-	public Dimension2D getSize() {
-		return new Dimension2DDouble(width, height);
+	public XDimension2D getSize() {
+		return new XDimension2D(width, height);
 	}
 
 	public final void setX(double x) {
@@ -153,6 +155,5 @@ public class Cluster implements Clusterable {
 	public void moveSvek(double deltaX, double deltaY) {
 		throw new UnsupportedOperationException();
 	}
-
 
 }

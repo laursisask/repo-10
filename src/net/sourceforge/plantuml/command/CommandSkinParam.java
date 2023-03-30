@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,17 +35,19 @@
  */
 package net.sourceforge.plantuml.command;
 
-import net.sourceforge.plantuml.LineLocation;
 import net.sourceforge.plantuml.TitledDiagram;
-import net.sourceforge.plantuml.command.regex.IRegex;
-import net.sourceforge.plantuml.command.regex.RegexConcat;
-import net.sourceforge.plantuml.command.regex.RegexLeaf;
-import net.sourceforge.plantuml.command.regex.RegexResult;
+import net.sourceforge.plantuml.regex.IRegex;
+import net.sourceforge.plantuml.regex.RegexConcat;
+import net.sourceforge.plantuml.regex.RegexLeaf;
+import net.sourceforge.plantuml.regex.RegexResult;
 import net.sourceforge.plantuml.style.NoStyleAvailableException;
+import net.sourceforge.plantuml.utils.LineLocation;
 
 public class CommandSkinParam extends SingleLineCommand2<TitledDiagram> {
 
-	public CommandSkinParam() {
+	public static final CommandSkinParam ME = new CommandSkinParam();
+
+	private CommandSkinParam() {
 		super(getRegexConcat());
 	}
 
@@ -61,7 +66,7 @@ public class CommandSkinParam extends SingleLineCommand2<TitledDiagram> {
 			diagram.setParam(arg.get("NAME", 0), arg.get("VALUE", 0));
 			return CommandExecutionResult.ok();
 		} catch (NoStyleAvailableException e) {
-			// e.printStackTrace();
+			// Logme.error(e);
 			return CommandExecutionResult.error("General failure: no style available.");
 		}
 

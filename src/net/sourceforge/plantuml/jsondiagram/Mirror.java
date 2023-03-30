@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,7 +35,7 @@
  */
 package net.sourceforge.plantuml.jsondiagram;
 
-import java.awt.geom.Point2D;
+import net.sourceforge.plantuml.klimt.geom.XPoint2D;
 
 public class Mirror {
 
@@ -49,16 +52,16 @@ public class Mirror {
 		return max - v;
 	}
 
-	public Point2D invAndXYSwitch(Point2D pt) {
+	public XPoint2D invAndXYSwitch(XPoint2D pt) {
 		final double x = inv(pt.getY());
 		final double y = pt.getX();
-		return new Point2D.Double(x, y);
+		return new XPoint2D(x, y);
 	}
 
-	public Point2D invGit(Point2D pt) {
+	public XPoint2D invGit(XPoint2D pt) {
 		final double x = pt.getX();
 		final double y = inv(pt.getY());
-		return new Point2D.Double(x, y);
+		return new XPoint2D(x, y);
 	}
 
 }

@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -33,12 +36,12 @@ package net.sourceforge.plantuml.braille;
 
 import java.awt.geom.Rectangle2D;
 
-import net.sourceforge.plantuml.ugraphic.ClipContainer;
-import net.sourceforge.plantuml.ugraphic.UClip;
-import net.sourceforge.plantuml.ugraphic.UDriver;
-import net.sourceforge.plantuml.ugraphic.UParam;
-import net.sourceforge.plantuml.ugraphic.URectangle;
-import net.sourceforge.plantuml.ugraphic.color.ColorMapper;
+import net.sourceforge.plantuml.klimt.ClipContainer;
+import net.sourceforge.plantuml.klimt.UClip;
+import net.sourceforge.plantuml.klimt.UParam;
+import net.sourceforge.plantuml.klimt.color.ColorMapper;
+import net.sourceforge.plantuml.klimt.drawing.UDriver;
+import net.sourceforge.plantuml.klimt.shape.URectangle;
 
 public class DriverRectangleBraille implements UDriver<URectangle, BrailleGrid> {
 
@@ -58,8 +61,10 @@ public class DriverRectangleBraille implements UDriver<URectangle, BrailleGrid> 
 		// final HtmlColor back = param.getBackcolor();
 		// if (back instanceof HtmlColorGradient) {
 		// final HtmlColorGradient gr = (HtmlColorGradient) back;
-		// final String id = svg.createSvgGradient(StringUtils.getAsHtml(mapper.getMappedColor(gr.getColor1())),
-		// StringUtils.getAsHtml(mapper.getMappedColor(gr.getColor2())), gr.getPolicy());
+		// final String id =
+		// svg.createSvgGradient(StringUtils.getAsHtml(mapper.getMappedColor(gr.getColor1())),
+		// StringUtils.getAsHtml(mapper.getMappedColor(gr.getColor2())),
+		// gr.getPolicy());
 		// svg.setFillColor("url(#" + id + ")");
 		// svg.setStrokeColor(color);
 		// } else {
@@ -68,7 +73,8 @@ public class DriverRectangleBraille implements UDriver<URectangle, BrailleGrid> 
 		// svg.setStrokeColor(color);
 		// }
 		//
-		// svg.setStrokeWidth(param.getStroke().getThickness(), param.getStroke().getDasharraySvg());
+		// svg.setStrokeWidth(param.getStroke().getThickness(),
+		// param.getStroke().getDasharraySvg());
 
 		final UClip clip = clipContainer.getClip();
 		if (clip != null) {

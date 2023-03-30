@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  *
  * If you like this project or if you find it useful, you can support us at:
  *
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  *
  * This file is part of PlantUML.
  *
@@ -57,10 +57,10 @@ import java.util.regex.Pattern;
 
 import javax.swing.ImageIcon;
 
-import net.sourceforge.plantuml.Log;
 import net.sourceforge.plantuml.StringUtils;
 import net.sourceforge.plantuml.json.Json;
 import net.sourceforge.plantuml.json.JsonValue;
+import net.sourceforge.plantuml.log.Logme;
 import net.sourceforge.plantuml.security.authentication.SecurityAccessInterceptor;
 import net.sourceforge.plantuml.security.authentication.SecurityAuthentication;
 import net.sourceforge.plantuml.security.authentication.SecurityAuthorizeManager;
@@ -74,14 +74,42 @@ import net.sourceforge.plantuml.security.authentication.oauth.OAuth2ClientAccess
 import net.sourceforge.plantuml.security.authentication.oauth.OAuth2ResourceOwnerAccessAuthorizeManager;
 import net.sourceforge.plantuml.security.authentication.token.TokenAuthAccessInterceptor;
 import net.sourceforge.plantuml.security.authentication.token.TokenAuthAuthorizeManager;
+import net.sourceforge.plantuml.utils.Log;
 
 public class SecurityUtils {
+
+	// ::uncomment when __CORE__
+//	public static SecurityProfile getSecurityProfile() {
+//		return SecurityProfile.UNSECURE;
+//	}
+	// ::done
+
+	public static boolean ignoreThisLink(String url) {
+		// ::comment when __CORE__
+		if (allowJavascriptInLink() == false && isJavascriptLink(url))
+			return true;
+		// ::done
+		return false;
+	}
 
 	/**
 	 * Indicates, that we have no authentication and credentials to access the URL.
 	 */
 	public static final String NO_CREDENTIALS = "<none>";
 
+	public synchronized static BufferedImage readRasterImage(final ImageIcon imageIcon) {
+		final Image tmpImage = imageIcon.getImage();
+		if (imageIcon.getIconWidth() == -1)
+			return null;
+
+		final BufferedImage image = new BufferedImage(imageIcon.getIconWidth(), imageIcon.getIconHeight(),
+				BufferedImage.TYPE_INT_ARGB);
+		image.getGraphics().drawImage(tmpImage, 0, 0, null);
+		tmpImage.flush();
+		return image;
+	}
+
+	// ::comment when __CORE__
 	/**
 	 * Java class paths to import files from.
 	 */
@@ -96,7 +124,7 @@ public class SecurityUtils {
 	 * Whitelist of paths from where scripts can load data.
 	 */
 	public static final String ALLOWLIST_LOCAL_PATHS = "plantuml.allowlist.path";
-	
+
 	/**
 	 * Whitelist of urls
 	 */
@@ -172,12 +200,6 @@ public class SecurityUtils {
 		return current;
 	}
 
-	public static boolean ignoreThisLink(String url) {
-		if (allowJavascriptInLink() == false && isJavascriptLink(url))
-			return true;
-		return false;
-	}
-
 	private static boolean isJavascriptLink(String url) {
 		return url.toLowerCase().replaceAll("[^a-z]", "").startsWith("javascript");
 	}
@@ -188,11 +210,16 @@ public class SecurityUtils {
 	}
 
 	public static String getenv(String name) {
-		final String env = System.getProperty(name);
-		if (StringUtils.isNotEmpty(env))
-			return env;
+		String result = System.getProperty(name);
+		if (StringUtils.isNotEmpty(result))
+			return result;
 
-		return System.getenv(name);
+		result = System.getenv(name);
+		if (StringUtils.isNotEmpty(result))
+			return result;
+
+		final String alternateName = name.replace(".", "_").toUpperCase();
+		return System.getenv(alternateName);
 	}
 
 	/**
@@ -262,18 +289,6 @@ public class SecurityUtils {
 	public static PrintStream createPrintStream(OutputStream os, boolean autoFlush, Charset charset)
 			throws UnsupportedEncodingException {
 		return new PrintStream(os, autoFlush, charset.name());
-	}
-
-	public synchronized static BufferedImage readRasterImage(final ImageIcon imageIcon) {
-		final Image tmpImage = imageIcon.getImage();
-		if (imageIcon.getIconWidth() == -1)
-			return null;
-
-		final BufferedImage image = new BufferedImage(imageIcon.getIconWidth(), imageIcon.getIconHeight(),
-				BufferedImage.TYPE_INT_ARGB);
-		image.getGraphics().drawImage(tmpImage, 0, 0, null);
-		tmpImage.flush();
-		return image;
 	}
 
 	// ----
@@ -426,10 +441,11 @@ public class SecurityUtils {
 			try (Reader r = new BufferedReader(new FileReader(jsonFile))) {
 				return Json.parse(r);
 			} catch (IOException e) {
-				e.printStackTrace();
+				Logme.error(e);
 			}
 		}
 		return Json.object();
 	}
+	// ::done
 
 }

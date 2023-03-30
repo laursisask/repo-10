@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,7 +35,6 @@
  */
 package net.sourceforge.plantuml.definition;
 
-import net.sourceforge.plantuml.api.ThemeStyle;
 import net.sourceforge.plantuml.command.PSystemBasicFactory;
 import net.sourceforge.plantuml.core.DiagramType;
 import net.sourceforge.plantuml.core.UmlSource;
@@ -44,7 +46,7 @@ public class PSystemDefinitionFactory extends PSystemBasicFactory<PSystemDefinit
 	}
 
 	@Override
-	public PSystemDefinition initDiagram(ThemeStyle style, UmlSource source, String startLine) {
+	public PSystemDefinition initDiagram(UmlSource source, String startLine) {
 		if (getDiagramType() == DiagramType.DEFINITION)
 			return new PSystemDefinition(source, startLine);
 
@@ -52,7 +54,7 @@ public class PSystemDefinitionFactory extends PSystemBasicFactory<PSystemDefinit
 	}
 
 	@Override
-	public PSystemDefinition executeLine(ThemeStyle style, UmlSource source, PSystemDefinition system, String line) {
+	public PSystemDefinition executeLine(UmlSource source, PSystemDefinition system, String line) {
 		system.doCommandLine(line);
 		return system;
 	}

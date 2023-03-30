@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,17 +35,16 @@
  */
 package net.sourceforge.plantuml.salt.element;
 
-import net.sourceforge.plantuml.graphic.FontConfiguration;
-import net.sourceforge.plantuml.ugraphic.UFont;
-import net.sourceforge.plantuml.ugraphic.color.HColor;
-import net.sourceforge.plantuml.ugraphic.color.HColorSet;
-import net.sourceforge.plantuml.ugraphic.color.HColorSimple;
-import net.sourceforge.plantuml.ugraphic.color.HColorUtils;
+import net.sourceforge.plantuml.klimt.color.HColor;
+import net.sourceforge.plantuml.klimt.color.HColorSet;
+import net.sourceforge.plantuml.klimt.color.HColors;
+import net.sourceforge.plantuml.klimt.font.FontConfiguration;
+import net.sourceforge.plantuml.klimt.font.UFont;
 
 public abstract class AbstractElement implements Element {
 
 	final protected HColor getBlack() {
-		return HColorUtils.BLACK.withDark(HColorUtils.WHITE);
+		return HColors.BLACK.withDark(HColors.WHITE);
 	}
 
 	final protected HColor getColor88() {
@@ -66,12 +68,12 @@ public abstract class AbstractElement implements Element {
 	}
 
 	final protected HColor getWhite() {
-		return HColorUtils.WHITE.withDark(HColorUtils.BLACK);
+		return HColors.WHITE.withDark(HColors.BLACK);
 	}
 
 	private HColor buildColor(String color1, String color2) {
-		final HColorSimple tmp1 = (HColorSimple) HColorSet.instance().getColorOrWhite(null, color1);
-		final HColor tmp2 = HColorSet.instance().getColorOrWhite(null, color2);
+		final HColor tmp1 = HColorSet.instance().getColorOrWhite(color1);
+		final HColor tmp2 = HColorSet.instance().getColorOrWhite(color2);
 		return tmp1.withDark(tmp2);
 	}
 

@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,15 +35,15 @@
  */
 package net.sourceforge.plantuml.style;
 
-import net.sourceforge.plantuml.api.ThemeStyle;
-import net.sourceforge.plantuml.ugraphic.color.HColor;
-import net.sourceforge.plantuml.ugraphic.color.HColorSet;
+import net.sourceforge.plantuml.klimt.color.HColor;
+import net.sourceforge.plantuml.klimt.color.HColorSet;
 
 public class ValueColor extends ValueAbstract {
+    // ::remove file when __HAXE__
 
 	private final HColor color;
 	private final int priority;
-	
+
 	@Override
 	public String toString() {
 		return color.toString();
@@ -52,7 +55,7 @@ public class ValueColor extends ValueAbstract {
 	}
 
 	@Override
-	public HColor asColor(ThemeStyle themeStyle, HColorSet set) {
+	public HColor asColor(HColorSet set) {
 		return color;
 	}
 

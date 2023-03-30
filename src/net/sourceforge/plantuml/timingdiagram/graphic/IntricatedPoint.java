@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -31,25 +34,25 @@
  */
 package net.sourceforge.plantuml.timingdiagram.graphic;
 
-import java.awt.geom.Point2D;
-
-import net.sourceforge.plantuml.ugraphic.UTranslate;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.geom.XPoint2D;
 
 public class IntricatedPoint {
+    // ::remove folder when __HAXE__
 
-	private final Point2D pta;
-	private final Point2D ptb;
+	private final XPoint2D pta;
+	private final XPoint2D ptb;
 
-	public IntricatedPoint(Point2D pta, Point2D ptb) {
+	public IntricatedPoint(XPoint2D pta, XPoint2D ptb) {
 		this.pta = pta;
 		this.ptb = ptb;
 	}
 
-	public final Point2D getPointA() {
+	public final XPoint2D getPointA() {
 		return pta;
 	}
 
-	public final Point2D getPointB() {
+	public final XPoint2D getPointB() {
 		return ptb;
 	}
 

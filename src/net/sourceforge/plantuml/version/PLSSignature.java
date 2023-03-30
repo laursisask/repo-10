@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
  * 
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  * 
  * This file is part of PlantUML.
  *
@@ -48,9 +48,11 @@ import java.util.Random;
 
 import net.sourceforge.plantuml.FileUtils;
 import net.sourceforge.plantuml.OptionPrint;
-import net.sourceforge.plantuml.SignatureUtils;
+import net.sourceforge.plantuml.log.Logme;
+import net.sourceforge.plantuml.utils.SignatureUtils;
 
 public class PLSSignature {
+	// ::remove file when __CORE__
 
 	private final int type;
 	private final byte[] sha;
@@ -177,7 +179,7 @@ public class PLSSignature {
 		try {
 			return SignatureUtils.getSHA512raw(SignatureUtils.salting(signature, getSalt(signature)));
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logme.error(e);
 			throw new IOException();
 		}
 	}

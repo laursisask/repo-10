@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -42,9 +45,10 @@ import net.sourceforge.plantuml.StringUtils;
 import net.sourceforge.plantuml.core.DiagramDescription;
 import net.sourceforge.plantuml.core.ImageData;
 import net.sourceforge.plantuml.core.UmlSource;
-import net.sourceforge.plantuml.ugraphic.color.ColorMapperIdentity;
-import net.sourceforge.plantuml.ugraphic.color.HColor;
-import net.sourceforge.plantuml.ugraphic.color.HColorSet;
+import net.sourceforge.plantuml.klimt.color.ColorMapper;
+import net.sourceforge.plantuml.klimt.color.HColor;
+import net.sourceforge.plantuml.klimt.color.HColorSet;
+import net.sourceforge.plantuml.log.Logme;
 
 public class PSystemLatex extends AbstractPSystem {
 
@@ -90,7 +94,7 @@ public class PSystemLatex extends AbstractPSystem {
 					scale = scale1;
 				}
 			} catch (Exception e) {
-				e.printStackTrace();
+				Logme.error(e);
 			}
 		} else if (lineLower.startsWith("dpi ")) {
 			final String value = line.substring("dpi ".length());
@@ -100,7 +104,7 @@ public class PSystemLatex extends AbstractPSystem {
 					scale = dpi1 / 96;
 				}
 			} catch (Exception e) {
-				e.printStackTrace();
+				Logme.error(e);
 			}
 		} else {
 			this.latex = line;
@@ -109,7 +113,7 @@ public class PSystemLatex extends AbstractPSystem {
 
 	private Color getColor(final String col) {
 		final HColor col2 = col == null ? null : HColorSet.instance().getColorOrWhite(col);
-		final Color col3 = new ColorMapperIdentity().toColor(col2);
+		final Color col3 = col2.toColor(ColorMapper.IDENTITY);
 		return col3;
 	}
 

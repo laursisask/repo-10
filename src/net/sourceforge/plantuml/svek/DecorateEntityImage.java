@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -34,19 +37,18 @@ package net.sourceforge.plantuml.svek;
 
 import java.util.Objects;
 
-import net.sourceforge.plantuml.Dimension2DDouble;
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
-import net.sourceforge.plantuml.graphic.AbstractTextBlock;
-import net.sourceforge.plantuml.graphic.HorizontalAlignment;
-import net.sourceforge.plantuml.graphic.StringBounder;
-import net.sourceforge.plantuml.graphic.TextBlock;
-import net.sourceforge.plantuml.graphic.VerticalAlignment;
-import net.sourceforge.plantuml.ugraphic.MinMax;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
-import net.sourceforge.plantuml.ugraphic.color.HColor;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.color.HColor;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
+import net.sourceforge.plantuml.klimt.geom.HorizontalAlignment;
+import net.sourceforge.plantuml.klimt.geom.MinMax;
+import net.sourceforge.plantuml.klimt.geom.VerticalAlignment;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
+import net.sourceforge.plantuml.klimt.shape.AbstractTextBlock;
+import net.sourceforge.plantuml.klimt.shape.TextBlock;
 
-public class DecorateEntityImage extends AbstractTextBlock implements TextBlockBackcolored {
+public class DecorateEntityImage extends AbstractTextBlock {
 
 	private final TextBlock original;
 	private final HorizontalAlignment horizontal1;
@@ -67,9 +69,9 @@ public class DecorateEntityImage extends AbstractTextBlock implements TextBlockB
 
 	public static TextBlock add(TextBlock original, TextBlock text, HorizontalAlignment horizontal,
 			VerticalAlignment verticalAlignment) {
-		if (verticalAlignment == VerticalAlignment.TOP) {
+		if (verticalAlignment == VerticalAlignment.TOP)
 			return addTop(original, text, horizontal);
-		}
+
 		return addBottom(original, text, horizontal);
 	}
 
@@ -89,10 +91,10 @@ public class DecorateEntityImage extends AbstractTextBlock implements TextBlockB
 
 	public void drawU(UGraphic ug) {
 		final StringBounder stringBounder = ug.getStringBounder();
-		final Dimension2D dimOriginal = original.calculateDimension(stringBounder);
-		final Dimension2D dimText1 = getTextDim(text1, stringBounder);
-		final Dimension2D dimText2 = getTextDim(text2, stringBounder);
-		final Dimension2D dimTotal = calculateDimension(stringBounder);
+		final XDimension2D dimOriginal = original.calculateDimension(stringBounder);
+		final XDimension2D dimText1 = getTextDim(text1, stringBounder);
+		final XDimension2D dimText2 = getTextDim(text2, stringBounder);
+		final XDimension2D dimTotal = calculateDimension(stringBounder);
 
 		final double yImage = dimText1.getHeight();
 		final double yText2 = yImage + dimOriginal.getHeight();
@@ -112,38 +114,35 @@ public class DecorateEntityImage extends AbstractTextBlock implements TextBlockB
 		}
 	}
 
-	private Dimension2D getTextDim(TextBlock text, StringBounder stringBounder) {
-		if (text == null) {
-			return new Dimension2DDouble(0, 0);
-		}
+	private XDimension2D getTextDim(TextBlock text, StringBounder stringBounder) {
+		if (text == null)
+			return new XDimension2D(0, 0);
+
 		return text.calculateDimension(stringBounder);
 	}
 
-	private double getTextX(final Dimension2D dimText, final Dimension2D dimTotal, HorizontalAlignment h) {
-		if (h == HorizontalAlignment.CENTER) {
+	private double getTextX(final XDimension2D dimText, final XDimension2D dimTotal, HorizontalAlignment h) {
+		if (h == HorizontalAlignment.CENTER)
 			return (dimTotal.getWidth() - dimText.getWidth()) / 2;
-		} else if (h == HorizontalAlignment.LEFT) {
+		else if (h == HorizontalAlignment.LEFT)
 			return 0;
-		} else if (h == HorizontalAlignment.RIGHT) {
+		else if (h == HorizontalAlignment.RIGHT)
 			return dimTotal.getWidth() - dimText.getWidth();
-		} else {
+		else
 			throw new IllegalStateException();
-		}
+
 	}
 
 	public HColor getBackcolor() {
-		if (original instanceof TextBlockBackcolored) {
-			return ((TextBlockBackcolored) original).getBackcolor();
-		}
-		throw new UnsupportedOperationException();
+		return original.getBackcolor();
 	}
 
-	public Dimension2D calculateDimension(StringBounder stringBounder) {
-		final Dimension2D dimOriginal = original.calculateDimension(stringBounder);
-		final Dimension2D dim1 = getTextDim(text1, stringBounder);
-		final Dimension2D dim2 = getTextDim(text2, stringBounder);
-		final Dimension2D dimText = Dimension2DDouble.mergeTB(dim1, dim2);
-		return Dimension2DDouble.mergeTB(dimOriginal, dimText);
+	public XDimension2D calculateDimension(StringBounder stringBounder) {
+		final XDimension2D dimOriginal = original.calculateDimension(stringBounder);
+		final XDimension2D dim1 = getTextDim(text1, stringBounder);
+		final XDimension2D dim2 = getTextDim(text2, stringBounder);
+		final XDimension2D dimText = dim1.mergeTB(dim2);
+		return dimOriginal.mergeTB(dimText);
 	}
 
 	@Override

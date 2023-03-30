@@ -24,9 +24,9 @@ java {
 }
 
 dependencies {
-	compileOnly("org.apache.ant:ant:1.10.12")
-	testImplementation("org.assertj:assertj-core:3.23.1")
-	testImplementation("org.junit.jupiter:junit-jupiter:5.9.1")
+	compileOnly("org.apache.ant:ant:1.10.13")
+	testImplementation("org.assertj:assertj-core:3.24.2")
+	testImplementation("org.junit.jupiter:junit-jupiter:5.9.2")
 	testImplementation("org.scilab.forge:jlatexmath:1.0.7")
 	"pdfRuntimeOnly"("org.apache.xmlgraphics:fop:2.8")
 	"pdfRuntimeOnly"("org.apache.xmlgraphics:batik-all:1.16")
@@ -89,6 +89,11 @@ publishing {
 	publications.create<MavenPublication>("maven") {
 		from(components["java"])
 		pom {
+			name.set("PlantUML")
+            description.set("PlantUML is a component that allows to quickly write diagrams from text.")
+			groupId = project.group as String
+			artifactId = project.name
+			version = project.version as String
 			url.set("https://plantuml.com/")
 			licenses {
 				license {
@@ -109,19 +114,16 @@ publishing {
 				url.set("https://github.com/plantuml/plantuml")
 			}
 		}
-		suppressAllPomMetadataWarnings()
 	}
 	repositories {
 		maven {
-			name = "fstest"
-			url = uri(layout.buildDirectory.dir("repo"))
-		}
-		maven {
 			name = "OSSRH"
-			url = uri("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
+			val releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+			val snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
+			url = uri(if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl)
 			credentials {
-				username = System.getenv("MAVEN_USERNAME")
-				password = System.getenv("MAVEN_PASSWORD")
+				username = System.getenv("OSSRH_USERNAME")
+				password = System.getenv("OSSRH_PASSWORD")
 			}
 		}
 	}

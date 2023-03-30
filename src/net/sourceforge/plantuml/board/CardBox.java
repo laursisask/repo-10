@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,20 +35,18 @@
  */
 package net.sourceforge.plantuml.board;
 
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
-
-import net.sourceforge.plantuml.Dimension2DDouble;
-import net.sourceforge.plantuml.ISkinParam;
-import net.sourceforge.plantuml.cucadiagram.Display;
-import net.sourceforge.plantuml.graphic.AbstractTextBlock;
-import net.sourceforge.plantuml.graphic.FontConfiguration;
-import net.sourceforge.plantuml.graphic.HorizontalAlignment;
-import net.sourceforge.plantuml.graphic.StringBounder;
-import net.sourceforge.plantuml.ugraphic.UFont;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.URectangle;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
-import net.sourceforge.plantuml.ugraphic.color.HColorUtils;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.color.HColors;
+import net.sourceforge.plantuml.klimt.creole.Display;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.font.FontConfiguration;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
+import net.sourceforge.plantuml.klimt.font.UFont;
+import net.sourceforge.plantuml.klimt.geom.HorizontalAlignment;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
+import net.sourceforge.plantuml.klimt.shape.AbstractTextBlock;
+import net.sourceforge.plantuml.klimt.shape.URectangle;
+import net.sourceforge.plantuml.style.ISkinParam;
 
 public class CardBox extends AbstractTextBlock {
 
@@ -61,15 +62,15 @@ public class CardBox extends AbstractTextBlock {
 //		return StyleSignature.of(SName.root, SName.element, SName.mindmapDiagram, SName.node);
 //	}
 
-	public Dimension2D calculateDimension(StringBounder stringBounder) {
-		return new Dimension2DDouble(150, 70);
+	public XDimension2D calculateDimension(StringBounder stringBounder) {
+		return new XDimension2D(150, 70);
 	}
 
 	public void drawU(UGraphic ug) {
-		final URectangle rect = new URectangle(calculateDimension(ug.getStringBounder()));
+		final URectangle rect = URectangle.build(calculateDimension(ug.getStringBounder()));
 		rect.setDeltaShadow(1);
 
-		ug.apply(HColorUtils.BLACK).apply(HColorUtils.LIGHT_GRAY.bg()).draw(rect);
+		ug.apply(HColors.BLACK).apply(HColors.LIGHT_GRAY.bg()).draw(rect);
 
 		label.create(FontConfiguration.blackBlueTrue(UFont.sansSerif(14)), HorizontalAlignment.LEFT, skinParam)
 				.drawU(ug.apply(new UTranslate(3, 3)));

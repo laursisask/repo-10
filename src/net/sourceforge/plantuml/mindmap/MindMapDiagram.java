@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
  * 
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  * 
  * This file is part of PlantUML.
  *
@@ -35,48 +35,47 @@
  */
 package net.sourceforge.plantuml.mindmap;
 
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
-import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sourceforge.plantuml.Dimension2DDouble;
-import net.sourceforge.plantuml.Direction;
 import net.sourceforge.plantuml.FileFormatOption;
 import net.sourceforge.plantuml.UmlDiagram;
-import net.sourceforge.plantuml.UmlDiagramType;
-import net.sourceforge.plantuml.api.ThemeStyle;
 import net.sourceforge.plantuml.command.CommandExecutionResult;
 import net.sourceforge.plantuml.core.DiagramDescription;
 import net.sourceforge.plantuml.core.ImageData;
 import net.sourceforge.plantuml.core.UmlSource;
-import net.sourceforge.plantuml.cucadiagram.Display;
-import net.sourceforge.plantuml.graphic.InnerStrategy;
-import net.sourceforge.plantuml.graphic.StringBounder;
-import net.sourceforge.plantuml.svek.TextBlockBackcolored;
-import net.sourceforge.plantuml.ugraphic.MinMax;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
-import net.sourceforge.plantuml.ugraphic.color.HColor;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.color.HColor;
+import net.sourceforge.plantuml.klimt.creole.Display;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
+import net.sourceforge.plantuml.klimt.geom.Rankdir;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
+import net.sourceforge.plantuml.klimt.shape.AbstractTextBlock;
+import net.sourceforge.plantuml.klimt.shape.TextBlock;
+import net.sourceforge.plantuml.skin.SkinParam;
+import net.sourceforge.plantuml.skin.UmlDiagramType;
+import net.sourceforge.plantuml.utils.Direction;
 
 public class MindMapDiagram extends UmlDiagram {
 
 	private final List<MindMap> mindmaps = new ArrayList<>();
 
-	private Direction defaultDirection = Direction.RIGHT;
+	private boolean defaultDirection = true;
 
-	public final void setDefaultDirection(Direction defaultDirection) {
-		this.defaultDirection = defaultDirection;
+	public final void setDefaultDirection(Direction direction) {
+		this.defaultDirection = direction == Direction.RIGHT || direction == Direction.DOWN;
 	}
 
 	public DiagramDescription getDescription() {
 		return new DiagramDescription("MindMap");
 	}
 
-	public MindMapDiagram(ThemeStyle style, UmlSource source) {
-		super(style, source, UmlDiagramType.MINDMAP, null);
+	public MindMapDiagram(UmlSource source) {
+		super(source, UmlDiagramType.MINDMAP, null);
+		((SkinParam) getSkinParam()).setRankdir(Rankdir.LEFT_TO_RIGHT);
 		this.mindmaps.add(new MindMap(getSkinParam()));
 	}
 
@@ -87,39 +86,29 @@ public class MindMapDiagram extends UmlDiagram {
 		return createImageBuilder(fileFormatOption).drawable(getTextBlock()).write(os);
 	}
 
-	private TextBlockBackcolored getTextBlock() {
-		return new TextBlockBackcolored() {
+	@Override
+	protected TextBlock getTextBlock() {
+		return new AbstractTextBlock() {
 
 			public void drawU(UGraphic ug) {
 				for (MindMap mindmap : mindmaps) {
 					mindmap.drawU(ug);
-					final Dimension2D dim = mindmap.calculateDimension(ug.getStringBounder());
+					final XDimension2D dim = mindmap.calculateDimension(ug.getStringBounder());
 					ug = ug.apply(UTranslate.dy(dim.getHeight()));
 				}
 			}
 
-			public Rectangle2D getInnerPosition(String member, StringBounder stringBounder, InnerStrategy strategy) {
-				return null;
-			}
-
-			public Dimension2D calculateDimension(StringBounder stringBounder) {
+			public XDimension2D calculateDimension(StringBounder stringBounder) {
 				double width = 0;
 				double height = 0;
 				for (MindMap mindmap : mindmaps) {
-					final Dimension2D dim = mindmap.calculateDimension(stringBounder);
+					final XDimension2D dim = mindmap.calculateDimension(stringBounder);
 					height += dim.getHeight();
 					width = Math.max(width, dim.getWidth());
 				}
-				return new Dimension2DDouble(width, height);
+				return new XDimension2D(width, height);
 			}
 
-			public MinMax getMinMax(StringBounder stringBounder) {
-				throw new UnsupportedOperationException();
-			}
-
-			public HColor getBackcolor() {
-				return null;
-			}
 		};
 	}
 
@@ -132,7 +121,7 @@ public class MindMapDiagram extends UmlDiagram {
 	}
 
 	public CommandExecutionResult addIdea(HColor backColor, int level, Display label, IdeaShape shape,
-			Direction direction) {
+			boolean direction) {
 		String stereotype = label.getEndingStereotype();
 		if (stereotype != null)
 			label = label.removeEndingStereotype();

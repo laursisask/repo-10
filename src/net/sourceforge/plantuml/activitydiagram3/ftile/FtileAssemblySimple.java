@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,7 +35,6 @@
  */
 package net.sourceforge.plantuml.activitydiagram3.ftile;
 
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -43,15 +45,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.sourceforge.plantuml.ISkinParam;
 import net.sourceforge.plantuml.activitydiagram3.LinkRendering;
-import net.sourceforge.plantuml.graphic.AbstractTextBlock;
-import net.sourceforge.plantuml.graphic.HorizontalAlignment;
-import net.sourceforge.plantuml.graphic.StringBounder;
+import net.sourceforge.plantuml.klimt.UStroke;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
+import net.sourceforge.plantuml.klimt.geom.HorizontalAlignment;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
+import net.sourceforge.plantuml.klimt.shape.AbstractTextBlock;
+import net.sourceforge.plantuml.style.ISkinParam;
 import net.sourceforge.plantuml.style.Style;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.UStroke;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
 
 public class FtileAssemblySimple extends AbstractTextBlock implements Ftile {
 
@@ -88,20 +91,20 @@ public class FtileAssemblySimple extends AbstractTextBlock implements Ftile {
 	}
 
 	private UTranslate getTranslateForSlow(Ftile child, StringBounder stringBounder) {
-		if (child == tile1) {
+		if (child == tile1)
 			return getTranslated1(stringBounder);
-		}
-		if (child == tile2) {
+
+		if (child == tile2)
 			return getTranslated2(stringBounder);
-		}
+
 		UTranslate tmp = tile1.getTranslateFor(child, stringBounder);
-		if (tmp != null) {
+		if (tmp != null)
 			return tmp.compose(getTranslated1(stringBounder));
-		}
+
 		tmp = tile2.getTranslateFor(child, stringBounder);
-		if (tmp != null) {
+		if (tmp != null)
 			return tmp.compose(getTranslated2(stringBounder));
-		}
+
 		throw new UnsupportedOperationException();
 	}
 
@@ -135,7 +138,7 @@ public class FtileAssemblySimple extends AbstractTextBlock implements Ftile {
 	}
 
 	private UTranslate getTranslated2(StringBounder stringBounder) {
-		final Dimension2D dim1 = tile1.calculateDimension(stringBounder);
+		final XDimension2D dim1 = tile1.calculateDimension(stringBounder);
 		final double left = calculateDimension(stringBounder).getLeft();
 		return new UTranslate(left - tile2.calculateDimension(stringBounder).getLeft(), dim1.getHeight());
 	}

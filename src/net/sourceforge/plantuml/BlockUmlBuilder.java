@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -44,7 +47,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import net.sourceforge.plantuml.api.ThemeStyle;
+import com.plantuml.api.cheerpj.WasmLog;
+
+import net.sourceforge.plantuml.file.AParentFolderRegular;
 import net.sourceforge.plantuml.preproc.Defines;
 import net.sourceforge.plantuml.preproc.FileWithSuffix;
 import net.sourceforge.plantuml.preproc.ImportedFiles;
@@ -53,9 +58,11 @@ import net.sourceforge.plantuml.preproc.ReadLineReader;
 import net.sourceforge.plantuml.preproc.UncommentReadLine;
 import net.sourceforge.plantuml.preproc2.Preprocessor;
 import net.sourceforge.plantuml.security.SFile;
+import net.sourceforge.plantuml.text.StringLocated;
 import net.sourceforge.plantuml.utils.StartUtils;
 
 public final class BlockUmlBuilder implements DefinitionsContainer {
+	// ::remove file when __HAXE__
 
 	private final List<BlockUml> blocks = new ArrayList<>();
 	private Set<FileWithSuffix> usedFiles = new HashSet<>();
@@ -63,7 +70,6 @@ public final class BlockUmlBuilder implements DefinitionsContainer {
 	private final Defines defines;
 	private final ImportedFiles importedFiles;
 	private final Charset charset;
-	private final ThemeStyle style;
 
 	/**
 	 * @deprecated being kept for backwards compatibility, perhaps other projects
@@ -72,7 +78,7 @@ public final class BlockUmlBuilder implements DefinitionsContainer {
 	@Deprecated
 	public BlockUmlBuilder(List<String> config, String charset, Defines defines, Reader readerInit, SFile newCurrentDir,
 			String desc) throws IOException {
-		this(ThemeStyle.LIGHT_REGULAR, config, charsetOrDefault(charset), defines, readerInit, newCurrentDir, desc);
+		this(config, charsetOrDefault(charset), defines, readerInit, newCurrentDir, desc);
 	}
 
 	/**
@@ -84,10 +90,9 @@ public final class BlockUmlBuilder implements DefinitionsContainer {
 		this(config, charset, defines, reader, null, null);
 	}
 
-	public BlockUmlBuilder(ThemeStyle style, List<String> config, Charset charset, Defines defines, Reader readerInit,
+	public BlockUmlBuilder(List<String> config, Charset charset, Defines defines, Reader readerInit,
 			SFile newCurrentDir, String desc) throws IOException {
 
-		this.style = style;
 		this.defines = defines;
 		this.charset = requireNonNull(charset);
 		this.reader = new UncommentReadLine(ReadLineReader.create(readerInit, desc));
@@ -135,7 +140,8 @@ public final class BlockUmlBuilder implements DefinitionsContainer {
 				if (paused)
 					current.add(s);
 
-				final BlockUml uml = new BlockUml(style, current, defines.cloneMe(), null, this, charset);
+				WasmLog.log("...text loaded...");
+				final BlockUml uml = new BlockUml(current, defines.cloneMe(), null, this, charset);
 				usedFiles.addAll(uml.getIncluded());
 				blocks.add(uml);
 				current = null;

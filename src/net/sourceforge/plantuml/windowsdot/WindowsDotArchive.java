@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
  * 
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  * 
  * This file is part of PlantUML.
  *
@@ -43,8 +43,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import net.sourceforge.plantuml.brotli.BrotliInputStream;
+import net.sourceforge.plantuml.log.Logme;
 
 public final class WindowsDotArchive {
+    // ::remove folder when __HAXE__
+	// ::remove folder when __CORE__
 
 	private static WindowsDotArchive singleton = null;
 
@@ -56,9 +59,9 @@ public final class WindowsDotArchive {
 	}
 
 	public final synchronized static WindowsDotArchive getInstance() {
-		if (singleton == null) {
+		if (singleton == null)
 			singleton = new WindowsDotArchive();
-		}
+
 		return singleton;
 	}
 
@@ -91,11 +94,16 @@ public final class WindowsDotArchive {
 				if (name.length() == 0)
 					break;
 				final int size = readNumber(is);
-				try (final OutputStream fos = new BufferedOutputStream(new FileOutputStream(new File(dir, name)))) {
-					for (int i = 0; i < size; i++) {
-						fos.write(is.read());
+				final File fileout = new File(dir, name);
+
+				if (fileout.exists())
+					for (int i = 0; i < size; i++)
+						is.read();
+				else
+					try (final OutputStream fos = new BufferedOutputStream(new FileOutputStream(fileout))) {
+						for (int i = 0; i < size; i++)
+							fos.write(is.read());
 					}
-				}
 			}
 		}
 	}
@@ -111,18 +119,19 @@ public final class WindowsDotArchive {
 	}
 
 	public synchronized File getWindowsExeLite() {
-		if (isThereArchive() == false) {
+		if (isThereArchive() == false)
 			return null;
-		}
-		if (exe == null)
+
+		if (exe == null) {
+			final File tmp = new File(System.getProperty("java.io.tmpdir"), "_graphviz");
 			try {
-				final File tmp = new File(System.getProperty("java.io.tmpdir"), "_graphviz");
 				tmp.mkdirs();
 				extract(tmp);
-				exe = new File(tmp, "dot.exe");
 			} catch (IOException e) {
-				e.printStackTrace();
+				Logme.error(e);
 			}
+			exe = new File(tmp, "dot.exe");
+		}
 		return exe;
 	}
 

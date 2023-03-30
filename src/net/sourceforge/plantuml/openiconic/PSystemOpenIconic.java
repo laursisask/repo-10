@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -36,11 +39,12 @@ import net.sourceforge.plantuml.FileFormatOption;
 import net.sourceforge.plantuml.PlainDiagram;
 import net.sourceforge.plantuml.core.DiagramDescription;
 import net.sourceforge.plantuml.core.UmlSource;
-import net.sourceforge.plantuml.graphic.UDrawable;
+import net.sourceforge.plantuml.klimt.color.HColors;
+import net.sourceforge.plantuml.klimt.shape.UDrawable;
 import net.sourceforge.plantuml.style.ClockwiseTopRightBottomLeft;
-import net.sourceforge.plantuml.ugraphic.color.HColorUtils;
 
 public class PSystemOpenIconic extends PlainDiagram {
+	// ::remove file when __CORE__
 
 	private final String iconName;
 	private final double factor;
@@ -56,12 +60,12 @@ public class PSystemOpenIconic extends PlainDiagram {
 		final OpenIcon icon = OpenIcon.retrieve(iconName);
 		// final Dimension2D dim = new Dimension2DDouble(100, 100);
 
-		return icon.asTextBlock(HColorUtils.BLACK, factor);
+		return icon.asTextBlock(HColors.BLACK, factor);
 
 		// UGraphic2 ug = fileFormat.createUGraphic(dim);
 		// ug = (UGraphic2) ug.apply(new UTranslate(10, 10));
 		// // ug = ug.apply(UChangeColor.nnn(HtmlColorUtils.BLACK));
-		// // ug.draw(new URectangle(7, 6));
+		// // ug.draw(URectangle.build(7, 6));
 		// icon.asTextBlock(HtmlColorUtils.BLACK, factor).drawU(ug);
 		// ug.writeImageTOBEMOVED(os, null, 96);
 		// return new ImageDataSimple(dim);

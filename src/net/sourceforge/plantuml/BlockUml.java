@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
  * 
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  * 
  * This file is part of PlantUML.
  *
@@ -48,21 +48,26 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import net.sourceforge.plantuml.api.ThemeStyle;
 import net.sourceforge.plantuml.code.AsciiEncoder;
 import net.sourceforge.plantuml.code.Transcoder;
 import net.sourceforge.plantuml.code.TranscoderUtil;
-import net.sourceforge.plantuml.command.regex.Matcher2;
 import net.sourceforge.plantuml.core.Diagram;
 import net.sourceforge.plantuml.error.PSystemErrorPreprocessor;
+import net.sourceforge.plantuml.log.Logme;
 import net.sourceforge.plantuml.preproc.Defines;
 import net.sourceforge.plantuml.preproc.FileWithSuffix;
 import net.sourceforge.plantuml.preproc2.PreprocessorModeSet;
+import net.sourceforge.plantuml.regex.Matcher2;
+import net.sourceforge.plantuml.style.ISkinSimple;
+import net.sourceforge.plantuml.text.BackSlash;
+import net.sourceforge.plantuml.text.StringLocated;
 import net.sourceforge.plantuml.tim.TimLoader;
+import net.sourceforge.plantuml.utils.LineLocationImpl;
 import net.sourceforge.plantuml.utils.StartUtils;
 import net.sourceforge.plantuml.version.Version;
 
 public class BlockUml {
+	// ::remove file when __HAXE__
 
 	private final List<StringLocated> rawSource;
 	private final List<StringLocated> data;
@@ -71,23 +76,24 @@ public class BlockUml {
 	private final Defines localDefines;
 	private final ISkinSimple skinParam;
 	private final Set<FileWithSuffix> included = new HashSet<>();
-	private final ThemeStyle style;
 
 	public Set<FileWithSuffix> getIncluded() {
 		return Collections.unmodifiableSet(included);
 	}
 
 	@Deprecated
-	BlockUml(ThemeStyle style, String... strings) {
-		this(style, convert(strings), Defines.createEmpty(), null, null, null);
+	BlockUml(String... strings) {
+		this(convert(strings), Defines.createEmpty(), null, null, null);
 	}
 
+	// ::comment when __CORE__
 	public String getEncodedUrl() throws IOException {
 		final Transcoder transcoder = TranscoderUtil.getDefaultTranscoder();
-		final String source = getDiagram().getSource().getPlainString();
+		final String source = getDiagram().getSource().getPlainString("\n");
 		final String encoded = transcoder.encode(source);
 		return encoded;
 	}
+	// ::done
 
 	public String getFlashData() {
 		final StringBuilder sb = new StringBuilder();
@@ -121,12 +127,11 @@ public class BlockUml {
 	 */
 	@Deprecated
 	public BlockUml(List<StringLocated> strings, Defines defines, ISkinSimple skinParam, PreprocessorModeSet mode) {
-		this(ThemeStyle.LIGHT_REGULAR, strings, defines, skinParam, mode, charsetOrDefault(mode.getCharset()));
+		this(strings, defines, skinParam, mode, charsetOrDefault(mode.getCharset()));
 	}
 
-	public BlockUml(ThemeStyle style, List<StringLocated> strings, Defines defines, ISkinSimple skinParam,
-			PreprocessorModeSet mode, Charset charset) {
-		this.style = style;
+	public BlockUml(List<StringLocated> strings, Defines defines, ISkinSimple skinParam, PreprocessorModeSet mode,
+			Charset charset) {
 		this.rawSource = new ArrayList<>(strings);
 		this.localDefines = defines;
 		this.skinParam = skinParam;
@@ -146,6 +151,7 @@ public class BlockUml {
 		}
 	}
 
+	// ::comment when __CORE__
 	public String getFileOrDirname() {
 		if (OptionFlags.getInstance().isWord())
 			return null;
@@ -172,13 +178,15 @@ public class BlockUml {
 		result = result.replaceAll("\\.\\w\\w\\w$", "");
 		return result;
 	}
+	// ::done
 
 	public Diagram getDiagram() {
 		if (system == null) {
 			if (preprocessorError)
 				system = new PSystemErrorPreprocessor(data, debug);
 			else
-				system = new PSystemBuilder().createPSystem(style, skinParam, data, rawSource);
+				system = new PSystemBuilder().createPSystem(data, rawSource,
+						skinParam == null ? Collections.<String, String>emptyMap() : skinParam.values());
 		}
 		return system;
 	}
@@ -187,6 +195,7 @@ public class BlockUml {
 		return data;
 	}
 
+	// ::comment when __CORE__
 	private String internalEtag() {
 		try {
 			final AsciiEncoder coder = new AsciiEncoder();
@@ -197,7 +206,7 @@ public class BlockUml {
 			final byte[] digest = msgDigest.digest();
 			return coder.encode(digest);
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logme.error(e);
 			return "NOETAG";
 		}
 	}
@@ -205,6 +214,7 @@ public class BlockUml {
 	public String etag() {
 		return Version.etag() + internalEtag();
 	}
+	// ::done
 
 	public long lastModified() {
 		return (Version.compileTime() / 1000L / 60) * 1000L * 60 + Version.beta() * 1000L * 3600;

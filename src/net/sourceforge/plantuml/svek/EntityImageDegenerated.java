@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
  * 
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  * 
  * This file is part of PlantUML.
  *
@@ -35,17 +35,17 @@
  */
 package net.sourceforge.plantuml.svek;
 
-import java.awt.geom.Rectangle2D;
-
-import net.sourceforge.plantuml.Dimension2DDouble;
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
-import net.sourceforge.plantuml.graphic.InnerStrategy;
-import net.sourceforge.plantuml.graphic.StringBounder;
-import net.sourceforge.plantuml.ugraphic.MinMax;
-import net.sourceforge.plantuml.ugraphic.UEmpty;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
-import net.sourceforge.plantuml.ugraphic.color.HColor;
+import net.atmp.InnerStrategy;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.color.HColor;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
+import net.sourceforge.plantuml.klimt.geom.MagneticBorder;
+import net.sourceforge.plantuml.klimt.geom.MinMax;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
+import net.sourceforge.plantuml.klimt.geom.XPoint2D;
+import net.sourceforge.plantuml.klimt.geom.XRectangle2D;
+import net.sourceforge.plantuml.klimt.shape.UEmpty;
 
 public class EntityImageDegenerated implements IEntityImage {
 
@@ -67,8 +67,8 @@ public class EntityImageDegenerated implements IEntityImage {
 		return backcolor;
 	}
 
-	public Dimension2D calculateDimension(StringBounder stringBounder) {
-		return Dimension2DDouble.delta(orig.calculateDimension(stringBounder), delta * 2, delta * 2);
+	public XDimension2D calculateDimension(StringBounder stringBounder) {
+		return orig.calculateDimension(stringBounder).delta(delta * 2, delta * 2);
 	}
 
 	public MinMax getMinMax(StringBounder stringBounder) {
@@ -77,16 +77,26 @@ public class EntityImageDegenerated implements IEntityImage {
 		// return orig.getMinMax(stringBounder).appendToMax(delta, delta);
 	}
 
-	public Rectangle2D getInnerPosition(String member, StringBounder stringBounder, InnerStrategy strategy) {
+	public XRectangle2D getInnerPosition(String member, StringBounder stringBounder, InnerStrategy strategy) {
 		return orig.getInnerPosition(member, stringBounder, strategy);
 	}
 
 	public void drawU(UGraphic ug) {
 		orig.drawU(ug.apply(new UTranslate(delta, delta)));
 
-		final Dimension2D dim = calculateDimension(ug.getStringBounder());
+		final XDimension2D dim = calculateDimension(ug.getStringBounder());
 		ug.apply(new UTranslate(dim.getWidth() - delta, dim.getHeight() - delta)).draw(new UEmpty(delta, delta));
 
+	}
+
+	@Override
+	public MagneticBorder getMagneticBorder() {
+		return new MagneticBorder() {
+			@Override
+			public UTranslate getForceAt(StringBounder stringBounder, XPoint2D position) {
+				return orig.getMagneticBorder().getForceAt(stringBounder, position.move(delta, delta));
+			}
+		};
 	}
 
 	public ShapeType getShapeType() {

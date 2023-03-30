@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -41,17 +44,22 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import net.atmp.CucaDiagram;
 import net.sourceforge.plantuml.core.Diagram;
 import net.sourceforge.plantuml.core.ImageData;
-import net.sourceforge.plantuml.cucadiagram.CucaDiagram;
+import net.sourceforge.plantuml.file.SuggestedFile;
 import net.sourceforge.plantuml.html.CucaDiagramHtmlMaker;
+import net.sourceforge.plantuml.klimt.color.HColors;
 import net.sourceforge.plantuml.png.PngSplitter;
 import net.sourceforge.plantuml.project.GanttDiagram;
 import net.sourceforge.plantuml.security.SFile;
 import net.sourceforge.plantuml.sequencediagram.SequenceDiagram;
-import net.sourceforge.plantuml.ugraphic.color.HColorUtils;
+import net.sourceforge.plantuml.skin.SplitParam;
+import net.sourceforge.plantuml.utils.Log;
 
 public class PSystemUtils {
+	// ::remove file when __CORE__
+	// ::remove file when __HAXE__
 
 	public static List<FileImageData> exportDiagrams(Diagram system, SuggestedFile suggested,
 			FileFormatOption fileFormatOption) throws IOException {
@@ -61,14 +69,10 @@ public class PSystemUtils {
 	public static List<FileImageData> exportDiagrams(Diagram system, SuggestedFile suggestedFile,
 			FileFormatOption fileFormatOption, boolean checkMetadata) throws IOException {
 
+		// ::comment when __CORE__
 		final SFile existingFile = suggestedFile.getFile(0);
-		if (checkMetadata && fileFormatOption.getFileFormat().doesSupportMetadata() && existingFile.exists()
-				&& system.getNbImages() == 1) {
-			// final String version = Version.versionString();
-			// System.out.println(system.getMetadata());
-			// System.out.println(data);
-			// System.out.println(version);
-			// System.out.println(data.contains(version));
+		if (checkMetadata && fileFormatOption.getFileFormat().doesSupportMetadata() && existingFile.exists()) {
+			// && system.getNbImages() == 1) {
 			final boolean sameMetadata = fileFormatOption.getFileFormat().equalsMetadata(system.getMetadata(),
 					existingFile);
 			if (sameMetadata) {
@@ -76,16 +80,18 @@ public class PSystemUtils {
 				return Arrays.asList(new FileImageData(existingFile, null));
 			}
 		}
+		// ::done
 
-		if (system instanceof NewpagedDiagram) {
+		if (system instanceof NewpagedDiagram)
 			return exportDiagramsNewpaged((NewpagedDiagram) system, suggestedFile, fileFormatOption);
-		}
-		if (system instanceof SequenceDiagram) {
+
+		if (system instanceof SequenceDiagram)
 			return exportDiagramsSequence((SequenceDiagram) system, suggestedFile, fileFormatOption);
-		}
-		if (system instanceof CucaDiagram && fileFormatOption.getFileFormat() == FileFormat.HTML) {
+
+		// ::comment when __CORE__
+		if (system instanceof CucaDiagram && fileFormatOption.getFileFormat() == FileFormat.HTML)
 			return createFilesHtml((CucaDiagram) system, suggestedFile);
-		}
+		// ::done
 
 		return exportDiagramsDefault(system, suggestedFile, fileFormatOption);
 	}
@@ -97,9 +103,9 @@ public class PSystemUtils {
 		for (int i = 0; i < nbImages; i++) {
 
 			final SFile f = suggestedFile.getFile(i);
-			if (canFileBeWritten(f) == false) {
+			if (canFileBeWritten(f) == false)
 				return result;
-			}
+
 			final OutputStream fos = f.createBufferedOutputStream();
 			ImageData cmap = null;
 			try {
@@ -138,9 +144,9 @@ public class PSystemUtils {
 		for (int i = 0; i < nbImages; i++) {
 
 			final SFile f = suggestedFile.getFile(i);
-			if (PSystemUtils.canFileBeWritten(suggestedFile.getFile(i)) == false) {
+			if (PSystemUtils.canFileBeWritten(suggestedFile.getFile(i)) == false)
 				return result;
-			}
+
 			final OutputStream fos = f.createBufferedOutputStream();
 			ImageData cmap = null;
 			try {
@@ -148,10 +154,12 @@ public class PSystemUtils {
 			} finally {
 				fos.close();
 			}
-			if (cmap != null && cmap.containsCMapData()) {
+			// ::comment when __CORE__
+			if (cmap != null && cmap.containsCMapData())
 				system.exportCmap(suggestedFile, i, cmap);
-			}
+
 			Log.info("File size : " + f.length());
+			// ::done
 			result.add(new FileImageData(f, cmap));
 		}
 		return result;
@@ -166,24 +174,19 @@ public class PSystemUtils {
 		return maker.create();
 	}
 
-	private static List<FileImageData> splitPng(TitledDiagram diagram, SuggestedFile pngFile, ImageData imageData, FileFormatOption fileFormatOption)
-			throws IOException {
+	private static List<FileImageData> splitPng(TitledDiagram diagram, SuggestedFile pngFile, ImageData imageData,
+			FileFormatOption fileFormatOption) throws IOException {
 
-		final List<SFile> files = new PngSplitter(
-				pngFile,
-				diagram.getSplitPagesHorizontal(),
-				diagram.getSplitPagesVertical(),
-				fileFormatOption.isWithMetadata() ? diagram.getMetadata() : null,
-				diagram.getSkinParam().getDpi(),
-				diagram instanceof GanttDiagram
-						? new SplitParam(HColorUtils.BLACK, null, 5)  // for backwards compatibility
-						: diagram.getSkinParam().getSplitParam()
-		).getFiles();
+		final List<SFile> files = new PngSplitter(fileFormatOption.getColorMapper(), pngFile,
+				diagram.getSplitPagesHorizontal(), diagram.getSplitPagesVertical(),
+				fileFormatOption.isWithMetadata() ? diagram.getMetadata() : null, diagram.getSkinParam().getDpi(),
+				diagram instanceof GanttDiagram ? new SplitParam(HColors.BLACK, null, 5) // for backwards compatibility
+						: diagram.getSkinParam().getSplitParam()).getFiles();
 
 		final List<FileImageData> result = new ArrayList<>();
-		for (SFile f : files) {
+		for (SFile f : files)
 			result.add(new FileImageData(f, imageData));
-		}
+
 		return result;
 	}
 
@@ -192,13 +195,11 @@ public class PSystemUtils {
 
 		final SFile outputFile = suggestedFile.getFile(0);
 
-		if (outputFile.isDirectory()) {
+		if (outputFile.isDirectory())
 			throw new IllegalArgumentException("File is a directory " + suggestedFile);
-		}
 
-		if (!canFileBeWritten(outputFile)) {
+		if (!canFileBeWritten(outputFile))
 			return emptyList();
-		}
 
 		final ImageData imageData;
 
@@ -206,17 +207,16 @@ public class PSystemUtils {
 			imageData = system.exportDiagram(os, 0, fileFormatOption);
 		}
 
-		if (imageData == null) {
+		if (imageData == null)
 			return emptyList();
-		}
 
-		if (imageData.containsCMapData() && system instanceof UmlDiagram) {
+		// ::comment when __CORE__
+		if (imageData.containsCMapData() && system instanceof UmlDiagram)
 			((UmlDiagram) system).exportCmap(suggestedFile, 0, imageData);
-		}
+		// ::done
 
-		if (system instanceof TitledDiagram && fileFormatOption.getFileFormat() == FileFormat.PNG) {
+		if (system instanceof TitledDiagram && fileFormatOption.getFileFormat() == FileFormat.PNG)
 			return splitPng((TitledDiagram) system, suggestedFile, imageData, fileFormatOption);
-		}
 
 		return singletonList(new FileImageData(outputFile, imageData));
 	}

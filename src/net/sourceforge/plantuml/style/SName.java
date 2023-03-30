@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  *
  * If you like this project or if you find it useful, you can support us at:
  *
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  *
  * This file is part of PlantUML.
  *
@@ -41,6 +41,7 @@ public enum SName {
 	activityDiagram, //
 	actor, //
 	agent, //
+	analog, //
 	archimate, //
 	arrow, //
 	artifact, //
@@ -48,6 +49,7 @@ public enum SName {
 	boundary, //
 	box, //
 	boxless, //
+	business, //
 	caption, //
 	card, //
 	circle, //
@@ -59,6 +61,7 @@ public enum SName {
 	collection, //
 	collections, //
 	component, //
+	composite, //
 	robust, //
 	concise, //
 	clock, //
@@ -70,6 +73,7 @@ public enum SName {
 	destroy, //
 	diamond, //
 	document, //
+	ebnf, //
 	element, //
 	entity, //
 	end, //
@@ -86,12 +90,13 @@ public enum SName {
 	hexagon, //
 	highlight, //
 	interface_, //
-	jsonDiagram, //
+	json, jsonDiagram, //
 	gitDiagram, //
 	label, //
 	leafNode, //
 	legend, //
 	lifeLine, //
+	mainframe, //
 	map, //
 	milestone, //
 	mindmapDiagram, //
@@ -105,10 +110,12 @@ public enum SName {
 	participant, //
 	partition, //
 	person, //
+	port, //
 	queue, //
 	rectangle, //
 	reference, //
 	referenceHeader, //
+	regex, //
 	requirement, //
 	root, //
 	rootNode, //
@@ -119,10 +126,12 @@ public enum SName {
 	stack, //
 	stateDiagram, //
 	state, //
+	stateBody, //
 	stereotype, //
 	storage, //
 	swimlane, //
 	task, //
+	timegrid, //
 	timeline, //
 	timingDiagram, //
 	title, //
@@ -142,8 +151,11 @@ public enum SName {
 	spotProtocol, //
 	spotStruct, //
 	spotEntity, //
+	spotException, //
 	spotClass, //
 	spotAbstractClass, //
+	spotMetaClass, //
+	spotStereotype, //
 
 	wbsDiagram, //
 	yamlDiagram; //

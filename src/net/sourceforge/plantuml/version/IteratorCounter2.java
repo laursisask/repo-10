@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -34,7 +37,7 @@ package net.sourceforge.plantuml.version;
 import java.util.Iterator;
 import java.util.List;
 
-import net.sourceforge.plantuml.StringLocated;
+import net.sourceforge.plantuml.text.StringLocated;
 
 public interface IteratorCounter2 extends Iterator<StringLocated> {
 

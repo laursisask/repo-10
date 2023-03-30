@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
  * 
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  * 
  * This file is part of PlantUML.
  *
@@ -35,14 +35,16 @@
  */
 package net.sourceforge.plantuml.project.draw;
 
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
-
-import net.sourceforge.plantuml.ISkinParam;
-import net.sourceforge.plantuml.SpriteContainerEmpty;
-import net.sourceforge.plantuml.cucadiagram.Display;
-import net.sourceforge.plantuml.graphic.HorizontalAlignment;
-import net.sourceforge.plantuml.graphic.StringBounder;
-import net.sourceforge.plantuml.graphic.TextBlock;
+import net.sourceforge.plantuml.klimt.UShape;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.creole.Display;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
+import net.sourceforge.plantuml.klimt.geom.HorizontalAlignment;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
+import net.sourceforge.plantuml.klimt.shape.TextBlock;
+import net.sourceforge.plantuml.klimt.shape.UPolygon;
+import net.sourceforge.plantuml.klimt.sprite.SpriteContainerEmpty;
 import net.sourceforge.plantuml.project.LabelStrategy;
 import net.sourceforge.plantuml.project.ToTaskDraw;
 import net.sourceforge.plantuml.project.core.Task;
@@ -52,21 +54,17 @@ import net.sourceforge.plantuml.project.time.Day;
 import net.sourceforge.plantuml.project.timescale.TimeScale;
 import net.sourceforge.plantuml.real.Real;
 import net.sourceforge.plantuml.style.ClockwiseTopRightBottomLeft;
+import net.sourceforge.plantuml.style.ISkinParam;
 import net.sourceforge.plantuml.style.SName;
 import net.sourceforge.plantuml.style.Style;
 import net.sourceforge.plantuml.style.StyleBuilder;
 import net.sourceforge.plantuml.style.StyleSignatureBasic;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.UPolygon;
-import net.sourceforge.plantuml.ugraphic.UShape;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
-import net.sourceforge.plantuml.ugraphic.color.HColorSet;
 
 public class TaskDrawDiamond extends AbstractTaskDraw {
 
 	public TaskDrawDiamond(TimeScale timeScale, Real y, String prettyDisplay, Day start, ISkinParam skinParam,
-			Task task, ToTaskDraw toTaskDraw, StyleBuilder styleBuilder, HColorSet colorSet) {
-		super(timeScale, y, prettyDisplay, start, skinParam, task, toTaskDraw, styleBuilder, colorSet);
+			Task task, ToTaskDraw toTaskDraw, StyleBuilder styleBuilder) {
+		super(timeScale, y, prettyDisplay, start, skinParam, task, toTaskDraw, styleBuilder);
 	}
 
 	@Override
@@ -102,7 +100,7 @@ public class TaskDrawDiamond extends AbstractTaskDraw {
 		ug = ug.apply(UTranslate.dy(margin.getTop()));
 
 		final StringBounder stringBounder = ug.getStringBounder();
-		final Dimension2D titleDim = title.calculateDimension(stringBounder);
+		final XDimension2D titleDim = title.calculateDimension(stringBounder);
 		final double h = (getShapeHeight(stringBounder) - titleDim.getHeight()) / 2;
 
 		final double x;
@@ -141,7 +139,14 @@ public class TaskDrawDiamond extends AbstractTaskDraw {
 		final double x2 = timeScale.getEndingPosition(start);
 		final double width = getShapeHeight(ug.getStringBounder());
 		final double delta = x2 - x1 - width;
+
+		if (url != null)
+			ug.startUrl(url);
+
 		drawShape(applyColors(ug).apply(UTranslate.dx(x1 + delta / 2)));
+
+		if (url != null)
+			ug.closeUrl();
 	}
 
 	private UGraphic applyColors(UGraphic ug) {

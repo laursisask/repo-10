@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
  * 
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  * 
  * This file is part of PlantUML.
  *
@@ -42,35 +42,35 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import net.sourceforge.plantuml.BackSlash;
+import net.atmp.ImageBuilder;
 import net.sourceforge.plantuml.ErrorUml;
 import net.sourceforge.plantuml.FileFormat;
 import net.sourceforge.plantuml.FileFormatOption;
 import net.sourceforge.plantuml.FileImageData;
-import net.sourceforge.plantuml.LineLocation;
 import net.sourceforge.plantuml.PlainDiagram;
-import net.sourceforge.plantuml.StringLocated;
 import net.sourceforge.plantuml.api.ImageDataSimple;
 import net.sourceforge.plantuml.asciiart.UmlCharArea;
 import net.sourceforge.plantuml.core.DiagramDescription;
 import net.sourceforge.plantuml.core.ImageData;
 import net.sourceforge.plantuml.core.UmlSource;
-import net.sourceforge.plantuml.graphic.FontConfiguration;
-import net.sourceforge.plantuml.graphic.GraphicStrings;
-import net.sourceforge.plantuml.graphic.HorizontalAlignment;
-import net.sourceforge.plantuml.graphic.TextBlock;
-import net.sourceforge.plantuml.graphic.TextBlockRaw;
-import net.sourceforge.plantuml.graphic.TextBlockUtils;
-import net.sourceforge.plantuml.graphic.UDrawable;
+import net.sourceforge.plantuml.klimt.color.HColors;
+import net.sourceforge.plantuml.klimt.drawing.txt.UGraphicTxt;
+import net.sourceforge.plantuml.klimt.font.FontConfiguration;
+import net.sourceforge.plantuml.klimt.geom.HorizontalAlignment;
+import net.sourceforge.plantuml.klimt.shape.GraphicStrings;
+import net.sourceforge.plantuml.klimt.shape.TextBlock;
+import net.sourceforge.plantuml.klimt.shape.TextBlockRaw;
+import net.sourceforge.plantuml.klimt.shape.TextBlockUtils;
+import net.sourceforge.plantuml.klimt.shape.UDrawable;
 import net.sourceforge.plantuml.security.SecurityUtils;
 import net.sourceforge.plantuml.svek.GraphvizCrash;
-import net.sourceforge.plantuml.svek.TextBlockBackcolored;
-import net.sourceforge.plantuml.ugraphic.ImageBuilder;
-import net.sourceforge.plantuml.ugraphic.color.HColorUtils;
-import net.sourceforge.plantuml.ugraphic.txt.UGraphicTxt;
+import net.sourceforge.plantuml.text.BackSlash;
+import net.sourceforge.plantuml.text.StringLocated;
+import net.sourceforge.plantuml.utils.LineLocation;
 import net.sourceforge.plantuml.version.Version;
 
 public abstract class PSystemError extends PlainDiagram {
+    // ::remove folder when __HAXE__
 
 	// Dodgy kludge for testing - we will need a different approach if we want to
 	// test addMessageDedication() etc.
@@ -120,17 +120,17 @@ public abstract class PSystemError extends PlainDiagram {
 		return sb.toString();
 	}
 
-	private TextBlockBackcolored getGraphicalFormatted() {
-		final FontConfiguration fc0 = GraphicStrings.sansSerif14(HColorUtils.BLACK).bold();
-		final FontConfiguration fc1 = GraphicStrings.sansSerif14(HColorUtils.MY_GREEN).bold();
-		final FontConfiguration fc2 = GraphicStrings.sansSerif14(HColorUtils.RED).bold();
-		final FontConfiguration fc4 = GraphicStrings.sansSerif12(HColorUtils.MY_GREEN).bold().italic();
+	private TextBlock getGraphicalFormatted() {
+		final FontConfiguration fc0 = GraphicStrings.sansSerif14(HColors.BLACK).bold();
+		final FontConfiguration fc1 = GraphicStrings.sansSerif14(HColors.MY_GREEN).bold();
+		final FontConfiguration fc2 = GraphicStrings.sansSerif14(HColors.RED).bold();
+		final FontConfiguration fc4 = GraphicStrings.sansSerif12(HColors.MY_GREEN).bold().italic();
 
 		final List<String> fullBody = getTextFullBody();
 		final TextBlock result0 = TextBlockUtils.addBackcolor(
-				TextBlockUtils.withMargin(new TextBlockRaw(getTextFromStack(), fc0), 1, 1, 1, 4), HColorUtils.MY_GREEN);
+				TextBlockUtils.withMargin(new TextBlockRaw(getTextFromStack(), fc0), 1, 1, 1, 4), HColors.MY_GREEN);
 		final TextBlock result1 = new TextBlockRaw(allButLast(fullBody), fc1);
-		final TextBlock result2 = new TextBlockRaw(onlyLast(fullBody), fc1.wave(HColorUtils.RED));
+		final TextBlock result2 = new TextBlockRaw(onlyLast(fullBody), fc1.wave(HColors.RED));
 		final TextBlock result3 = new TextBlockRaw(getTextError(), fc2);
 		final TextBlock result4 = TextBlockUtils.withMargin(new TextBlockRaw(header(), fc4), 0, 2, 0, 8);
 		TextBlock result = result0;
@@ -139,7 +139,7 @@ public abstract class PSystemError extends PlainDiagram {
 		result = TextBlockUtils.mergeTB(result, result3, HorizontalAlignment.LEFT);
 		result = TextBlockUtils.mergeTB(result4, result, HorizontalAlignment.LEFT);
 		result = TextBlockUtils.withMargin(result, 5, 5);
-		return TextBlockUtils.addBackcolor(result, HColorUtils.BLACK);
+		return TextBlockUtils.addBackcolor(result, HColors.BLACK);
 	}
 
 	private List<String> header() {
@@ -208,6 +208,7 @@ public abstract class PSystemError extends PlainDiagram {
 	@Override
 	final protected ImageData exportDiagramNow(OutputStream os, int num, FileFormatOption fileFormat)
 			throws IOException {
+		// ::comment when __CORE__
 		if (fileFormat.getFileFormat() == FileFormat.ATXT || fileFormat.getFileFormat() == FileFormat.UTXT) {
 			final UGraphicTxt ugt = new UGraphicTxt();
 			final UmlCharArea area = ugt.getCharArea();
@@ -216,12 +217,13 @@ public abstract class PSystemError extends PlainDiagram {
 			return new ImageDataSimple(1, 1);
 
 		}
+		// ::done
 		return super.exportDiagramNow(os, num, fileFormat);
 	}
 
 	@Override
 	protected UDrawable getRootDrawable(FileFormatOption fileFormatOption) throws IOException {
-		final TextBlockBackcolored result = getGraphicalFormatted();
+		final TextBlock result = getGraphicalFormatted();
 
 		TextBlock udrawable = result;
 		

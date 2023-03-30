@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -34,8 +37,6 @@ package net.sourceforge.plantuml.posimo;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
-import java.awt.geom.Point2D;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -44,19 +45,23 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sourceforge.plantuml.Dimension2DDouble;
-import net.sourceforge.plantuml.cucadiagram.dot.Graphviz;
-import net.sourceforge.plantuml.cucadiagram.dot.GraphvizUtils;
-import net.sourceforge.plantuml.cucadiagram.dot.ProcessState;
+import net.sourceforge.plantuml.dot.Graphviz;
+import net.sourceforge.plantuml.dot.GraphvizUtils;
+import net.sourceforge.plantuml.dot.ProcessState;
+import net.sourceforge.plantuml.klimt.geom.MinFinder;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
+import net.sourceforge.plantuml.klimt.geom.XPoint2D;
+import net.sourceforge.plantuml.klimt.shape.DotPath;
 import net.sourceforge.plantuml.security.SFile;
-import net.sourceforge.plantuml.svek.MinFinder;
 import net.sourceforge.plantuml.svek.SvgResult;
 import net.sourceforge.plantuml.svek.YDelta;
 
 public class GraphvizSolverB {
+	// ::remove file when __CORE__
 
 	// static private void traceDotString(String dotString) throws IOException {
-	// final File f = SecurityUtils.File("dottmpfile" + UniqueSequence.getValue() + ".tmp");
+	// final File f = SecurityUtils.File("dottmpfile" + UniqueSequence.getValue() +
+	// ".tmp");
 	// PrintWriter pw = null;
 	// try {
 	// pw = SecurityUtils.PrintWriter(new FileWriter(f));
@@ -70,7 +75,8 @@ public class GraphvizSolverB {
 	// }
 	//
 	// static private void traceSvgString(String svg) throws IOException {
-	// final File f = SecurityUtils.File("svgtmpfile" + UniqueSequence.getValue() + ".svg");
+	// final File f = SecurityUtils.File("svgtmpfile" + UniqueSequence.getValue() +
+	// ".svg");
 	// PrintWriter pw = null;
 	// try {
 	// pw = SecurityUtils.PrintWriter(new FileWriter(f));
@@ -83,7 +89,7 @@ public class GraphvizSolverB {
 	// }
 	// }
 
-	public Dimension2D solve(Cluster root, Collection<Path> paths) throws IOException {
+	public XDimension2D solve(Cluster root, Collection<Path> paths) throws IOException {
 		final String dotString = new DotxMaker(root, paths).createDotString("nodesep=0.2;", "ranksep=0.2;");
 
 		// if (OptionFlags.getInstance().isKeepTmpFiles()) {
@@ -126,7 +132,7 @@ public class GraphvizSolverB {
 			if (p1 == -1) {
 				throw new IllegalStateException();
 			}
-			final List<Point2D.Double> pointsList = extractPointsList(s, p1, yDelta);
+			final List<XPoint2D> pointsList = extractPointsList(s, p1, yDelta);
 			b.setX(getMinX(pointsList));
 			b.setY(getMinY(pointsList));
 			minMax.manage(b.getPosition());
@@ -138,7 +144,7 @@ public class GraphvizSolverB {
 			if (p1 == -1) {
 				throw new IllegalStateException();
 			}
-			final List<Point2D.Double> pointsList = extractPointsList(s, p1, yDelta);
+			final List<XPoint2D> pointsList = extractPointsList(s, p1, yDelta);
 			cl.setX(getMinX(pointsList));
 			cl.setY(getMinY(pointsList));
 			final double w = getMaxX(pointsList) - getMinX(pointsList);
@@ -159,27 +165,27 @@ public class GraphvizSolverB {
 			final int p2 = s.indexOf(" d=\"", p1);
 			final int p3 = s.indexOf("\"", p2 + " d=\"".length());
 			final String points = s.substring(p2 + " d=\"".length(), p3);
-			final DotPath dotPath = new DotPath(new SvgResult(points, yDelta));
+			final DotPath dotPath = new SvgResult(points, yDelta).toDotPath();
 			p.setDotPath(dotPath);
 			minMax.manage(dotPath.getMinFinder());
 
 			// Log.println("pointsList=" + pointsList);
 			if (p.getLabel() != null) {
-				final List<Point2D.Double> pointsList = extractPointsList(s, p1, yDelta);
+				final List<XPoint2D> pointsList = extractPointsList(s, p1, yDelta);
 				final double x = getMinX(pointsList);
 				final double y = getMinY(pointsList);
 				p.setLabelPosition(x, y);
 				minMax.manage(x, y);
 			}
 		}
-		return new Dimension2DDouble(width, height);
+		return new XDimension2D(width, height);
 	}
 
-	static private List<Point2D.Double> extractPointsList(final String svg, final int starting, final YDelta yDelta) {
+	static private List<XPoint2D> extractPointsList(final String svg, final int starting, final YDelta yDelta) {
 		return new SvgResult(svg, yDelta).substring(starting).extractList(SvgResult.POINTS_EQUALS);
 	}
 
-	static private double getMaxX(List<Point2D.Double> points) {
+	static private double getMaxX(List<XPoint2D> points) {
 		double result = points.get(0).x;
 		for (int i = 1; i < points.size(); i++) {
 			if (points.get(i).x > result) {
@@ -189,7 +195,7 @@ public class GraphvizSolverB {
 		return result;
 	}
 
-	static private double getMinX(List<Point2D.Double> points) {
+	static private double getMinX(List<XPoint2D> points) {
 		double result = points.get(0).x;
 		for (int i = 1; i < points.size(); i++) {
 			if (points.get(i).x < result) {
@@ -199,7 +205,7 @@ public class GraphvizSolverB {
 		return result;
 	}
 
-	static private double getMaxY(List<Point2D.Double> points) {
+	static private double getMaxY(List<XPoint2D> points) {
 		double result = points.get(0).y;
 		for (int i = 1; i < points.size(); i++) {
 			if (points.get(i).y > result) {
@@ -209,7 +215,7 @@ public class GraphvizSolverB {
 		return result;
 	}
 
-	static private double getMinY(List<Point2D.Double> points) {
+	static private double getMinY(List<XPoint2D> points) {
 		double result = points.get(0).y;
 		for (int i = 1; i < points.size(); i++) {
 			if (points.get(i).y < result) {

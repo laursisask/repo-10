@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
  * 
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  * 
  * This file is part of PlantUML.
  *
@@ -35,14 +35,13 @@
  */
 package net.sourceforge.plantuml.mindmap;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-import net.sourceforge.plantuml.ISkinSimple;
-import net.sourceforge.plantuml.api.ThemeStyle;
 import net.sourceforge.plantuml.command.Command;
-import net.sourceforge.plantuml.command.PSystemCommandFactory;
+import net.sourceforge.plantuml.command.CommandRankDir;
 import net.sourceforge.plantuml.command.CommonCommands;
+import net.sourceforge.plantuml.command.PSystemCommandFactory;
 import net.sourceforge.plantuml.core.DiagramType;
 import net.sourceforge.plantuml.core.UmlSource;
 
@@ -53,23 +52,20 @@ public class MindMapDiagramFactory extends PSystemCommandFactory {
 	}
 
 	@Override
-	protected List<Command> createCommands() {
-
-		final List<Command> cmds = new ArrayList<>();
+	protected void initCommandsList(List<Command> cmds) {
 		CommonCommands.addCommonCommands1(cmds);
 		// cmds.add(new CommandMindMapTabulation());
+		cmds.add(new CommandRankDir());
 		cmds.add(new CommandMindMapOrgmode());
 		cmds.add(new CommandMindMapOrgmodeMultiline());
 		cmds.add(new CommandMindMapRoot());
 		cmds.add(new CommandMindMapPlus());
 		cmds.add(new CommandMindMapDirection());
-
-		return cmds;
 	}
 
 	@Override
-	public MindMapDiagram createEmptyDiagram(ThemeStyle style, UmlSource source, ISkinSimple skinParam) {
-		return new MindMapDiagram(style, source);
+	public MindMapDiagram createEmptyDiagram(UmlSource source, Map<String, String> skinParam) {
+		return new MindMapDiagram(source);
 	}
 
 }

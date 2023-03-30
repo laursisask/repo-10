@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,13 +35,16 @@
  */
 package net.sourceforge.plantuml.svek;
 
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
 
 import net.sourceforge.plantuml.StringUtils;
+import net.sourceforge.plantuml.klimt.geom.XCubicCurve2D;
+import net.sourceforge.plantuml.klimt.geom.XPoint2D;
+import net.sourceforge.plantuml.klimt.shape.DotPath;
 
 public class SvgResult {
 
@@ -57,7 +63,7 @@ public class SvgResult {
 		return PointListIteratorImpl.create(this, lineColor);
 	}
 
-	public List<Point2D.Double> extractList(final String searched) {
+	public List<XPoint2D> extractList(final String searched) {
 		final int p2 = this.indexOf(searched, 0);
 		if (p2 == -1)
 			return Collections.emptyList();
@@ -91,10 +97,10 @@ public class SvgResult {
 
 	}
 
-	public List<Point2D.Double> getPoints(String separator) {
+	public List<XPoint2D> getPoints(String separator) {
 		try {
 			final StringTokenizer st = new StringTokenizer(svg, separator);
-			final List<Point2D.Double> result = new ArrayList<Point2D.Double>();
+			final List<XPoint2D> result = new ArrayList<XPoint2D>();
 			while (st.hasMoreTokens())
 				result.add(getFirstPoint(st.nextToken()));
 
@@ -104,15 +110,15 @@ public class SvgResult {
 		}
 	}
 
-	public Point2D.Double getNextPoint() {
+	public XPoint2D getNextPoint() {
 		return getFirstPoint(svg);
 	}
 
-	private Point2D.Double getFirstPoint(final String tmp) {
+	private XPoint2D getFirstPoint(final String tmp) {
 		final StringTokenizer st = new StringTokenizer(tmp, ",");
 		final double startX = Double.parseDouble(st.nextToken());
 		final double startY = Double.parseDouble(st.nextToken());
-		return function.apply(new Point2D.Double(startX, startY));
+		return function.apply(new XPoint2D(startX, startY));
 	}
 
 	public int indexOf(String s, int pos) {
@@ -130,4 +136,43 @@ public class SvgResult {
 	public final String getSvg() {
 		return svg;
 	}
+
+	public DotPath toDotPath() {
+		if (isPathConsistent() == false)
+			throw new IllegalArgumentException();
+
+		final List<XCubicCurve2D> beziers = new ArrayList<>();
+
+		final int posC = this.indexOf("C", 0);
+		if (posC == -1)
+			throw new IllegalArgumentException();
+
+		final XPoint2D start = this.substring(1, posC).getNextPoint();
+
+		final List<DotPath.TriPoints> triPoints = new ArrayList<>();
+		for (Iterator<XPoint2D> it = this.substring(posC + 1).getPoints(" ").iterator(); it.hasNext();) {
+			final XPoint2D p1 = it.next();
+			final XPoint2D p2 = it.next();
+			final XPoint2D p = it.next();
+			triPoints.add(new DotPath.TriPoints(p1, p2, p));
+		}
+		double x = start.getX();
+		double y = start.getY();
+		for (DotPath.TriPoints p : triPoints) {
+			final XCubicCurve2D bezier = new XCubicCurve2D(x, y, p.x1, p.y1, p.x2, p.y2, p.x, p.y);
+			beziers.add(bezier);
+			x = p.x;
+			y = p.y;
+		}
+
+		return DotPath.fromBeziers(beziers);
+	}
+
+	public boolean isPathConsistent() {
+		if (this.getSvg().startsWith("M") == false)
+			return false;
+
+		return true;
+	}
+
 }

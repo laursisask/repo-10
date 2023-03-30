@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,14 +35,13 @@
  */
 package net.sourceforge.plantuml.braille;
 
-import net.sourceforge.plantuml.api.ThemeStyle;
-import net.sourceforge.plantuml.graphic.UDrawable;
-import net.sourceforge.plantuml.ugraphic.UEllipse;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.ULine;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
-import net.sourceforge.plantuml.ugraphic.color.HColorSet;
-import net.sourceforge.plantuml.ugraphic.color.HColorUtils;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.color.HColorSet;
+import net.sourceforge.plantuml.klimt.color.HColors;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.shape.UDrawable;
+import net.sourceforge.plantuml.klimt.shape.UEllipse;
+import net.sourceforge.plantuml.klimt.shape.ULine;
 
 public class BrailleDrawer implements UDrawable {
 
@@ -52,7 +54,7 @@ public class BrailleDrawer implements UDrawable {
 	}
 
 	public void drawU(UGraphic ug) {
-		ug = ug.apply(HColorSet.instance().getColorOrWhite(ThemeStyle.LIGHT_REGULAR, "#F0F0F0"));
+		ug = ug.apply(HColorSet.instance().getColorOrWhite("#F0F0F0"));
 		for (int x = grid.getMinX(); x <= grid.getMaxX(); x++) {
 			ug.apply(UTranslate.dx(x * step + spotSize + 1))
 					.draw(ULine.vline((grid.getMaxY() - grid.getMinY()) * step));
@@ -61,7 +63,7 @@ public class BrailleDrawer implements UDrawable {
 			ug.apply(UTranslate.dy(y * step + spotSize + 1))
 					.draw(ULine.hline((grid.getMaxX() - grid.getMinX()) * step));
 		}
-		ug = ug.apply(HColorUtils.BLACK).apply(HColorUtils.BLACK.bg());
+		ug = ug.apply(HColors.BLACK).apply(HColors.BLACK.bg());
 		for (int x = grid.getMinX(); x <= grid.getMaxX(); x++) {
 			for (int y = grid.getMinY(); y <= grid.getMaxY(); y++) {
 				if (grid.getState(x, y)) {
@@ -74,7 +76,7 @@ public class BrailleDrawer implements UDrawable {
 	private void drawCircle(UGraphic ug, int x, int y) {
 		final double cx = x * step;
 		final double cy = y * step;
-		ug.apply(new UTranslate(cx, cy)).draw(new UEllipse(spotSize, spotSize));
+		ug.apply(new UTranslate(cx, cy)).draw(UEllipse.build(spotSize, spotSize));
 	}
 
 }

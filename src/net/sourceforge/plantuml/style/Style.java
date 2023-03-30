@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
  * 
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  * 
  * This file is part of PlantUML.
  *
@@ -40,25 +40,25 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.StringTokenizer;
 
-import net.sourceforge.plantuml.ISkinSimple;
-import net.sourceforge.plantuml.LineBreakStrategy;
-import net.sourceforge.plantuml.api.ThemeStyle;
-import net.sourceforge.plantuml.cucadiagram.Display;
-import net.sourceforge.plantuml.graphic.FontConfiguration;
-import net.sourceforge.plantuml.graphic.HorizontalAlignment;
-import net.sourceforge.plantuml.graphic.SymbolContext;
-import net.sourceforge.plantuml.graphic.TextBlock;
-import net.sourceforge.plantuml.graphic.TextBlockUtils;
-import net.sourceforge.plantuml.graphic.color.ColorType;
-import net.sourceforge.plantuml.graphic.color.Colors;
-import net.sourceforge.plantuml.ugraphic.UFont;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.UStroke;
-import net.sourceforge.plantuml.ugraphic.color.HColor;
-import net.sourceforge.plantuml.ugraphic.color.HColorNone;
-import net.sourceforge.plantuml.ugraphic.color.HColorSet;
+import net.sourceforge.plantuml.StringUtils;
+import net.sourceforge.plantuml.klimt.Fashion;
+import net.sourceforge.plantuml.klimt.LineBreakStrategy;
+import net.sourceforge.plantuml.klimt.UStroke;
+import net.sourceforge.plantuml.klimt.color.ColorType;
+import net.sourceforge.plantuml.klimt.color.Colors;
+import net.sourceforge.plantuml.klimt.color.HColor;
+import net.sourceforge.plantuml.klimt.color.HColorSet;
+import net.sourceforge.plantuml.klimt.color.HColors;
+import net.sourceforge.plantuml.klimt.creole.Display;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.font.FontConfiguration;
+import net.sourceforge.plantuml.klimt.font.UFont;
+import net.sourceforge.plantuml.klimt.geom.HorizontalAlignment;
+import net.sourceforge.plantuml.klimt.shape.TextBlock;
+import net.sourceforge.plantuml.klimt.shape.TextBlockUtils;
 
 public class Style {
+    // ::remove file when __HAXE__
 
 	private final Map<PName, Value> map;
 	private final StyleSignatureBasic signature;
@@ -164,7 +164,7 @@ public class Style {
 		return result;
 	}
 
-	public Style eventuallyOverride(SymbolContext symbolContext) {
+	public Style eventuallyOverride(Fashion symbolContext) {
 		Style result = this;
 		if (symbolContext != null) {
 			final HColor back = symbolContext.getBackColor();
@@ -180,31 +180,46 @@ public class Style {
 	}
 
 	public UFont getUFont() {
-		final String family = value(PName.FontName).asString();
+		final String family = StringUtils
+				.eventuallyRemoveStartingAndEndingDoubleQuote(value(PName.FontName).asString());
 		final int fontStyle = value(PName.FontStyle).asFontStyle();
-		final int size = value(PName.FontSize).asInt();
-		return new UFont(family, fontStyle, size);
+		int size = value(PName.FontSize).asInt(true);
+		if (size == -1)
+			size = 14;
+		return UFont.build(family, fontStyle, size);
 	}
 
-	public FontConfiguration getFontConfiguration(ThemeStyle themeStyle, HColorSet set) {
-		return getFontConfiguration(themeStyle, set, null);
+	public FontConfiguration getFontConfiguration(HColorSet set) {
+		return getFontConfiguration(set, null);
 	}
 
-	public FontConfiguration getFontConfiguration(ThemeStyle themeStyle, HColorSet set, Colors colors) {
+	public FontConfiguration getFontConfiguration(HColorSet set, Colors colors) {
 		final UFont font = getUFont();
 		HColor color = colors == null ? null : colors.getColor(ColorType.TEXT);
 		if (color == null)
-			color = value(PName.FontColor).asColor(themeStyle, set);
+			color = value(PName.FontColor).asColor(set);
 
-		final HColor hyperlinkColor = value(PName.HyperLinkColor).asColor(themeStyle, set);
-		return FontConfiguration.create(font, color, hyperlinkColor, true);
+		final HColor hyperlinkColor = value(PName.HyperLinkColor).asColor(set);
+		final UStroke stroke = getStroke(PName.HyperlinkUnderlineThickness, PName.HyperlinkUnderlineStyle);
+		return FontConfiguration.create(font, color, hyperlinkColor, stroke);
 	}
 
-	public SymbolContext getSymbolContext(ThemeStyle themeStyle, HColorSet set) {
-		final HColor backColor = value(PName.BackGroundColor).asColor(themeStyle, set);
-		final HColor foreColor = value(PName.LineColor).asColor(themeStyle, set);
+	public Fashion getSymbolContext(HColorSet set, Colors colors) {
+		HColor backColor = colors == null ? null : colors.getColor(ColorType.BACK);
+		if (backColor == null)
+			backColor = value(PName.BackGroundColor).asColor(set);
+		HColor foreColor = colors == null ? null : colors.getColor(ColorType.LINE);
+		if (foreColor == null)
+			foreColor = value(PName.LineColor).asColor(set);
 		final double deltaShadowing = value(PName.Shadowing).asDouble();
-		return new SymbolContext(backColor, foreColor).withStroke(getStroke()).withDeltaShadow(deltaShadowing);
+		final double roundCorner = value(PName.RoundCorner).asDouble();
+		final double diagonalCorner = value(PName.DiagonalCorner).asDouble();
+		return new Fashion(backColor, foreColor).withStroke(getStroke()).withDeltaShadow(deltaShadowing)
+				.withCorner(roundCorner, diagonalCorner);
+	}
+
+	public Fashion getSymbolContext(HColorSet set) {
+		return getSymbolContext(set, null);
 	}
 
 	public Style eventuallyOverride(UStroke stroke) {
@@ -214,15 +229,19 @@ public class Style {
 		Style result = this.eventuallyOverride(PName.LineThickness, stroke.getThickness());
 		final double space = stroke.getDashSpace();
 		final double visible = stroke.getDashVisible();
-		result = result.eventuallyOverride(PName.LineStyle, "" + visible + ";" + space);
+		result = result.eventuallyOverride(PName.LineStyle, "" + visible + "-" + space);
 		return result;
 	}
 
 	public UStroke getStroke() {
-		final double thickness = value(PName.LineThickness).asDouble();
-		final String dash = value(PName.LineStyle).asString();
+		return getStroke(PName.LineThickness, PName.LineStyle);
+	}
+
+	private UStroke getStroke(final PName thicknessParam, final PName styleParam) {
+		final double thickness = value(thicknessParam).asDouble();
+		final String dash = value(styleParam).asString();
 		if (dash.length() == 0)
-			return new UStroke(thickness);
+			return UStroke.withThickness(thickness);
 
 		try {
 			final StringTokenizer st = new StringTokenizer(dash, "-;,");
@@ -233,7 +252,7 @@ public class Style {
 
 			return new UStroke(dashVisible, dashSpace, thickness);
 		} catch (Exception e) {
-			return new UStroke(thickness);
+			return UStroke.withThickness(thickness);
 		}
 	}
 
@@ -266,29 +285,33 @@ public class Style {
 
 	private TextBlock createTextBlockInternal(Display display, HColorSet set, ISkinSimple spriteContainer,
 			HorizontalAlignment alignment) {
-		final FontConfiguration fc = getFontConfiguration(spriteContainer.getThemeStyle(), set);
+		final FontConfiguration fc = getFontConfiguration(set);
 		return display.create(fc, alignment, spriteContainer);
 	}
 
-	public TextBlock createTextBlockBordered(Display note, HColorSet set, ISkinSimple spriteContainer) {
+	public static final String ID_TITLE = "_title";
+	public static final String ID_CAPTION = "_caption";
+	public static final String ID_LEGEND = "_legend";
+
+	public TextBlock createTextBlockBordered(Display note, HColorSet set, ISkinSimple spriteContainer, String id) {
 		final HorizontalAlignment alignment = this.getHorizontalAlignment();
 		final TextBlock textBlock = this.createTextBlockInternal(note, set, spriteContainer, alignment);
 
-		final HColor backgroundColor = this.value(PName.BackGroundColor).asColor(spriteContainer.getThemeStyle(), set);
-		final HColor lineColor = this.value(PName.LineColor).asColor(spriteContainer.getThemeStyle(), set);
+		final HColor backgroundColor = this.value(PName.BackGroundColor).asColor(set);
+		final HColor lineColor = this.value(PName.LineColor).asColor(set);
 		final UStroke stroke = this.getStroke();
-		final int cornersize = this.value(PName.RoundCorner).asInt();
+		final int cornersize = this.value(PName.RoundCorner).asInt(false);
 		final ClockwiseTopRightBottomLeft margin = this.getMargin();
 		final ClockwiseTopRightBottomLeft padding = this.getPadding();
 		final TextBlock result = TextBlockUtils.bordered(textBlock, stroke, lineColor, backgroundColor, cornersize,
-				padding);
+				padding, id);
 		return TextBlockUtils.withMargin(result, margin);
 	}
 
-	public UGraphic applyStrokeAndLineColor(UGraphic ug, HColorSet colorSet, ThemeStyle themeStyle) {
-		final HColor color = value(PName.LineColor).asColor(themeStyle, colorSet);
+	public UGraphic applyStrokeAndLineColor(UGraphic ug, HColorSet colorSet) {
+		final HColor color = value(PName.LineColor).asColor(colorSet);
 		if (color == null)
-			ug = ug.apply(new HColorNone());
+			ug = ug.apply(HColors.none());
 		else
 			ug = ug.apply(color);
 

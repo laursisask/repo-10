@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -49,9 +52,9 @@ import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
-import net.sourceforge.plantuml.Log;
-import net.sourceforge.plantuml.sprite.SpriteGrayLevel;
-import net.sourceforge.plantuml.sprite.SpriteUtils;
+import net.sourceforge.plantuml.klimt.sprite.SpriteGrayLevel;
+import net.sourceforge.plantuml.klimt.sprite.SpriteUtils;
+import net.sourceforge.plantuml.utils.Log;
 import net.sourceforge.plantuml.version.PSystemVersion;
 
 public class SpriteWindow extends JFrame {
@@ -121,7 +124,7 @@ public class SpriteWindow extends JFrame {
 	private void encodeColor(BufferedImage img, StringBuilder sb) {
 		sb.append("\n");
 		sb.append(SpriteUtils.encodeColor(img, "demo"));
-		
+
 	}
 
 	private void encodeCompressed(BufferedImage img, SpriteGrayLevel level, StringBuilder sb) {

@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  *
  * If you like this project or if you find it useful, you can support us at:
  *
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  *
  * This file is part of PlantUML.
  *
@@ -73,20 +73,20 @@ public class ShuntingYard {
 				final String name = token.getSurface();
 				final TValue variable = knowledge.getVariable(name);
 				if (variable == null) {
-					if (isVariableName(name) == false) {
+					if (isVariableName(name) == false)
 						throw EaterException.unlocated("Parsing syntax error about " + name);
-					}
+
 					ouputQueue.add(new Token(name, TokenType.QUOTED_STRING, null));
 				} else {
 					ouputQueue.add(variable.toToken());
 				}
 			} else if (token.getTokenType() == TokenType.OPERATOR) {
-				while ((thereIsAFunctionAtTheTopOfTheOperatorStack(token) //
+				while ((thereIsAFunctionAtTheTopOfTheOperatorStack() //
 						|| thereIsAnOperatorAtTheTopOfTheOperatorStackWithGreaterPrecedence(token) //
 						|| theOperatorAtTheTopOfTheOperatorStackHasEqualPrecedenceAndIsLeftAssociative(token)) //
-						&& theOperatorAtTheTopOfTheOperatorStackIsNotALeftParenthesis(token)) {
+						&& theOperatorAtTheTopOfTheOperatorStackIsNotALeftParenthesis(token))
 					ouputQueue.add(operatorStack.removeFirst());
-				}
+
 				// push it onto the operator stack.
 				operatorStack.addFirst(token);
 			} else if (token.getTokenType() == TokenType.OPEN_PAREN_FUNC) {
@@ -94,20 +94,23 @@ public class ShuntingYard {
 			} else if (token.getTokenType() == TokenType.OPEN_PAREN_MATH) {
 				operatorStack.addFirst(token);
 			} else if (token.getTokenType() == TokenType.CLOSE_PAREN_FUNC) {
+				while (operatorStack.peekFirst() != null
+						&& operatorStack.peekFirst().getTokenType() != TokenType.OPEN_PAREN_FUNC)
+					ouputQueue.add(operatorStack.removeFirst());
 				final Token first = operatorStack.removeFirst();
 				ouputQueue.add(first);
 			} else if (token.getTokenType() == TokenType.CLOSE_PAREN_MATH) {
-				while (operatorStack.peekFirst().getTokenType() != TokenType.OPEN_PAREN_MATH) {
+				while (operatorStack.peekFirst().getTokenType() != TokenType.OPEN_PAREN_MATH)
 					ouputQueue.add(operatorStack.removeFirst());
-				}
-				if (operatorStack.peekFirst().getTokenType() == TokenType.OPEN_PAREN_MATH) {
+
+				if (operatorStack.peekFirst().getTokenType() == TokenType.OPEN_PAREN_MATH)
 					operatorStack.removeFirst();
-				}
+
 			} else if (token.getTokenType() == TokenType.COMMA) {
 				while (operatorStack.peekFirst() != null
-						&& operatorStack.peekFirst().getTokenType() != TokenType.OPEN_PAREN_FUNC) {
+						&& operatorStack.peekFirst().getTokenType() != TokenType.OPEN_PAREN_FUNC)
 					ouputQueue.add(operatorStack.removeFirst());
-				}
+
 			} else {
 				throw new UnsupportedOperationException(token.toString());
 			}
@@ -125,7 +128,7 @@ public class ShuntingYard {
 		return name.matches("[a-zA-Z0-9.$_]+");
 	}
 
-	private boolean thereIsAFunctionAtTheTopOfTheOperatorStack(Token token) {
+	private boolean thereIsAFunctionAtTheTopOfTheOperatorStack() {
 		final Token top = operatorStack.peekFirst();
 		return top != null && top.getTokenType() == TokenType.FUNCTION_NAME;
 	}
@@ -133,26 +136,26 @@ public class ShuntingYard {
 	private boolean thereIsAnOperatorAtTheTopOfTheOperatorStackWithGreaterPrecedence(Token token) {
 		final Token top = operatorStack.peekFirst();
 		if (top != null && top.getTokenType() == TokenType.OPERATOR
-				&& top.getTokenOperator().getPrecedence() > token.getTokenOperator().getPrecedence()) {
+				&& top.getTokenOperator().getPrecedence() > token.getTokenOperator().getPrecedence())
 			return true;
-		}
+
 		return false;
 	}
 
 	private boolean theOperatorAtTheTopOfTheOperatorStackHasEqualPrecedenceAndIsLeftAssociative(Token token) {
 		final Token top = operatorStack.peekFirst();
 		if (top != null && top.getTokenType() == TokenType.OPERATOR && top.getTokenOperator().isLeftAssociativity()
-				&& top.getTokenOperator().getPrecedence() == token.getTokenOperator().getPrecedence()) {
+				&& top.getTokenOperator().getPrecedence() == token.getTokenOperator().getPrecedence())
 			return true;
-		}
+
 		return false;
 	}
 
 	private boolean theOperatorAtTheTopOfTheOperatorStackIsNotALeftParenthesis(Token token) {
 		final Token top = operatorStack.peekFirst();
-		if (top != null && top.getTokenType() == TokenType.OPEN_PAREN_MATH) {
+		if (top != null && top.getTokenType() == TokenType.OPEN_PAREN_MATH)
 			return true;
-		}
+
 		return true;
 	}
 

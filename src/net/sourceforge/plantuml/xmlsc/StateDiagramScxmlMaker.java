@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -38,10 +41,12 @@ import java.io.OutputStream;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
-import net.sourceforge.plantuml.Log;
+import net.sourceforge.plantuml.log.Logme;
 import net.sourceforge.plantuml.statediagram.StateDiagram;
+import net.sourceforge.plantuml.utils.Log;
 
 public final class StateDiagramScxmlMaker {
+    // ::remove folder when __HAXE__
 
 	private final StateDiagram diagram;
 
@@ -56,11 +61,11 @@ public final class StateDiagramScxmlMaker {
 			xmi.transformerXml(fos);
 		} catch (ParserConfigurationException e) {
 			Log.error(e.toString());
-			e.printStackTrace();
+			Logme.error(e);
 			throw new IOException(e.toString());
 		} catch (TransformerException e) {
 			Log.error(e.toString());
-			e.printStackTrace();
+			Logme.error(e);
 			throw new IOException(e.toString());
 		}
 	}

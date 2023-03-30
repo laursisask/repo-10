@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -31,27 +34,26 @@
  */
 package net.sourceforge.plantuml.timingdiagram.graphic;
 
-import java.awt.geom.Point2D;
-
-import net.sourceforge.plantuml.ISkinSimple;
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
-import net.sourceforge.plantuml.cucadiagram.Display;
-import net.sourceforge.plantuml.cucadiagram.WithLinkType;
-import net.sourceforge.plantuml.graphic.FontConfiguration;
-import net.sourceforge.plantuml.graphic.HorizontalAlignment;
-import net.sourceforge.plantuml.graphic.TextBlock;
-import net.sourceforge.plantuml.graphic.UDrawable;
-import net.sourceforge.plantuml.ugraphic.UFont;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.ULine;
-import net.sourceforge.plantuml.ugraphic.UPolygon;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
-import net.sourceforge.plantuml.ugraphic.color.HColor;
+import net.sourceforge.plantuml.decoration.WithLinkType;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.color.HColor;
+import net.sourceforge.plantuml.klimt.creole.Display;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.font.FontConfiguration;
+import net.sourceforge.plantuml.klimt.font.UFont;
+import net.sourceforge.plantuml.klimt.geom.HorizontalAlignment;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
+import net.sourceforge.plantuml.klimt.geom.XPoint2D;
+import net.sourceforge.plantuml.klimt.shape.TextBlock;
+import net.sourceforge.plantuml.klimt.shape.UDrawable;
+import net.sourceforge.plantuml.klimt.shape.ULine;
+import net.sourceforge.plantuml.klimt.shape.UPolygon;
+import net.sourceforge.plantuml.style.ISkinSimple;
 
 public class TimeArrow implements UDrawable {
 
-	private final Point2D start;
-	private final Point2D end;
+	private final XPoint2D start;
+	private final XPoint2D end;
 	private final Display label;
 	private final ISkinSimple spriteContainer;
 	private final WithLinkType type;
@@ -65,7 +67,7 @@ public class TimeArrow implements UDrawable {
 		return shorter(arrow1, arrow2, arrow3, arrow4);
 	}
 
-	private TimeArrow(Point2D start, Point2D end, Display label, ISkinSimple spriteContainer, WithLinkType type) {
+	private TimeArrow(XPoint2D start, XPoint2D end, Display label, ISkinSimple spriteContainer, WithLinkType type) {
 		this.start = start;
 		this.type = type;
 		this.end = end;
@@ -97,18 +99,18 @@ public class TimeArrow implements UDrawable {
 				type);
 	}
 
-	public static Point2D onCircle(Point2D pt, double alpha) {
+	public static XPoint2D onCircle(XPoint2D pt, double alpha) {
 		final double radius = 8;
 		final double x = pt.getX() - Math.sin(alpha) * radius;
 		final double y = pt.getY() - Math.cos(alpha) * radius;
-		return new Point2D.Double(x, y);
+		return new XPoint2D(x, y);
 	}
 
 	private FontConfiguration getFontConfiguration() {
 		final UFont font = UFont.serif(14);
 
 		final HColor color = type.getSpecificColor();
-		return FontConfiguration.create(font, color, color, false);
+		return FontConfiguration.create(font, color, color, null);
 	}
 
 	public void drawU(UGraphic ug) {
@@ -116,11 +118,11 @@ public class TimeArrow implements UDrawable {
 
 		ug = ug.apply(type.getSpecificColor()).apply(type.getUStroke());
 		final ULine line = new ULine(end.getX() - start.getX(), end.getY() - start.getY());
-		ug.apply(new UTranslate(start)).draw(line);
+		ug.apply(UTranslate.point(start)).draw(line);
 
 		final double delta = 20.0 * Math.PI / 180.0;
-		final Point2D pt1 = onCircle(end, angle + delta);
-		final Point2D pt2 = onCircle(end, angle - delta);
+		final XPoint2D pt1 = onCircle(end, angle + delta);
+		final XPoint2D pt2 = onCircle(end, angle - delta);
 
 		final UPolygon polygon = new UPolygon();
 		polygon.addPoint(pt1.getX(), pt1.getY());
@@ -134,7 +136,7 @@ public class TimeArrow implements UDrawable {
 		double xText = (pt1.getX() + pt2.getX()) / 2;
 		double yText = (pt1.getY() + pt2.getY()) / 2;
 		if (start.getY() < end.getY()) {
-			final Dimension2D dimLabel = textLabel.calculateDimension(ug.getStringBounder());
+			final XDimension2D dimLabel = textLabel.calculateDimension(ug.getStringBounder());
 			yText -= dimLabel.getHeight();
 		}
 		textLabel.drawU(ug.apply(new UTranslate(xText, yText)));

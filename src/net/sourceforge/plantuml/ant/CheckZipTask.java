@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -46,10 +49,12 @@ import org.apache.tools.ant.Task;
 import org.apache.tools.ant.types.FileList;
 import org.apache.tools.ant.types.FileSet;
 
+import net.sourceforge.plantuml.log.Logme;
 import net.sourceforge.plantuml.security.SFile;
 import net.sourceforge.plantuml.security.SecurityUtils;
 
 public class CheckZipTask extends Task {
+	// ::remove folder when __CORE__
 
 	private String zipfile = null;
 	private List<FileSet> filesets = new ArrayList<>();
@@ -81,7 +86,7 @@ public class CheckZipTask extends Task {
 				manageFileList(fileList);
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			Logme.error(e);
 			throw new BuildException(e.toString());
 		}
 	}
@@ -113,10 +118,8 @@ public class CheckZipTask extends Task {
 		if (tmp == null) {
 			throw new FileNotFoundException();
 		}
-		try (
-			final PrintWriter pw = SecurityUtils.createPrintWriter("tmp.txt");
-			final ZipInputStream zis = new ZipInputStream(tmp);
-		) {
+		try (final PrintWriter pw = SecurityUtils.createPrintWriter("tmp.txt");
+				final ZipInputStream zis = new ZipInputStream(tmp);) {
 			ZipEntry ze = zis.getNextEntry();
 			while (ze != null) {
 				final String fileName = ze.getName();

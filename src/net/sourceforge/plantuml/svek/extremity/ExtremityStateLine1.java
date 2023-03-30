@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,33 +35,31 @@
  */
 package net.sourceforge.plantuml.svek.extremity;
 
-import java.awt.geom.Point2D;
-
-import net.sourceforge.plantuml.ugraphic.UEllipse;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.ULine;
-import net.sourceforge.plantuml.ugraphic.UPolygon;
-import net.sourceforge.plantuml.ugraphic.UStroke;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
-import net.sourceforge.plantuml.ugraphic.color.HColorUtils;
+import net.sourceforge.plantuml.klimt.UStroke;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.color.HColors;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.geom.XPoint2D;
+import net.sourceforge.plantuml.klimt.shape.UEllipse;
+import net.sourceforge.plantuml.klimt.shape.ULine;
+import net.sourceforge.plantuml.klimt.shape.UPolygon;
 
 class ExtremityStateLine1 extends Extremity {
 
 	private UPolygon polygon = new UPolygon();
-	private final Point2D dest;
+	private final XPoint2D dest;
 	private final double radius = 7;
 	private final double angle;
-	
+
 	@Override
-	public Point2D somePoint() {
+	public XPoint2D somePoint() {
 		return dest;
 	}
 
-
-	public ExtremityStateLine1(double angle, Point2D center) {
+	public ExtremityStateLine1(double angle, XPoint2D center) {
 		this.angle = manageround(angle);
 		polygon.addPoint(0, 0);
-		this.dest = new Point2D.Double(center.getX(), center.getY());
+		this.dest = new XPoint2D(center.getX(), center.getY());
 		final int xWing = 9;
 		final int yAperture = 4;
 		polygon.addPoint(-xWing, -yAperture);
@@ -71,22 +72,24 @@ class ExtremityStateLine1 extends Extremity {
 	}
 
 	public void drawU(UGraphic ug) {
-		ug.apply(ug.getParam().getColor().bg()).apply(new UTranslate(-radius * Math.cos(angle), -radius * Math.sin(angle))).draw(polygon);
-		ug = ug.apply(HColorUtils.WHITE.bg());
-		ug.apply(new UStroke(1.5)).apply(new UTranslate(dest.getX() - radius, dest.getY() - radius)).draw(new UEllipse(radius * 2, radius * 2));
+		ug.apply(ug.getParam().getColor().bg())
+				.apply(new UTranslate(-radius * Math.cos(angle), -radius * Math.sin(angle))).draw(polygon);
+		ug = ug.apply(HColors.WHITE.bg());
+		ug.apply(UStroke.withThickness(1.5)).apply(new UTranslate(dest.getX() - radius, dest.getY() - radius))
+				.draw(UEllipse.build(radius * 2, radius * 2));
 		drawLine(ug, getPointOnCircle(dest.getX(), dest.getY(), Math.PI / 4),
 				getPointOnCircle(dest.getX(), dest.getY(), Math.PI + Math.PI / 4));
 		drawLine(ug, getPointOnCircle(dest.getX(), dest.getY(), -Math.PI / 4),
 				getPointOnCircle(dest.getX(), dest.getY(), Math.PI - Math.PI / 4));
 	}
 
-	private Point2D getPointOnCircle(double centerX, double centerY, double angle) {
+	private XPoint2D getPointOnCircle(double centerX, double centerY, double angle) {
 		final double x = centerX + radius * Math.cos(angle);
 		final double y = centerY + radius * Math.sin(angle);
-		return new Point2D.Double(x, y);
+		return new XPoint2D(x, y);
 	}
 
-	static private void drawLine(UGraphic ug, Point2D p1, Point2D p2) {
+	static private void drawLine(UGraphic ug, XPoint2D p1, XPoint2D p2) {
 		final double dx = p2.getX() - p1.getX();
 		final double dy = p2.getY() - p1.getY();
 		ug.apply(new UTranslate(p1.getX(), p1.getY())).draw(new ULine(dx, dy));

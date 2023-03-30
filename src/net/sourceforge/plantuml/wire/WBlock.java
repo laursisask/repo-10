@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
  * 
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  * 
  * This file is part of PlantUML.
  *
@@ -35,28 +35,28 @@
  */
 package net.sourceforge.plantuml.wire;
 
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import net.sourceforge.plantuml.Dimension2DDouble;
-import net.sourceforge.plantuml.ISkinParam;
-import net.sourceforge.plantuml.SpriteContainerEmpty;
 import net.sourceforge.plantuml.command.CommandExecutionResult;
-import net.sourceforge.plantuml.cucadiagram.Display;
-import net.sourceforge.plantuml.graphic.FontConfiguration;
-import net.sourceforge.plantuml.graphic.HorizontalAlignment;
-import net.sourceforge.plantuml.graphic.StringBounder;
-import net.sourceforge.plantuml.graphic.TextBlock;
-import net.sourceforge.plantuml.ugraphic.UFont;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.URectangle;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
-import net.sourceforge.plantuml.ugraphic.color.HColor;
-import net.sourceforge.plantuml.ugraphic.color.HColorUtils;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.color.HColor;
+import net.sourceforge.plantuml.klimt.color.HColors;
+import net.sourceforge.plantuml.klimt.creole.Display;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.font.FontConfiguration;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
+import net.sourceforge.plantuml.klimt.font.UFont;
+import net.sourceforge.plantuml.klimt.geom.HorizontalAlignment;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
+import net.sourceforge.plantuml.klimt.shape.TextBlock;
+import net.sourceforge.plantuml.klimt.shape.URectangle;
+import net.sourceforge.plantuml.klimt.sprite.SpriteContainerEmpty;
+import net.sourceforge.plantuml.style.ISkinParam;
 
 public class WBlock {
+    // ::remove folder when __HAXE__
 
 	private final static int STARTING_Y = 10;
 
@@ -158,7 +158,7 @@ public class WBlock {
 
 	public CommandExecutionResult newColumn(int level) {
 		if (level == 0) {
-			final Dimension2D max = getNaturalDimension();
+			final XDimension2D max = getNaturalDimension();
 			this.cursor = new UTranslate(max.getWidth() + 10, STARTING_Y);
 			this.addedToCursor = null;
 			return CommandExecutionResult.ok();
@@ -218,7 +218,7 @@ public class WBlock {
 
 	private UTranslate getNextPosition() {
 		if (this.addedToCursor != null) {
-			final Dimension2D dim = this.addedToCursor.getMaxDimension();
+			final XDimension2D dim = this.addedToCursor.getMaxDimension();
 			this.cursor = this.cursor.compose(UTranslate.dy(dim.getHeight()));
 		}
 		this.addedToCursor = null;
@@ -235,7 +235,7 @@ public class WBlock {
 	public void drawMe(UGraphic ug) {
 		drawBox(ug);
 		final UFont font = UFont.sansSerif(12);
-		final FontConfiguration fc = FontConfiguration.create(font, getBlack(), getBlack(), false);
+		final FontConfiguration fc = FontConfiguration.create(font, getBlack(), getBlack(), null);
 		final Display display = Display.create(name.replace('_', ' '));
 		final TextBlock text = display.create(fc, HorizontalAlignment.LEFT, new SpriteContainerEmpty());
 		text.drawU(ug.apply(UTranslate.dx(5)));
@@ -243,13 +243,13 @@ public class WBlock {
 	}
 
 	private HColor getBlack() {
-		return HColorUtils.BLACK.withDark(HColorUtils.WHITE);
+		return HColors.BLACK.withDark(HColors.WHITE);
 	}
 
 	private void drawBox(UGraphic ug) {
 		ug = ug.apply(getBlack());
 		if (name.length() > 0) {
-			final URectangle rect = new URectangle(getMaxDimension());
+			final URectangle rect = URectangle.build(getMaxDimension());
 			UGraphic ugRect = ug;
 			if (color != null) {
 				ugRect = ugRect.apply(color.bg());
@@ -264,27 +264,27 @@ public class WBlock {
 		}
 	}
 
-	private Dimension2D getMaxDimension() {
+	private XDimension2D getMaxDimension() {
 		if (children.size() > 0) {
 			if (forcedWidth != 0) {
-				return new Dimension2DDouble(forcedWidth, forcedHeight);
+				return new XDimension2D(forcedWidth, forcedHeight);
 			}
 			return getNaturalDimension();
 		}
 		final double x = forcedWidth == 0 ? 100 : forcedWidth;
 		final double y = forcedHeight == 0 ? 100 : forcedHeight;
-		return new Dimension2DDouble(x, y);
+		return new XDimension2D(x, y);
 	}
 
-	private Dimension2D getNaturalDimension() {
+	private XDimension2D getNaturalDimension() {
 		double x = 0;
 		double y = 0;
 		for (WBlock child : children) {
-			final Dimension2D dim = child.getMaxDimension();
+			final XDimension2D dim = child.getMaxDimension();
 			x = Math.max(x, child.position.getDx() + dim.getWidth() + 10);
 			y = Math.max(y, child.position.getDy() + dim.getHeight() + 10);
 		}
-		return new Dimension2DDouble(x, y);
+		return new XDimension2D(x, y);
 	}
 
 	public UTranslate getNextOutHorizontal(String x, String y, WLinkType type) {

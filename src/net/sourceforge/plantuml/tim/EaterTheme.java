@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  *
  * If you like this project or if you find it useful, you can support us at:
  *
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  *
  * This file is part of PlantUML.
  *
@@ -38,19 +38,22 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 
-import net.sourceforge.plantuml.AFile;
-import net.sourceforge.plantuml.StringLocated;
+import net.sourceforge.plantuml.file.AFile;
+import net.sourceforge.plantuml.log.Logme;
 import net.sourceforge.plantuml.preproc.FileWithSuffix;
 import net.sourceforge.plantuml.preproc.ImportedFiles;
 import net.sourceforge.plantuml.preproc.ReadLine;
 import net.sourceforge.plantuml.preproc.ReadLineReader;
 import net.sourceforge.plantuml.preproc2.PreprocessorUtils;
 import net.sourceforge.plantuml.security.SURL;
+import net.sourceforge.plantuml.text.StringLocated;
 import net.sourceforge.plantuml.theme.ThemeUtils;
 
 public class EaterTheme extends Eater {
+    // ::remove folder when __HAXE__
 
 	private String realName;
 	private String name;
@@ -83,11 +86,11 @@ public class EaterTheme extends Eater {
 
 	public final ReadLine getTheme() throws EaterException {
 		if (from == null) {
-			final ReadLine reader = ThemeUtils.getReaderTheme(realName);
-			if (reader != null)
-				return reader;
-
 			try {
+				final ReadLine reader = ThemeUtils.getReaderTheme(realName);
+				if (reader != null)
+					return reader;
+
 				final AFile localFile = importedFiles.getAFile(ThemeUtils.getFilename(realName));
 				if (localFile != null && localFile.isOk()) {
 					final BufferedReader br = localFile.getUnderlyingFile().openBufferedReader();
@@ -95,7 +98,7 @@ public class EaterTheme extends Eater {
 						return ReadLineReader.create(br, "theme " + realName);
 				}
 			} catch (IOException e) {
-				e.printStackTrace();
+				Logme.error(e);
 			}
 			throw EaterException.located("Cannot load " + realName);
 
@@ -107,16 +110,20 @@ public class EaterTheme extends Eater {
 			try {
 				return PreprocessorUtils.getReaderInclude(url, getLineLocation(), UTF_8);
 			} catch (UnsupportedEncodingException e) {
-				e.printStackTrace();
+				Logme.error(e);
 				throw EaterException.located("Cannot decode charset");
 			}
 		}
 
 		try {
 			final FileWithSuffix file = context.getFileWithSuffix(from, realName);
-			return ReadLineReader.create(file.getReader(UTF_8), "theme " + realName);
+			final Reader tmp = file.getReader(UTF_8);
+			if (tmp == null)
+				throw EaterException.located("No such theme " + realName);
+
+			return ReadLineReader.create(tmp, "theme " + realName);
 		} catch (IOException e) {
-			e.printStackTrace();
+			Logme.error(e);
 			throw EaterException.located("Cannot load " + realName);
 		}
 

@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,24 +35,22 @@
  */
 package net.sourceforge.plantuml.flowdiagram;
 
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
-
-import net.sourceforge.plantuml.Dimension2DDouble;
-import net.sourceforge.plantuml.SpriteContainerEmpty;
-import net.sourceforge.plantuml.cucadiagram.Display;
 import net.sourceforge.plantuml.golem.Tile;
-import net.sourceforge.plantuml.graphic.AbstractTextBlock;
-import net.sourceforge.plantuml.graphic.FontConfiguration;
-import net.sourceforge.plantuml.graphic.HorizontalAlignment;
-import net.sourceforge.plantuml.graphic.StringBounder;
-import net.sourceforge.plantuml.graphic.TextBlock;
-import net.sourceforge.plantuml.ugraphic.Shadowable;
-import net.sourceforge.plantuml.ugraphic.UFont;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.URectangle;
-import net.sourceforge.plantuml.ugraphic.UStroke;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
-import net.sourceforge.plantuml.ugraphic.color.HColorUtils;
+import net.sourceforge.plantuml.klimt.Shadowable;
+import net.sourceforge.plantuml.klimt.UStroke;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.color.HColors;
+import net.sourceforge.plantuml.klimt.creole.Display;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.font.FontConfiguration;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
+import net.sourceforge.plantuml.klimt.font.UFont;
+import net.sourceforge.plantuml.klimt.geom.HorizontalAlignment;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
+import net.sourceforge.plantuml.klimt.shape.AbstractTextBlock;
+import net.sourceforge.plantuml.klimt.shape.TextBlock;
+import net.sourceforge.plantuml.klimt.shape.URectangle;
+import net.sourceforge.plantuml.klimt.sprite.SpriteContainerEmpty;
 
 public class ActivityBox extends AbstractTextBlock {
 
@@ -83,23 +84,23 @@ public class ActivityBox extends AbstractTextBlock {
 	}
 
 	public void drawU(UGraphic ug) {
-		final Dimension2D dimTotal = calculateDimension(ug.getStringBounder());
+		final XDimension2D dimTotal = calculateDimension(ug.getStringBounder());
 		// final Dimension2D dimDesc = tb.calculateDimension(ug.getStringBounder());
 
 		final double widthTotal = dimTotal.getWidth();
 		final double heightTotal = dimTotal.getHeight();
-		final Shadowable rect = new URectangle(widthTotal, heightTotal).rounded(CORNER);
-		ug = ug.apply(HColorUtils.MY_RED);
-		ug = ug.apply(HColorUtils.MY_YELLOW.bg());
-		ug.apply(new UStroke(1.5)).draw(rect);
+		final Shadowable rect = URectangle.build(widthTotal, heightTotal).rounded(CORNER);
+		ug = ug.apply(HColors.MY_RED);
+		ug = ug.apply(HColors.MY_YELLOW.bg());
+		ug.apply(UStroke.withThickness(1.5)).draw(rect);
 
 		tb.drawU(ug.apply(new UTranslate(MARGIN, MARGIN)));
 	}
 
-	public Dimension2D calculateDimension(StringBounder stringBounder) {
-		final Dimension2D dim = tb.calculateDimension(stringBounder);
+	public XDimension2D calculateDimension(StringBounder stringBounder) {
+		final XDimension2D dim = tb.calculateDimension(stringBounder);
 
-		return Dimension2DDouble.delta(dim, 2 * MARGIN, 2 * MARGIN);
+		return dim.delta((2 * MARGIN), (2 * MARGIN));
 	}
 
 }

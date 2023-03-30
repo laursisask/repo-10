@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -36,7 +39,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import net.sourceforge.plantuml.ugraphic.UTranslate;
+import net.sourceforge.plantuml.klimt.UTranslate;
 
 public class WormMutation {
 
@@ -185,7 +188,7 @@ public class WormMutation {
 	}
 
 	public Worm mute(Worm original) {
-		final Worm result = new Worm(original.getStyle());
+		final Worm result = original.cloneEmpty();
 		for (int i = 0; i < original.size(); i++) {
 			result.addPoint(translations.get(i).getTranslated(original.get(i)));
 		}

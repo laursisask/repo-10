@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,22 +35,21 @@
  */
 package net.sourceforge.plantuml.asciiart;
 
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
-
-import net.sourceforge.plantuml.Dimension2DDouble;
-import net.sourceforge.plantuml.graphic.StringBounder;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
 import net.sourceforge.plantuml.skin.Component;
 import net.sourceforge.plantuml.style.Style;
 import net.sourceforge.plantuml.style.StyleSignatureBasic;
 
 public abstract class AbstractComponentText implements Component {
+	// ::remove folder when __CORE__
 
-	public final Dimension2D getPreferredDimension(StringBounder stringBounder) {
+	public final XDimension2D getPreferredDimension(StringBounder stringBounder) {
 		final double w = getPreferredWidth(stringBounder);
 		final double h = getPreferredHeight(stringBounder);
-		return new Dimension2DDouble(w, h);
+		return new XDimension2D(w, h);
 	}
-	
+
 	public Style[] getUsedStyles() {
 		throw new UnsupportedOperationException();
 	}
@@ -55,6 +57,5 @@ public abstract class AbstractComponentText implements Component {
 	public StyleSignatureBasic getStyleSignature() {
 		throw new UnsupportedOperationException();
 	}
-
 
 }

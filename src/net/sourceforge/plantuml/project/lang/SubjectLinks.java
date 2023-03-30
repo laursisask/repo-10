@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -36,14 +39,17 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import net.sourceforge.plantuml.command.CommandExecutionResult;
-import net.sourceforge.plantuml.command.regex.IRegex;
-import net.sourceforge.plantuml.command.regex.RegexLeaf;
-import net.sourceforge.plantuml.command.regex.RegexResult;
 import net.sourceforge.plantuml.project.Failable;
 import net.sourceforge.plantuml.project.GanttDiagram;
+import net.sourceforge.plantuml.regex.IRegex;
+import net.sourceforge.plantuml.regex.RegexLeaf;
+import net.sourceforge.plantuml.regex.RegexResult;
 
 // Removed
 public class SubjectLinks implements Subject {
+
+	private SubjectLinks() {
+	}
 
 	public IRegex toRegex() {
 		return new RegexLeaf("SUBJECT", "links?");
@@ -60,7 +66,7 @@ public class SubjectLinks implements Subject {
 	public class InColor extends SentenceSimple {
 
 		public InColor() {
-			super(SubjectLinks.this, Verbs.areColored(), new ComplementInColors());
+			super(SubjectLinks.this, Verbs.areColored, new ComplementInColors());
 		}
 
 		@Override

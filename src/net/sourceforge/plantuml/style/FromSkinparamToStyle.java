@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
  * 
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  * 
  * This file is part of PlantUML.
  *
@@ -43,7 +43,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import net.sourceforge.plantuml.stereo.StereotypeDecoration;
+
 public class FromSkinparamToStyle {
+	// ::remove file when __HAXE__
 
 	static class Data {
 		final private SName[] styleNames;
@@ -85,6 +88,7 @@ public class FromSkinparamToStyle {
 
 		addConFont("header", SName.document, SName.header);
 		addConFont("footer", SName.document, SName.footer);
+		addConFont("caption", SName.document, SName.caption);
 
 		addConvert("defaultFontSize", PName.FontSize, SName.element);
 
@@ -106,6 +110,7 @@ public class FromSkinparamToStyle {
 		addConFont("SequenceGroupHeader", SName.groupHeader);
 		addConvert("SequenceBoxBorderColor", PName.LineColor, SName.box);
 		addConvert("SequenceBoxBackgroundColor", PName.BackGroundColor, SName.box);
+		addConvert("SequenceBoxFontColor", PName.FontColor, SName.box);
 		addConvert("SequenceLifeLineBorderColor", PName.LineColor, SName.lifeLine);
 		addConvert("SequenceLifeLineBackgroundColor", PName.BackGroundColor, SName.lifeLine);
 		addConvert("sequenceDividerBackgroundColor", PName.BackGroundColor, SName.separator);
@@ -116,15 +121,16 @@ public class FromSkinparamToStyle {
 
 		addConFont("note", SName.note);
 		addConvert("noteBorderThickness", PName.LineThickness, SName.note);
+		addConvert("noteBorderColor", PName.LineColor, SName.note);
 		addConvert("noteBackgroundColor", PName.BackGroundColor, SName.note);
 
 		addConvert("packageBackgroundColor", PName.BackGroundColor, SName.group);
 		addConvert("packageBorderColor", PName.LineColor, SName.group);
 		addMagic(SName.package_);
 
-		addConvert("PartitionBorderColor", PName.LineColor, SName.partition);
-		addConvert("PartitionBackgroundColor", PName.BackGroundColor, SName.partition);
-		addConFont("Partition", SName.partition);
+		addConvert("PartitionBorderColor", PName.LineColor, SName.composite);
+		addConvert("PartitionBackgroundColor", PName.BackGroundColor, SName.composite);
+		addConFont("Partition", SName.composite);
 
 		addConvert("hyperlinkColor", PName.HyperLinkColor, SName.root);
 
@@ -161,7 +167,7 @@ public class FromSkinparamToStyle {
 		addConvert("titleBorderColor", PName.LineColor, SName.title);
 		addConvert("titleBackgroundColor", PName.BackGroundColor, SName.title);
 		addConvert("titleBorderRoundCorner", PName.RoundCorner, SName.title);
-		addConFont("title", SName.title);
+		addConFont("title", SName.document, SName.title);
 
 		addConvert("legendBorderThickness", PName.LineThickness, SName.legend);
 		addConvert("legendBorderColor", PName.LineColor, SName.legend);
@@ -175,8 +181,17 @@ public class FromSkinparamToStyle {
 
 		addConvert("classBackgroundColor", PName.BackGroundColor, SName.element, SName.class_);
 		addConvert("classBorderColor", PName.LineColor, SName.element, SName.class_);
-		addConFont("class", SName.element, SName.class_);
-		addConFont("classAttribute", SName.element, SName.class_);
+
+		addConvert("classFontSize", PName.FontSize, SName.element, SName.class_, SName.header);
+		addConvert("classFontStyle", PName.FontStyle, SName.element, SName.class_, SName.header);
+		addConvert("classFontColor", PName.FontColor, SName.element, SName.class_, SName.header);
+		addConvert("classFontName", PName.FontName, SName.element, SName.class_, SName.header);
+
+		addConvert("classAttributeFontSize", PName.FontSize, SName.element, SName.class_);
+		addConvert("classAttributeFontStyle", PName.FontStyle, SName.element, SName.class_);
+		addConvert("classAttributeFontColor", PName.FontColor, SName.element, SName.class_);
+		addConvert("classAttributeFontName", PName.FontName, SName.element, SName.class_);
+
 		addConvert("classBorderThickness", PName.LineThickness, SName.element, SName.class_);
 		addConvert("classHeaderBackgroundColor", PName.BackGroundColor, SName.element, SName.class_, SName.header);
 
@@ -221,11 +236,17 @@ public class FromSkinparamToStyle {
 		addConvert("IconPublicColor", PName.LineColor, SName.visibilityIcon, SName.public_);
 		addConvert("IconPublicBackgroundColor", PName.BackGroundColor, SName.visibilityIcon, SName.public_);
 
+		addConvert("MinClassWidth", PName.MinimumWidth);
+
 //		addConvert("nodeStereotypeFontSize", PName.FontSize, SName.node, SName.stereotype);
 //		addConvert("sequenceStereotypeFontSize", PName.FontSize, SName.stereotype);
 //		addConvert("sequenceStereotypeFontStyle", PName.FontStyle, SName.stereotype);
 //		addConvert("sequenceStereotypeFontColor", PName.FontColor, SName.stereotype);
 //		addConvert("sequenceStereotypeFontName", PName.FontName, SName.stereotype);
+
+		addConvert("lifelineStrategy", PName.LineStyle, SName.lifeLine);
+		addConvert("wrapWidth", PName.MaximumWidth, SName.element);
+		addConvert("HyperlinkUnderline", PName.HyperlinkUnderlineThickness, SName.element);
 
 	}
 
@@ -270,7 +291,14 @@ public class FromSkinparamToStyle {
 				value = "0";
 			else if (value.equalsIgnoreCase("true"))
 				value = "3";
+		} else if (key.equals("lifelinestrategy")) {
+			if (value.equalsIgnoreCase("solid"))
+				value = "0";
+		} else if (key.equals("hyperlinkunderline")) {
+			if (value.equalsIgnoreCase("false"))
+				value = "0";
 		}
+
 		if (value.equalsIgnoreCase("right:right"))
 			value = "right";
 		if (value.equalsIgnoreCase("dotted"))
@@ -353,7 +381,7 @@ public class FromSkinparamToStyle {
 		if (stereo != null) {
 			map = StyleLoader.addPriorityForStereotype(map);
 			for (String s : stereo.split("\\&"))
-				sig = sig.add(s);
+				sig = sig.add(StereotypeDecoration.PREFIX + s);
 		}
 
 		final Style style = new Style(sig, map);

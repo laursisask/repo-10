@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,21 +35,20 @@
  */
 package net.sourceforge.plantuml.svek.image;
 
-import net.sourceforge.plantuml.Dimension2DDouble;
-import net.sourceforge.plantuml.ISkinParam;
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
-import net.sourceforge.plantuml.cucadiagram.ILeaf;
-import net.sourceforge.plantuml.graphic.StringBounder;
+import net.sourceforge.plantuml.abel.Entity;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
+import net.sourceforge.plantuml.style.ISkinParam;
 import net.sourceforge.plantuml.svek.AbstractEntityImage;
 import net.sourceforge.plantuml.svek.ShapeType;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
 
 public class EntityImageGroup extends AbstractEntityImage {
 
 	// final private TextBlock desc;
 	// final private static int MARGIN = 10;
 
-	public EntityImageGroup(ILeaf entity, ISkinParam skinParam) {
+	public EntityImageGroup(Entity entity, ISkinParam skinParam) {
 		super(entity, skinParam);
 		// this.desc = Display.create(StringUtils.getWithNewlines(entity.getDisplay()),
 		// FontConfiguration.create(
@@ -54,8 +56,8 @@ public class EntityImageGroup extends AbstractEntityImage {
 		// HorizontalAlignment.CENTER);
 	}
 
-	public Dimension2D calculateDimension(StringBounder stringBounder) {
-		return new Dimension2DDouble(30, 30);
+	public XDimension2D calculateDimension(StringBounder stringBounder) {
+		return new XDimension2D(30, 30);
 	}
 
 	final public void drawU(UGraphic ug) {

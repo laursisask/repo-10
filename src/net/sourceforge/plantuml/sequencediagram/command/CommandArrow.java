@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -37,24 +40,21 @@ import java.util.Collections;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import net.sourceforge.plantuml.LineLocation;
 import net.sourceforge.plantuml.StringUtils;
-import net.sourceforge.plantuml.Url;
-import net.sourceforge.plantuml.UrlBuilder;
-import net.sourceforge.plantuml.UrlMode;
-import net.sourceforge.plantuml.api.ThemeStyle;
 import net.sourceforge.plantuml.classdiagram.command.CommandLinkClass;
 import net.sourceforge.plantuml.command.CommandExecutionResult;
 import net.sourceforge.plantuml.command.SingleLineCommand2;
-import net.sourceforge.plantuml.command.regex.IRegex;
-import net.sourceforge.plantuml.command.regex.RegexConcat;
-import net.sourceforge.plantuml.command.regex.RegexLeaf;
-import net.sourceforge.plantuml.command.regex.RegexOptional;
-import net.sourceforge.plantuml.command.regex.RegexOr;
-import net.sourceforge.plantuml.command.regex.RegexResult;
-import net.sourceforge.plantuml.cucadiagram.Display;
-import net.sourceforge.plantuml.cucadiagram.Stereotype;
 import net.sourceforge.plantuml.descdiagram.command.CommandLinkElement;
+import net.sourceforge.plantuml.klimt.color.HColor;
+import net.sourceforge.plantuml.klimt.color.HColorSet;
+import net.sourceforge.plantuml.klimt.color.NoSuchColorException;
+import net.sourceforge.plantuml.klimt.creole.Display;
+import net.sourceforge.plantuml.regex.IRegex;
+import net.sourceforge.plantuml.regex.RegexConcat;
+import net.sourceforge.plantuml.regex.RegexLeaf;
+import net.sourceforge.plantuml.regex.RegexOptional;
+import net.sourceforge.plantuml.regex.RegexOr;
+import net.sourceforge.plantuml.regex.RegexResult;
 import net.sourceforge.plantuml.sequencediagram.LifeEventType;
 import net.sourceforge.plantuml.sequencediagram.Message;
 import net.sourceforge.plantuml.sequencediagram.Participant;
@@ -64,9 +64,11 @@ import net.sourceforge.plantuml.skin.ArrowConfiguration;
 import net.sourceforge.plantuml.skin.ArrowDecoration;
 import net.sourceforge.plantuml.skin.ArrowHead;
 import net.sourceforge.plantuml.skin.ArrowPart;
-import net.sourceforge.plantuml.ugraphic.color.HColor;
-import net.sourceforge.plantuml.ugraphic.color.HColorSet;
-import net.sourceforge.plantuml.ugraphic.color.NoSuchColorException;
+import net.sourceforge.plantuml.stereo.Stereotype;
+import net.sourceforge.plantuml.url.Url;
+import net.sourceforge.plantuml.url.UrlBuilder;
+import net.sourceforge.plantuml.url.UrlMode;
+import net.sourceforge.plantuml.utils.LineLocation;
 
 public class CommandArrow extends SingleLineCommand2<SequenceDiagram> {
 
@@ -124,7 +126,7 @@ public class CommandArrow extends SingleLineCommand2<SequenceDiagram> {
 				RegexLeaf.spaceZeroOrMore(), //
 				new RegexLeaf("STEREOTYPE", "(\\<\\<.*\\>\\>)?"), //
 				RegexLeaf.spaceZeroOrMore(), //
-				new RegexLeaf("URL", "(" + UrlBuilder.getRegexp() + ")?"), //
+				UrlBuilder.OPTIONAL, //
 				RegexLeaf.spaceZeroOrMore(), //
 				new RegexLeaf("MESSAGE", "(?::[%s]*(.*))?"), //
 				RegexLeaf.end()).protectSize(2000);
@@ -284,7 +286,7 @@ public class CommandArrow extends SingleLineCommand2<SequenceDiagram> {
 		if (reverseDefine)
 			config = config.reverseDefine();
 
-		config = applyStyle(diagram.getSkinParam().getThemeStyle(), arg.getLazzy("ARROW_STYLE", 0), config);
+		config = applyStyle(arg.getLazzy("ARROW_STYLE", 0), config);
 
 		config = config.withInclination(inclination1 + inclination2);
 
@@ -317,14 +319,13 @@ public class CommandArrow extends SingleLineCommand2<SequenceDiagram> {
 		msg.setPart1Anchor(arg.get("PART1ANCHOR", 1));
 		msg.setPart2Anchor(arg.get("PART2ANCHOR", 1));
 
-		final String error = diagram.addMessage(msg);
-		if (error != null)
-			return CommandExecutionResult.error(error);
+		final CommandExecutionResult status = diagram.addMessage(msg);
+		if (status.isOk() == false)
+			return status;
 
 		final String s = arg.get("LIFECOLOR", 0);
 
-		final HColor activationColor = s == null ? null
-				: diagram.getSkinParam().getIHtmlColorSet().getColor(diagram.getSkinParam().getThemeStyle(), s);
+		final HColor activationColor = s == null ? null : diagram.getSkinParam().getIHtmlColorSet().getColor(s);
 
 		if (activationSpec != null)
 			return manageActivations(activationSpec, diagram, p1, p2, activationColor);
@@ -376,7 +377,7 @@ public class CommandArrow extends SingleLineCommand2<SequenceDiagram> {
 		return sa.length() + sb.length();
 	}
 
-	public static ArrowConfiguration applyStyle(ThemeStyle themeStyle, String arrowStyle, ArrowConfiguration config)
+	public static ArrowConfiguration applyStyle(String arrowStyle, ArrowConfiguration config)
 			throws NoSuchColorException {
 		if (arrowStyle == null)
 			return config;
@@ -392,7 +393,7 @@ public class CommandArrow extends SingleLineCommand2<SequenceDiagram> {
 			} else if (s.equalsIgnoreCase("hidden")) {
 				config = config.withBody(ArrowBody.HIDDEN);
 			} else {
-				config = config.withColor(HColorSet.instance().getColor(themeStyle, s));
+				config = config.withColor(HColorSet.instance().getColor(s));
 			}
 		}
 		return config;

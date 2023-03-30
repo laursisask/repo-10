@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,28 +35,27 @@
  */
 package net.sourceforge.plantuml.sequencediagram.teoz;
 
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
 import java.util.List;
 import java.util.Objects;
 
-import net.sourceforge.plantuml.Dimension2DDouble;
-import net.sourceforge.plantuml.graphic.AbstractTextBlock;
-import net.sourceforge.plantuml.graphic.StringBounder;
-import net.sourceforge.plantuml.graphic.TextBlock;
-import net.sourceforge.plantuml.graphic.VerticalAlignment;
+import net.sourceforge.plantuml.klimt.UClip;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.color.HColors;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
+import net.sourceforge.plantuml.klimt.geom.VerticalAlignment;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
+import net.sourceforge.plantuml.klimt.shape.AbstractTextBlock;
+import net.sourceforge.plantuml.klimt.shape.TextBlock;
+import net.sourceforge.plantuml.klimt.shape.ULine;
 import net.sourceforge.plantuml.real.Real;
 import net.sourceforge.plantuml.skin.Context2D;
 import net.sourceforge.plantuml.skin.SimpleContext2D;
-import net.sourceforge.plantuml.ugraphic.UClip;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.ULine;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
-import net.sourceforge.plantuml.ugraphic.color.HColorUtils;
 
 public class PlayingSpaceWithParticipants extends AbstractTextBlock implements TextBlock {
 
 	private final PlayingSpace playingSpace;
-	private Dimension2D cacheDimension;
+	private XDimension2D cacheDimension;
 	private double ymin;
 	private double ymax;
 
@@ -61,7 +63,7 @@ public class PlayingSpaceWithParticipants extends AbstractTextBlock implements T
 		this.playingSpace = Objects.requireNonNull(playingSpace);
 	}
 
-	public Dimension2D calculateDimension(StringBounder stringBounder) {
+	public XDimension2D calculateDimension(StringBounder stringBounder) {
 		if (cacheDimension == null) {
 			final double width = playingSpace.getMaxX(stringBounder).getCurrentValue()
 					- playingSpace.getMinX(stringBounder).getCurrentValue();
@@ -70,7 +72,7 @@ public class PlayingSpaceWithParticipants extends AbstractTextBlock implements T
 			final double height = playingSpace.getPreferredHeight(stringBounder)
 					+ factor * playingSpace.getLivingSpaces().getHeadHeight(stringBounder);
 
-			cacheDimension = new Dimension2DDouble(width, height);
+			cacheDimension = new XDimension2D(width, height);
 		}
 		return cacheDimension;
 	}
@@ -127,7 +129,7 @@ public class PlayingSpaceWithParticipants extends AbstractTextBlock implements T
 	}
 
 	private void drawNewPages(UGraphic ug) {
-		ug = ug.apply(HColorUtils.BLUE);
+		ug = ug.apply(HColors.BLUE);
 		for (Double change : yNewPages()) {
 			if (change == 0 || change == Double.MAX_VALUE) {
 				continue;

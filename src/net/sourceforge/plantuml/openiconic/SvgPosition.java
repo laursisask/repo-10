@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -33,7 +36,8 @@
 package net.sourceforge.plantuml.openiconic;
 
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Point2D;
+
+import net.sourceforge.plantuml.klimt.geom.XPoint2D;
 
 public class SvgPosition {
 
@@ -88,7 +92,8 @@ public class SvgPosition {
 		return new SvgPosition(x, y);
 	}
 
-	public Point2D affine(AffineTransform at) {
-		return at.transform(new Point2D.Double(getXDouble(), getYDouble()), null);
+	public XPoint2D affine(AffineTransform at) {
+		final XPoint2D tmp = new XPoint2D(getXDouble(), getYDouble()).transform(at);
+		return tmp;
 	}
 }

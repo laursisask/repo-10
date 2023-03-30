@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -34,7 +37,6 @@
  */
 package net.sourceforge.plantuml.svek;
 
-import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -44,57 +46,49 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sourceforge.plantuml.BaseFile;
-import net.sourceforge.plantuml.Dimension2DDouble;
-import net.sourceforge.plantuml.FontParam;
-import net.sourceforge.plantuml.Guillemet;
-import net.sourceforge.plantuml.ISkinParam;
-import net.sourceforge.plantuml.LineParam;
-import net.sourceforge.plantuml.Log;
+import net.atmp.InnerStrategy;
 import net.sourceforge.plantuml.OptionFlags;
-import net.sourceforge.plantuml.Pragma;
-import net.sourceforge.plantuml.SkinParamSameClassWidth;
 import net.sourceforge.plantuml.StringUtils;
-import net.sourceforge.plantuml.UmlDiagramType;
-import net.sourceforge.plantuml.activitydiagram3.ftile.EntityImageLegend;
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
+import net.sourceforge.plantuml.abel.Entity;
+import net.sourceforge.plantuml.abel.EntityFactory;
+import net.sourceforge.plantuml.abel.EntityPosition;
+import net.sourceforge.plantuml.abel.GroupType;
+import net.sourceforge.plantuml.abel.LeafType;
+import net.sourceforge.plantuml.abel.Link;
 import net.sourceforge.plantuml.core.UmlSource;
-import net.sourceforge.plantuml.cucadiagram.Display;
-import net.sourceforge.plantuml.cucadiagram.DisplayPositioned;
-import net.sourceforge.plantuml.cucadiagram.EntityPortion;
-import net.sourceforge.plantuml.cucadiagram.EntityPosition;
-import net.sourceforge.plantuml.cucadiagram.GroupRoot;
-import net.sourceforge.plantuml.cucadiagram.GroupType;
-import net.sourceforge.plantuml.cucadiagram.IEntity;
-import net.sourceforge.plantuml.cucadiagram.IGroup;
-import net.sourceforge.plantuml.cucadiagram.ILeaf;
-import net.sourceforge.plantuml.cucadiagram.LeafType;
-import net.sourceforge.plantuml.cucadiagram.Link;
 import net.sourceforge.plantuml.cucadiagram.PortionShower;
-import net.sourceforge.plantuml.cucadiagram.Stereotype;
-import net.sourceforge.plantuml.cucadiagram.UnparsableGraphvizException;
-import net.sourceforge.plantuml.cucadiagram.dot.DotData;
-import net.sourceforge.plantuml.cucadiagram.dot.ExeState;
-import net.sourceforge.plantuml.cucadiagram.dot.GraphvizUtils;
-import net.sourceforge.plantuml.cucadiagram.dot.GraphvizVersion;
-import net.sourceforge.plantuml.cucadiagram.dot.Neighborhood;
-import net.sourceforge.plantuml.cucadiagram.entity.EntityFactory;
+import net.sourceforge.plantuml.decoration.symbol.USymbolHexagon;
+import net.sourceforge.plantuml.decoration.symbol.USymbolInterface;
 import net.sourceforge.plantuml.descdiagram.EntityImageDesignedDomain;
 import net.sourceforge.plantuml.descdiagram.EntityImageDomain;
 import net.sourceforge.plantuml.descdiagram.EntityImageMachine;
 import net.sourceforge.plantuml.descdiagram.EntityImageRequirement;
-import net.sourceforge.plantuml.graphic.FontConfiguration;
-import net.sourceforge.plantuml.graphic.GraphicStrings;
-import net.sourceforge.plantuml.graphic.HorizontalAlignment;
-import net.sourceforge.plantuml.graphic.InnerStrategy;
-import net.sourceforge.plantuml.graphic.StringBounder;
-import net.sourceforge.plantuml.graphic.TextBlock;
-import net.sourceforge.plantuml.graphic.TextBlockEmpty;
-import net.sourceforge.plantuml.graphic.TextBlockUtils;
-import net.sourceforge.plantuml.graphic.USymbol;
-import net.sourceforge.plantuml.graphic.USymbolHexagon;
-import net.sourceforge.plantuml.graphic.USymbolInterface;
-import net.sourceforge.plantuml.graphic.USymbols;
+import net.sourceforge.plantuml.dot.DotData;
+import net.sourceforge.plantuml.dot.ExeState;
+import net.sourceforge.plantuml.dot.GraphvizUtils;
+import net.sourceforge.plantuml.dot.GraphvizVersion;
+import net.sourceforge.plantuml.dot.Neighborhood;
+import net.sourceforge.plantuml.dot.UnparsableGraphvizException;
+import net.sourceforge.plantuml.klimt.UStroke;
+import net.sourceforge.plantuml.klimt.color.HColor;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.font.FontConfiguration;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
+import net.sourceforge.plantuml.klimt.geom.MagneticBorder;
+import net.sourceforge.plantuml.klimt.geom.MagneticBorderNone;
+import net.sourceforge.plantuml.klimt.geom.MinMax;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
+import net.sourceforge.plantuml.klimt.geom.XRectangle2D;
+import net.sourceforge.plantuml.klimt.shape.GraphicStrings;
+import net.sourceforge.plantuml.log.Logme;
+import net.sourceforge.plantuml.security.SecurityProfile;
+import net.sourceforge.plantuml.security.SecurityUtils;
+import net.sourceforge.plantuml.skin.LineParam;
+import net.sourceforge.plantuml.skin.Pragma;
+import net.sourceforge.plantuml.skin.SkinParam;
+import net.sourceforge.plantuml.skin.UmlDiagramType;
+import net.sourceforge.plantuml.stereo.Stereotype;
+import net.sourceforge.plantuml.style.ISkinParam;
 import net.sourceforge.plantuml.style.PName;
 import net.sourceforge.plantuml.style.SName;
 import net.sourceforge.plantuml.style.Style;
@@ -128,14 +122,13 @@ import net.sourceforge.plantuml.svek.image.EntityImageStateEmptyDescription;
 import net.sourceforge.plantuml.svek.image.EntityImageSynchroBar;
 import net.sourceforge.plantuml.svek.image.EntityImageTips;
 import net.sourceforge.plantuml.svek.image.EntityImageUseCase;
-import net.sourceforge.plantuml.ugraphic.MinMax;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.UStroke;
-import net.sourceforge.plantuml.ugraphic.color.HColor;
+import net.sourceforge.plantuml.text.BackSlash;
+import net.sourceforge.plantuml.text.Guillemet;
+import net.sourceforge.plantuml.utils.Log;
 
 public final class GeneralImageBuilder {
 
-	public static IEntityImage createEntityImageBlock(ILeaf leaf, ISkinParam skinParam,
+	public static IEntityImage createEntityImageBlock(Entity leaf, ISkinParam skinParam,
 			boolean isHideEmptyDescriptionForState, PortionShower portionShower, Bibliotekon bibliotekon,
 			GraphvizVersion graphvizVersion, UmlDiagramType umlDiagramType, Collection<Link> links) {
 		final IEntityImage result = createEntityImageBlockInternal(leaf, skinParam, isHideEmptyDescriptionForState,
@@ -144,15 +137,14 @@ public final class GeneralImageBuilder {
 		return result;
 	}
 
-	private static IEntityImage createEntityImageBlockInternal(ILeaf leaf, ISkinParam skinParam,
+	private static IEntityImage createEntityImageBlockInternal(Entity leaf, ISkinParam skinParam,
 			boolean isHideEmptyDescriptionForState, PortionShower portionShower, Bibliotekon bibliotekon,
 			GraphvizVersion graphvizVersion, UmlDiagramType umlDiagramType, Collection<Link> links) {
 		if (leaf.isRemoved())
 			throw new IllegalStateException();
 
 		if (leaf.getLeafType().isLikeClass()) {
-			final EntityImageClass entityImageClass = new EntityImageClass(graphvizVersion, (ILeaf) leaf, skinParam,
-					portionShower);
+			final EntityImageClass entityImageClass = new EntityImageClass((Entity) leaf, skinParam, portionShower);
 			final Neighborhood neighborhood = leaf.getNeighborhood();
 			if (neighborhood != null)
 				return new EntityImageProtected(entityImageClass, 20, neighborhood, bibliotekon);
@@ -165,8 +157,8 @@ public final class GeneralImageBuilder {
 		if (leaf.getLeafType() == LeafType.ACTIVITY)
 			return new EntityImageActivity(leaf, skinParam, bibliotekon);
 
-		if ((leaf.getLeafType() == LeafType.PORT) || (leaf.getLeafType() == LeafType.PORTIN)
-				|| (leaf.getLeafType() == LeafType.PORTOUT)) {
+		if (/* (leaf.getLeafType() == LeafType.PORT) || */leaf.getLeafType() == LeafType.PORTIN
+				|| leaf.getLeafType() == LeafType.PORTOUT) {
 			final Cluster parent = bibliotekon.getCluster(leaf.getParentContainer());
 			return new EntityImagePort(leaf, skinParam, parent, bibliotekon, umlDiagramType.getStyleName());
 		}
@@ -289,7 +281,7 @@ public final class GeneralImageBuilder {
 	public static UStroke getForcedStroke(Stereotype stereotype, ISkinParam skinParam) {
 		UStroke stroke = skinParam.getThickness(LineParam.packageBorder, stereotype);
 		if (stroke == null)
-			stroke = new UStroke(1.5);
+			stroke = UStroke.withThickness(1.5);
 
 		return stroke;
 	}
@@ -302,11 +294,10 @@ public final class GeneralImageBuilder {
 	private Map<String, Double> maxX;
 
 	private final StringBounder stringBounder;
-	private final boolean mergeIntricated;
 	private final SName styleName;
 
-	public GeneralImageBuilder(boolean mergeIntricated, DotData dotData, EntityFactory entityFactory, UmlSource source,
-			Pragma pragma, StringBounder stringBounder, SName styleName) {
+	public GeneralImageBuilder(DotData dotData, EntityFactory entityFactory, UmlSource source, Pragma pragma,
+			StringBounder stringBounder, SName styleName) {
 		this.dotData = dotData;
 		this.styleName = styleName;
 		this.entityFactory = entityFactory;
@@ -314,7 +305,6 @@ public final class GeneralImageBuilder {
 		this.pragma = pragma;
 		this.stringBounder = stringBounder;
 		this.strictUmlStyle = dotData.getSkinParam().strictUmlStyle();
-		this.mergeIntricated = mergeIntricated;
 	}
 
 	final public StyleSignature getDefaultStyleDefinitionArrow(Stereotype stereotype) {
@@ -325,11 +315,21 @@ public final class GeneralImageBuilder {
 		return result;
 	}
 
-	private boolean isOpalisable(IEntity entity) {
+	private boolean isOpalisable(Entity entity) {
 		if (strictUmlStyle)
 			return false;
 
-		return entity.isGroup() == false && entity.getLeafType() == LeafType.NOTE && onlyOneLink(entity);
+		if (entity.isGroup())
+			return false;
+
+		if (entity.getLeafType() != LeafType.NOTE)
+			return false;
+
+		final Link single = onlyOneLink(entity);
+		if (single == null)
+			return false;
+
+		return single.getOther(entity).getLeafType() != LeafType.NOTE;
 	}
 
 	static class EntityImageSimpleEmpty implements IEntityImage {
@@ -348,15 +348,15 @@ public final class GeneralImageBuilder {
 			return backColor;
 		}
 
-		public Dimension2D calculateDimension(StringBounder stringBounder) {
-			return new Dimension2DDouble(10, 10);
+		public XDimension2D calculateDimension(StringBounder stringBounder) {
+			return new XDimension2D(10, 10);
 		}
 
 		public MinMax getMinMax(StringBounder stringBounder) {
 			return MinMax.fromDim(calculateDimension(stringBounder));
 		}
 
-		public Rectangle2D getInnerPosition(String member, StringBounder stringBounder, InnerStrategy strategy) {
+		public XRectangle2D getInnerPosition(String member, StringBounder stringBounder, InnerStrategy strategy) {
 			return null;
 		}
 
@@ -375,24 +375,29 @@ public final class GeneralImageBuilder {
 			return 0;
 		}
 
+		@Override
+		public MagneticBorder getMagneticBorder() {
+			return new MagneticBorderNone();
+		}
+
 	}
 
 	// Duplicate SvekResult / GeneralImageBuilder
 	private HColor getBackcolor() {
 		final Style style = StyleSignatureBasic.of(SName.root, SName.document)
 				.getMergedStyle(dotData.getSkinParam().getCurrentStyleBuilder());
-		return style.value(PName.BackGroundColor).asColor(dotData.getSkinParam().getThemeStyle(),
-				dotData.getSkinParam().getIHtmlColorSet());
+		return style.value(PName.BackGroundColor).asColor(dotData.getSkinParam().getIHtmlColorSet());
 	}
 
-	public IEntityImage buildImage(BaseFile basefile, String dotStrings[]) {
+	public IEntityImage buildImage(BaseFile basefile, String dotStrings[], boolean fileFormatOptionIsDebugSvek) {
+		// ::comment when __CORE__
 		if (dotData.isDegeneratedWithFewEntities(0))
 			return new EntityImageSimpleEmpty(dotData.getSkinParam().getBackgroundColor());
 
 		if (dotData.isDegeneratedWithFewEntities(1) && dotData.getUmlDiagramType() != UmlDiagramType.STATE) {
-			final ILeaf single = dotData.getLeafs().iterator().next();
-			final IGroup group = single.getParentContainer();
-			if (group instanceof GroupRoot && single.getUSymbol() instanceof USymbolHexagon == false) {
+			final Entity single = dotData.getLeafs().iterator().next();
+			final Entity group = single.getParentContainer();
+			if (group.isRoot() && single.getUSymbol() instanceof USymbolHexagon == false) {
 				final IEntityImage tmp = GeneralImageBuilder.createEntityImageBlock(single, dotData.getSkinParam(),
 						dotData.isHideEmptyDescriptionForState(), dotData, null, null, dotData.getUmlDiagramType(),
 						dotData.getLinks());
@@ -414,7 +419,7 @@ public final class GeneralImageBuilder {
 				final FontConfiguration labelFont = getFontForLink(link, skinParam);
 
 				final SvekLine line = new SvekLine(link, dotStringFactory.getColorSequence(), skinParam, stringBounder,
-						labelFont, dotStringFactory.getBibliotekon(), pragma);
+						labelFont, dotStringFactory.getBibliotekon(), pragma, dotStringFactory.getGraphvizVersion());
 
 				dotStringFactory.getBibliotekon().addLine(line);
 
@@ -434,42 +439,51 @@ public final class GeneralImageBuilder {
 					}
 				}
 			} catch (IllegalStateException e) {
-				e.printStackTrace();
+				Logme.error(e);
 			}
 		}
 
 		if (dotStringFactory.illegalDotExe())
 			return error(dotStringFactory.getDotExe());
 
-		if (basefile == null && isSvekTrace())
+		if (basefile == null && (fileFormatOptionIsDebugSvek || isSvekTrace())
+				&& (SecurityUtils.getSecurityProfile() == SecurityProfile.UNSECURE
+						|| SecurityUtils.getSecurityProfile() == SecurityProfile.LEGACY
+						|| SecurityUtils.getSecurityProfile() == SecurityProfile.SANDBOX))
 			basefile = new BaseFile(null);
 
 		final String svg;
 		try {
 			svg = dotStringFactory.getSvg(basefile, dotStrings);
 		} catch (IOException e) {
-			return new GraphvizCrash(source.getPlainString(), GraphvizUtils.graphviz244onWindows(), e);
+			return new GraphvizCrash(source.getPlainString(BackSlash.lineSeparator()),
+					GraphvizUtils.graphviz244onWindows(), e);
 		}
 		if (svg.length() == 0)
-			return new GraphvizCrash(source.getPlainString(), GraphvizUtils.graphviz244onWindows(),
-					new EmptySvgException());
+			return new GraphvizCrash(source.getPlainString(BackSlash.lineSeparator()),
+					GraphvizUtils.graphviz244onWindows(), new EmptySvgException());
 
 		final String graphvizVersion = extractGraphvizVersion(svg);
 		try {
-			dotStringFactory.solve(mergeIntricated, dotData.getEntityFactory(), svg);
+			dotStringFactory.solve(dotData.getEntityFactory(), svg);
 			final SvekResult result = new SvekResult(dotData, dotStringFactory);
 			this.maxX = dotStringFactory.getBibliotekon().getMaxX();
 			return result;
 		} catch (Exception e) {
 			Log.error("Exception " + e);
-			throw new UnparsableGraphvizException(e, graphvizVersion, svg, source.getPlainString());
+			throw new UnparsableGraphvizException(e, graphvizVersion, svg,
+					source.getPlainString(BackSlash.lineSeparator()));
 		}
+		// ::done
+		// ::uncomment when __CORE__
+		// return null;
+		// ::done
 
 	}
 
 	private FontConfiguration getFontForLink(Link link, final ISkinParam skinParam) {
 		final Style style = getDefaultStyleDefinitionArrow(link.getStereotype()).getMergedStyle(link.getStyleBuilder());
-		return style.getFontConfiguration(skinParam.getThemeStyle(), skinParam.getIHtmlColorSet());
+		return style.getFontConfiguration(skinParam.getIHtmlColorSet());
 	}
 
 	private boolean isSvekTrace() {
@@ -486,24 +500,23 @@ public final class GeneralImageBuilder {
 		return null;
 	}
 
-	private boolean onlyOneLink(IEntity ent) {
-		int nb = 0;
+	private Link onlyOneLink(Entity ent) {
+		Link single = null;
 		for (Link link : dotData.getLinks()) {
 			if (link.isInvis())
 				continue;
+			if (link.contains(ent) == false)
+				continue;
 
-			if (link.contains(ent))
-				nb++;
-
-			if (nb > 1)
-				return false;
-
+			if (single != null)
+				return null;
+			single = link;
 		}
-		return nb == 1;
+		return single;
 	}
 
+	// ::comment when __CORE__
 	private IEntityImage error(File dotExe) {
-
 		final List<String> msg = new ArrayList<>();
 		msg.add("Dot Executable: " + dotExe);
 		final ExeState exeState = ExeState.checkFile(dotExe);
@@ -520,9 +533,10 @@ public final class GeneralImageBuilder {
 		msg.add(" ");
 		return GraphicStrings.createForError(msg, false);
 	}
+	// ::done
 
-	private void printEntities(DotStringFactory dotStringFactory, Collection<ILeaf> entities2) {
-		for (ILeaf ent : entities2) {
+	private void printEntities(DotStringFactory dotStringFactory, Collection<Entity> entities2) {
+		for (Entity ent : entities2) {
 			if (ent.isRemoved())
 				continue;
 
@@ -530,7 +544,7 @@ public final class GeneralImageBuilder {
 		}
 	}
 
-	private void printEntity(DotStringFactory dotStringFactory, ILeaf ent) {
+	private void printEntity(DotStringFactory dotStringFactory, Entity ent) {
 		if (ent.isRemoved())
 			throw new IllegalStateException();
 
@@ -540,15 +554,15 @@ public final class GeneralImageBuilder {
 		dotStringFactory.addNode(node);
 	}
 
-	private IEntityImage printEntityInternal(DotStringFactory dotStringFactory, ILeaf ent) {
+	private IEntityImage printEntityInternal(DotStringFactory dotStringFactory, Entity ent) {
 		if (ent.isRemoved())
 			throw new IllegalStateException();
 
 		if (ent.getSvekImage() == null) {
 			ISkinParam skinParam = dotData.getSkinParam();
 			if (skinParam.sameClassWidth()) {
-				final double width = getMaxWidth(dotStringFactory);
-				skinParam = new SkinParamSameClassWidth(skinParam, width);
+				final double width = getMaxWidth();
+				((SkinParam) skinParam).setParamSameClassWidth(width);
 			}
 
 			return createEntityImageBlock(ent, skinParam, dotData.isHideEmptyDescriptionForState(), dotData,
@@ -558,14 +572,13 @@ public final class GeneralImageBuilder {
 		return ent.getSvekImage();
 	}
 
-	private double getMaxWidth(DotStringFactory dotStringFactory) {
+	private double getMaxWidth() {
 		double result = 0;
-		for (ILeaf ent : dotData.getLeafs()) {
+		for (Entity ent : dotData.getLeafs()) {
 			if (ent.getLeafType().isLikeClass() == false)
 				continue;
 
-			final IEntityImage im = new EntityImageClass(dotStringFactory.getGraphvizVersion(), ent,
-					dotData.getSkinParam(), dotData);
+			final IEntityImage im = new EntityImageClass(ent, dotData.getSkinParam(), dotData);
 			final double w = im.calculateDimension(stringBounder).getWidth();
 			if (w > result)
 				result = w;
@@ -574,171 +587,44 @@ public final class GeneralImageBuilder {
 		return result;
 	}
 
-	private Collection<ILeaf> getUnpackagedEntities() {
-		final List<ILeaf> result = new ArrayList<>();
-		for (ILeaf ent : dotData.getLeafs())
+	private Collection<Entity> getUnpackagedEntities() {
+		final List<Entity> result = new ArrayList<>();
+		for (Entity ent : dotData.getLeafs())
 			if (dotData.getTopParent() == ent.getParentContainer())
 				result.add(ent);
 
 		return result;
 	}
 
-	private void printGroups(DotStringFactory dotStringFactory, IGroup parent) {
-		final Collection<IGroup> groups = dotData.getGroupHierarchy().getChildrenGroups(parent);
-		for (IGroup g : groups) {
+	private void printGroups(DotStringFactory dotStringFactory, Entity parent) {
+		// System.err.println("PARENT=" + parent);
+		final Collection<Entity> groups = dotData.getGroupHierarchy().getChildrenGroups(parent);
+		// System.err.println("groups=" + groups);
+		for (Entity g : groups) {
 			if (g.isRemoved())
 				continue;
 
 			if (dotData.isEmpty(g) && g.getGroupType() == GroupType.PACKAGE) {
-				final ISkinParam skinParam = dotData.getSkinParam();
-				entityFactory.thisIsGoingToBeALeaf(g.getIdent());
-				final ILeaf folder = entityFactory.createLeafForEmptyGroup(g, skinParam);
-				printEntity(dotStringFactory, folder);
+				g.muteToType(LeafType.EMPTY_PACKAGE);
+				printEntity(dotStringFactory, g);
 			} else {
 				printGroup(dotStringFactory, g);
 			}
 		}
 	}
 
-	private void printGroup(DotStringFactory dotStringFactory, IGroup g) {
+	private void printGroup(DotStringFactory dotStringFactory, Entity g) {
 		if (g.getGroupType() == GroupType.CONCURRENT_STATE)
 			return;
 
-		if (mergeIntricated) {
-			final IGroup intricated = dotData.getEntityFactory().isIntricated(g);
-			if (intricated != null) {
-				printGroup(dotStringFactory, intricated);
-				return;
-			}
-		}
-		int titleAndAttributeWidth = 0;
-		int titleAndAttributeHeight = 0;
-
-		final TextBlock title = getTitleBlock(g);
-		final TextBlock stereo = getStereoBlock(g);
-		final TextBlock stereoAndTitle = TextBlockUtils.mergeTB(stereo, title, HorizontalAlignment.CENTER);
-		final Dimension2D dimLabel = stereoAndTitle.calculateDimension(stringBounder);
-		if (dimLabel.getWidth() > 0) {
-			final Dimension2D dimAttribute = stateHeader((IEntity) g, getStyleState(FontParam.STATE_ATTRIBUTE),
-					dotData.getSkinParam()).calculateDimension(stringBounder);
-			final double attributeHeight = dimAttribute.getHeight();
-			final double attributeWidth = dimAttribute.getWidth();
-			final double marginForFields = attributeHeight > 0 ? IEntityImage.MARGIN : 0;
-			final USymbol uSymbol = g.getUSymbol();
-			final int suppHeightBecauseOfShape = uSymbol == null ? 0 : uSymbol.suppHeightBecauseOfShape();
-			final int suppWidthBecauseOfShape = uSymbol == null ? 0 : uSymbol.suppWidthBecauseOfShape();
-
-			titleAndAttributeWidth = (int) Math.max(dimLabel.getWidth(), attributeWidth) + suppWidthBecauseOfShape;
-			titleAndAttributeHeight = (int) (dimLabel.getHeight() + attributeHeight + marginForFields
-					+ suppHeightBecauseOfShape);
-		}
-
-		dotStringFactory.openCluster(titleAndAttributeWidth, titleAndAttributeHeight, title, stereo, g);
-		this.printEntities(dotStringFactory, g.getLeafsDirect());
+		final ClusterHeader clusterHeader = new ClusterHeader((Entity) g, dotData.getSkinParam(), dotData,
+				stringBounder);
+		dotStringFactory.openCluster(g, clusterHeader);
+		this.printEntities(dotStringFactory, g.leafs());
 
 		printGroups(dotStringFactory, g);
 
 		dotStringFactory.closeCluster();
-	}
-
-	public static TextBlock stateHeader(IEntity group, Style style, ISkinParam skinParam) {
-		final List<CharSequence> details = group.getBodier().getRawBody();
-
-		if (details.size() == 0)
-			return new TextBlockEmpty();
-
-		final FontConfiguration fontConfiguration;
-		if (style == null)
-			fontConfiguration = FontConfiguration.create(skinParam, FontParam.STATE_ATTRIBUTE, null);
-		else
-			fontConfiguration = FontConfiguration.create(skinParam, style);
-
-		Display display = null;
-		for (CharSequence s : details)
-			if (display == null)
-				display = Display.getWithNewlines(s.toString());
-			else
-				display = display.addAll(Display.getWithNewlines(s.toString()));
-
-		return display.create(fontConfiguration, HorizontalAlignment.LEFT, skinParam);
-
-	}
-
-	private Style getStyleState(FontParam fontParam) {
-		return fontParam.getStyleDefinition(SName.stateDiagram)
-				.getMergedStyle(dotData.getSkinParam().getCurrentStyleBuilder());
-	}
-
-	private TextBlock getTitleBlock(IGroup g) {
-		final Display label = g.getDisplay();
-		if (label == null)
-			return TextBlockUtils.empty(0, 0);
-
-		final ISkinParam skinParam = dotData.getSkinParam();
-
-		final SName sname = dotData.getUmlDiagramType().getStyleName();
-		final StyleSignatureBasic signature;
-		final USymbol uSymbol = g.getUSymbol();
-		if (g.getGroupType() == GroupType.STATE)
-			signature = StyleSignatureBasic.of(SName.root, SName.element, SName.stateDiagram, SName.state,
-					SName.header);
-		else if (uSymbol == USymbols.RECTANGLE)
-			signature = StyleSignatureBasic.of(SName.root, SName.element, sname, uSymbol.getSName(), SName.title);
-		else
-			signature = StyleSignatureBasic.of(SName.root, SName.element, sname, SName.title);
-
-		final Style style = signature //
-				.withTOBECHANGED(g.getStereotype()) //
-				.with(g.getStereostyles()) //
-				.getMergedStyle(skinParam.getCurrentStyleBuilder());
-
-		final FontConfiguration fontConfiguration = style.getFontConfiguration(skinParam.getThemeStyle(),
-				skinParam.getIHtmlColorSet());
-
-		final HorizontalAlignment alignment = HorizontalAlignment.CENTER;
-		return label.create(fontConfiguration, alignment, dotData.getSkinParam());
-	}
-
-	private TextBlock addLegend(TextBlock original, DisplayPositioned legend) {
-		if (legend == null || legend.isNull())
-			return original;
-
-		final TextBlock legendBlock = EntityImageLegend.create(legend.getDisplay(), dotData.getSkinParam());
-		return DecorateEntityImage.add(legendBlock, original, legend.getHorizontalAlignment(),
-				legend.getVerticalAlignment());
-	}
-
-	private TextBlock getStereoBlock(IGroup g) {
-		final DisplayPositioned legend = g.getLegend();
-		return addLegend(getStereoBlockWithoutLegend(g), legend);
-	}
-
-	private TextBlock getStereoBlockWithoutLegend(IGroup g) {
-		final Stereotype stereotype = g.getStereotype();
-		// final DisplayPositionned legend = g.getLegend();
-		if (stereotype == null)
-			return TextBlockUtils.empty(0, 0);
-
-		final TextBlock tmp = stereotype.getSprite(dotData.getSkinParam());
-		if (tmp != null)
-			return tmp;
-
-		final List<String> stereos = stereotype.getLabels(dotData.getSkinParam().guillemet());
-		if (stereos == null)
-			return TextBlockUtils.empty(0, 0);
-
-		final boolean show = dotData.showPortion(EntityPortion.STEREOTYPE, g);
-		if (show == false)
-			return TextBlockUtils.empty(0, 0);
-
-		final Style style = Cluster
-				.getDefaultStyleDefinition(dotData.getUmlDiagramType().getStyleName(), g.getUSymbol())
-				.forStereotypeItself(g.getStereotype()).getMergedStyle(dotData.getSkinParam().getCurrentStyleBuilder());
-
-		final FontConfiguration fontConfiguration = style.getFontConfiguration(dotData.getSkinParam().getThemeStyle(),
-				dotData.getSkinParam().getIHtmlColorSet());
-		return Display.create(stereos).create(fontConfiguration, HorizontalAlignment.CENTER, dotData.getSkinParam());
-
 	}
 
 	public String getWarningOrError(int warningOrError) {

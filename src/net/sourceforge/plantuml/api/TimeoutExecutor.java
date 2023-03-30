@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -34,6 +37,8 @@ package net.sourceforge.plantuml.api;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import net.sourceforge.plantuml.log.Logme;
+
 public final class TimeoutExecutor {
 
 	private final long ms;
@@ -50,7 +55,7 @@ public final class TimeoutExecutor {
 			mainThread.join(ms);
 		} catch (InterruptedException e) {
 			System.err.println("TimeoutExecutorA " + e);
-			e.printStackTrace();
+			Logme.error(e);
 			return false;
 		} finally {
 			done = mainThread.done.get();
@@ -77,7 +82,7 @@ public final class TimeoutExecutor {
 				done.set(true);
 			} catch (InterruptedException e) {
 				System.err.println("TimeoutExecutorB " + e);
-				e.printStackTrace();
+				Logme.error(e);
 			}
 		}
 

@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,9 +35,8 @@
  */
 package net.sourceforge.plantuml.svek.image;
 
-import java.awt.geom.Point2D;
-
-import net.sourceforge.plantuml.ugraphic.UEllipse;
+import net.sourceforge.plantuml.klimt.geom.XPoint2D;
+import net.sourceforge.plantuml.klimt.shape.UEllipse;
 
 public class ContainingEllipse {
 
@@ -50,13 +52,13 @@ public class ContainingEllipse {
 		ytransformer = new YTransformer(coefY);
 	}
 
-	public void append(Point2D pt) {
+	public void append(XPoint2D pt) {
 		pt = ytransformer.getReversePoint2D(pt);
 		sec.append(pt);
 	}
 
 	public void append(double x, double y) {
-		append(new Point2D.Double(x, y));
+		append(new XPoint2D(x, y));
 	}
 
 	public double getWidth() {
@@ -67,12 +69,12 @@ public class ContainingEllipse {
 		return 2 * sec.getCircle().getRadius() * ytransformer.getAlpha();
 	}
 
-	public Point2D getCenter() {
+	public XPoint2D getCenter() {
 		return ytransformer.getPoint2D(sec.getCircle().getCenter());
 	}
 
 	public UEllipse asUEllipse() {
-		final UEllipse ellipse = new UEllipse(getWidth(), getHeight());
+		final UEllipse ellipse = UEllipse.build(getWidth(), getHeight());
 		ellipse.setDeltaShadow(deltaShadow);
 		return ellipse;
 	}

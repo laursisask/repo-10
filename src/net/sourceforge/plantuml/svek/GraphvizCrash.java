@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -37,55 +40,54 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sourceforge.plantuml.BackSlash;
+import net.atmp.PixelImage;
 import net.sourceforge.plantuml.OptionPrint;
 import net.sourceforge.plantuml.StringUtils;
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
 import net.sourceforge.plantuml.command.CommandExecutionResult;
-import net.sourceforge.plantuml.cucadiagram.dot.GraphvizUtils;
+import net.sourceforge.plantuml.dot.GraphvizUtils;
 import net.sourceforge.plantuml.flashcode.FlashCodeFactory;
-import net.sourceforge.plantuml.flashcode.FlashCodeUtils;
-import net.sourceforge.plantuml.graphic.AbstractTextBlock;
-import net.sourceforge.plantuml.graphic.GraphicPosition;
-import net.sourceforge.plantuml.graphic.GraphicStrings;
-import net.sourceforge.plantuml.graphic.HorizontalAlignment;
-import net.sourceforge.plantuml.graphic.QuoteUtils;
-import net.sourceforge.plantuml.graphic.StringBounder;
-import net.sourceforge.plantuml.graphic.TextBlock;
-import net.sourceforge.plantuml.graphic.TextBlockUtils;
-import net.sourceforge.plantuml.ugraphic.AffineTransformType;
-import net.sourceforge.plantuml.ugraphic.PixelImage;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.UImage;
-import net.sourceforge.plantuml.ugraphic.color.HColor;
-import net.sourceforge.plantuml.ugraphic.color.HColorUtils;
+import net.sourceforge.plantuml.klimt.AffineTransformType;
+import net.sourceforge.plantuml.klimt.color.HColor;
+import net.sourceforge.plantuml.klimt.color.HColors;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
+import net.sourceforge.plantuml.klimt.geom.GraphicPosition;
+import net.sourceforge.plantuml.klimt.geom.HorizontalAlignment;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
+import net.sourceforge.plantuml.klimt.shape.AbstractTextBlock;
+import net.sourceforge.plantuml.klimt.shape.GraphicStrings;
+import net.sourceforge.plantuml.klimt.shape.TextBlock;
+import net.sourceforge.plantuml.klimt.shape.TextBlockUtils;
+import net.sourceforge.plantuml.klimt.shape.UImage;
+import net.sourceforge.plantuml.text.BackSlash;
 import net.sourceforge.plantuml.version.PSystemVersion;
 import net.sourceforge.plantuml.version.Version;
 
 public class GraphvizCrash extends AbstractTextBlock implements IEntityImage {
 
 	private final TextBlock text1;
-	private final BufferedImage flashCode;
 	private final String text;
+	// ::comment when __CORE__
+	private final BufferedImage flashCode;
 	private final boolean graphviz244onWindows;
+	// ::done
 
 	public GraphvizCrash(String text, boolean graphviz244onWindows, Throwable rootCause) {
 		this.text = text;
+		// ::comment when __CORE__
 		this.graphviz244onWindows = graphviz244onWindows;
-		final FlashCodeUtils utils = FlashCodeFactory.getFlashCodeUtils();
-		this.flashCode = utils.exportFlashcode(text, Color.BLACK, Color.WHITE);
+		this.flashCode = FlashCodeFactory.getFlashCodeUtils().exportFlashcode(text, Color.BLACK, Color.WHITE);
+		// ::done
 		this.text1 = GraphicStrings.createBlackOnWhite(init(rootCause));
 	}
 
 	public static List<String> anErrorHasOccured(Throwable exception, String text) {
 		final List<String> strings = new ArrayList<>();
-		if (exception == null) {
+		if (exception == null)
 			strings.add("An error has occured!");
-		} else {
+		else
 			strings.add("An error has occured : " + exception);
-		}
-		final String quote = StringUtils.rot(QuoteUtils.getSomeQuote());
-		strings.add("<i>" + quote);
+
 		strings.add(" ");
 		strings.add("Diagram size: " + lines(text) + " lines / " + text.length() + " characters.");
 		strings.add(" ");
@@ -94,11 +96,10 @@ public class GraphvizCrash extends AbstractTextBlock implements IEntityImage {
 
 	private static int lines(String text) {
 		int result = 0;
-		for (int i = 0; i < text.length(); i++) {
-			if (text.charAt(i) == BackSlash.CHAR_NEWLINE) {
+		for (int i = 0; i < text.length(); i++)
+			if (text.charAt(i) == BackSlash.CHAR_NEWLINE)
 				result++;
-			}
-		}
+
 		return result;
 	}
 
@@ -120,7 +121,7 @@ public class GraphvizCrash extends AbstractTextBlock implements IEntityImage {
 	public static void youShouldSendThisDiagram(List<String> strings) {
 		strings.add("You should send this diagram and this image to <b>plantuml@gmail.com</b> or");
 		strings.add("post to <b>https://plantuml.com/qa</b> to solve this issue.");
-		strings.add("You can try to turn arround this issue by simplifing your diagram.");
+		strings.add("You can try to turn around this issue by simplifing your diagram.");
 	}
 
 	public static void thisMayBeCaused(final List<String> strings) {
@@ -134,26 +135,29 @@ public class GraphvizCrash extends AbstractTextBlock implements IEntityImage {
 		strings.add("For some reason, dot/GraphViz has crashed.");
 		strings.add("");
 		strings.add("RootCause " + rootCause);
-		if (rootCause != null) {
+		if (rootCause != null)
 			strings.addAll(CommandExecutionResult.getStackTrace(rootCause));
-		}
+
 		strings.add("");
 		strings.add("This has been generated with PlantUML (" + Version.versionString() + ").");
 		checkOldVersionWarning(strings);
 		strings.add(" ");
 		addProperties(strings);
 		strings.add(" ");
+		// ::comment when __CORE__
 		try {
 			final String dotVersion = GraphvizUtils.dotVersion();
 			strings.add("Default dot version: " + dotVersion);
 		} catch (Throwable e) {
 			strings.add("Cannot determine dot version: " + e.toString());
 		}
+		// ::done
 		pleaseGoTo(strings);
 		youShouldSendThisDiagram(strings);
-		if (flashCode != null) {
+		// ::comment when __CORE__
+		if (flashCode != null)
 			addDecodeHint(strings);
-		}
+		// ::done
 
 		return strings;
 	}
@@ -180,8 +184,10 @@ public class GraphvizCrash extends AbstractTextBlock implements IEntityImage {
 	}
 
 	public static void addProperties(final List<String> strings) {
+		// ::comment when __CORE__
 		strings.addAll(OptionPrint.interestingProperties());
 		strings.addAll(OptionPrint.interestingValues());
+		// ::done
 	}
 
 	public boolean isHidden() {
@@ -189,10 +195,10 @@ public class GraphvizCrash extends AbstractTextBlock implements IEntityImage {
 	}
 
 	public HColor getBackcolor() {
-		return HColorUtils.WHITE;
+		return HColors.WHITE;
 	}
 
-	public Dimension2D calculateDimension(StringBounder stringBounder) {
+	public XDimension2D calculateDimension(StringBounder stringBounder) {
 		return getMain().calculateDimension(stringBounder);
 	}
 
@@ -202,6 +208,7 @@ public class GraphvizCrash extends AbstractTextBlock implements IEntityImage {
 
 	private TextBlock getMain() {
 		TextBlock result = text1;
+		// ::comment when __CORE__
 		if (flashCode != null) {
 			final UImage flash = new UImage(new PixelImage(flashCode, AffineTransformType.TYPE_NEAREST_NEIGHBOR))
 					.scale(3);
@@ -221,6 +228,7 @@ public class GraphvizCrash extends AbstractTextBlock implements IEntityImage {
 			final UImage dotd = new UImage(new PixelImage(PSystemVersion.getDotd(), AffineTransformType.TYPE_BILINEAR));
 			result = TextBlockUtils.mergeTB(result, dotd, HorizontalAlignment.LEFT);
 		}
+		// ::done
 
 		return result;
 	}

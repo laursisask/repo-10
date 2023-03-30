@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -40,20 +43,24 @@ import net.sourceforge.plantuml.code.deflate.Decompressor;
 
 public class CompressionZlib implements Compression {
 
+	// ::comment when __CORE__
 	private static boolean USE_ZOPFLI = false;
+	// ::done
 	private static final int COMPRESSION_LEVEL = 9;
 
 	public byte[] compress(byte[] in) {
-		if (USE_ZOPFLI) {
+		// ::comment when __CORE__
+		if (USE_ZOPFLI)
 			return new CompressionZopfliZlib().compress(in);
-		}
-		if (in.length == 0) {
+		// ::done
+
+		if (in.length == 0)
 			return null;
-		}
+
 		int len = in.length * 2;
-		if (len < 1000) {
+		if (len < 1000)
 			len = 1000;
-		}
+
 		// Compress the bytes
 		final Deflater compresser = new Deflater(COMPRESSION_LEVEL, true);
 		compresser.setInput(in);
@@ -61,9 +68,9 @@ public class CompressionZlib implements Compression {
 
 		final byte[] output = new byte[len];
 		final int compressedDataLength = compresser.deflate(output);
-		if (compresser.finished() == false) {
+		if (compresser.finished() == false)
 			return null;
-		}
+
 		return copyArray(output, compressedDataLength);
 	}
 

@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -36,11 +39,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import net.sourceforge.plantuml.Dimension2DDouble;
-import net.sourceforge.plantuml.ISkinParam;
-import net.sourceforge.plantuml.PaddingParam;
-import net.sourceforge.plantuml.SkinParamBackcolored;
-import net.sourceforge.plantuml.graphic.StringBounder;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.color.HColor;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
 import net.sourceforge.plantuml.real.Real;
 import net.sourceforge.plantuml.sequencediagram.teoz.LivingSpace;
 import net.sourceforge.plantuml.sequencediagram.teoz.TileArguments;
@@ -48,15 +51,15 @@ import net.sourceforge.plantuml.skin.Area;
 import net.sourceforge.plantuml.skin.Component;
 import net.sourceforge.plantuml.skin.ComponentType;
 import net.sourceforge.plantuml.skin.Context2D;
+import net.sourceforge.plantuml.skin.PaddingParam;
+import net.sourceforge.plantuml.skin.SkinParamBackcolored;
 import net.sourceforge.plantuml.skin.rose.Rose;
+import net.sourceforge.plantuml.style.ISkinParam;
 import net.sourceforge.plantuml.style.PName;
 import net.sourceforge.plantuml.style.Style;
 import net.sourceforge.plantuml.style.StyleBuilder;
 import net.sourceforge.plantuml.style.StyleSignatureBasic;
 import net.sourceforge.plantuml.style.WithStyle;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
-import net.sourceforge.plantuml.ugraphic.color.HColor;
 
 public class Doll implements WithStyle {
 
@@ -76,7 +79,7 @@ public class Doll implements WithStyle {
 
 	private static TileArguments convertFunctionToBeRemoved(ISkinParam skinParam, Rose skin,
 			StringBounder stringBounder) {
-		return new TileArguments(stringBounder, null, skin, skinParam, null);
+		return new TileArguments(stringBounder, null, skin, skinParam, null, null);
 	}
 
 	private Doll(ParticipantEnglober englober, TileArguments tileArguments, StyleBuilder styleBuilder,
@@ -85,9 +88,8 @@ public class Doll implements WithStyle {
 		this.styleBuilder = styleBuilder;
 		this.tileArguments = Objects.requireNonNull(tileArguments);
 
-		if (first != null) {
+		if (first != null)
 			this.participants.add(first);
-		}
 
 	}
 
@@ -148,9 +150,9 @@ public class Doll implements WithStyle {
 
 	private Real getPosAA(StringBounder stringBounder) {
 		final LivingSpace previous = tileArguments.getLivingSpaces().previous(getFirstLivingSpace());
-		if (previous == null) {
-			return tileArguments.getOrigin();
-		}
+		if (previous == null)
+			return tileArguments.getXOrigin();
+
 		return previous.getPosD(stringBounder);
 	}
 
@@ -190,7 +192,7 @@ public class Doll implements WithStyle {
 			height -= titlePreferredHeight;
 		}
 
-		final Dimension2DDouble dim = new Dimension2DDouble(x2 - x1, height);
+		final XDimension2D dim = new XDimension2D(x2 - x1, height);
 		getComponent().drawU(ug.apply(new UTranslate(x1, 1)), new Area(dim), context);
 	}
 

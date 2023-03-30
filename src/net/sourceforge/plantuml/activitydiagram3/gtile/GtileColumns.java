@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
  * 
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  * 
  * This file is part of PlantUML.
  *
@@ -40,12 +40,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import net.sourceforge.plantuml.Dimension2DDouble;
 import net.sourceforge.plantuml.activitydiagram3.ftile.Swimlane;
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
-import net.sourceforge.plantuml.graphic.StringBounder;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
 import net.sourceforge.plantuml.utils.MathUtils;
 
 public class GtileColumns extends AbstractGtile {
@@ -58,7 +57,7 @@ public class GtileColumns extends AbstractGtile {
 	protected final UTranslate getPosition(int pos) {
 		double dx = 0;
 		for (int i = 0; i < pos; i++) {
-			final Dimension2D dim = gtiles.get(i).calculateDimension(getStringBounder());
+			final XDimension2D dim = gtiles.get(i).calculateDimension(getStringBounder());
 			dx += dim.getWidth() + margin;
 		}
 		return new UTranslate(dx, dy);
@@ -99,13 +98,13 @@ public class GtileColumns extends AbstractGtile {
 	}
 
 	@Override
-	public Dimension2D calculateDimension(StringBounder stringBounder) {
-		Dimension2D result = new Dimension2DDouble(0, 0);
+	public XDimension2D calculateDimension(StringBounder stringBounder) {
+		XDimension2D result = new XDimension2D(0, 0);
 		for (int i = 0; i < gtiles.size(); i++) {
-			final Dimension2D dim = gtiles.get(i).calculateDimension(stringBounder);
+			final XDimension2D dim = gtiles.get(i).calculateDimension(stringBounder);
 			final UTranslate pos = getPosition(i);
-			final Dimension2D corner = pos.getTranslated(dim);
-			result = MathUtils.max(result, corner);
+			final XDimension2D corner = dim.applyTranslate(pos);
+			result = MathUtils.maxDim(result, corner);
 		}
 		return result;
 	}

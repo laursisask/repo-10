@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -36,22 +39,24 @@ import java.util.EnumSet;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import net.sourceforge.plantuml.LineLocation;
 import net.sourceforge.plantuml.StringUtils;
 import net.sourceforge.plantuml.UmlDiagram;
+import net.sourceforge.plantuml.abel.EntityPortion;
 import net.sourceforge.plantuml.classdiagram.ClassDiagram;
 import net.sourceforge.plantuml.command.CommandExecutionResult;
 import net.sourceforge.plantuml.command.SingleLineCommand2;
-import net.sourceforge.plantuml.command.regex.IRegex;
-import net.sourceforge.plantuml.command.regex.RegexConcat;
-import net.sourceforge.plantuml.command.regex.RegexLeaf;
-import net.sourceforge.plantuml.command.regex.RegexResult;
-import net.sourceforge.plantuml.cucadiagram.EntityPortion;
+import net.sourceforge.plantuml.regex.IRegex;
+import net.sourceforge.plantuml.regex.RegexConcat;
+import net.sourceforge.plantuml.regex.RegexLeaf;
+import net.sourceforge.plantuml.regex.RegexResult;
 import net.sourceforge.plantuml.skin.VisibilityModifier;
+import net.sourceforge.plantuml.utils.LineLocation;
 
 public class CommandHideShowByVisibility extends SingleLineCommand2<UmlDiagram> {
 
-	public CommandHideShowByVisibility() {
+	public static final CommandHideShowByVisibility ME = new CommandHideShowByVisibility();
+
+	private CommandHideShowByVisibility() {
 		super(getRegexConcat());
 	}
 
@@ -78,7 +83,7 @@ public class CommandHideShowByVisibility extends SingleLineCommand2<UmlDiagram> 
 
 		final EntityPortion portion = getEntityPortion(arg.get("PORTION", 0));
 
-		final Set<VisibilityModifier> visibilities = EnumSet.<VisibilityModifier> noneOf(VisibilityModifier.class);
+		final Set<VisibilityModifier> visibilities = EnumSet.<VisibilityModifier>noneOf(VisibilityModifier.class);
 		final StringTokenizer st = new StringTokenizer(StringUtils.goLowerCase(arg.get("VISIBILITY", 0)), " ,");
 		while (st.hasMoreTokens()) {
 			addVisibilities(st.nextToken(), portion, visibilities);

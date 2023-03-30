@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -50,15 +53,15 @@ public final class FtileFactoryDelegatorCreateParallel extends FtileFactoryDeleg
 	public Ftile createParallel(List<Ftile> all, ForkStyle style, String label, Swimlane in, Swimlane out) {
 
 		AbstractParallelFtilesBuilder builder;
-		if (style == ForkStyle.SPLIT) {
+		if (style == ForkStyle.SPLIT)
 			builder = new ParallelBuilderSplit(skinParam(), getStringBounder(), all);
-		} else if (style == ForkStyle.MERGE) {
+		else if (style == ForkStyle.MERGE)
 			builder = new ParallelBuilderMerge(skinParam(), getStringBounder(), all);
-		} else if (style == ForkStyle.FORK) {
+		else if (style == ForkStyle.FORK)
 			builder = new ParallelBuilderFork(skinParam(), getStringBounder(), label, in, out, all);
-		} else {
+		else
 			throw new IllegalStateException();
-		}
+
 		final Ftile inner = super.createParallel(builder.list99, style, label, in, out);
 		return builder.build(inner);
 	}

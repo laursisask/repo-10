@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -36,9 +39,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import net.sourceforge.plantuml.FontParam;
-import net.sourceforge.plantuml.ISkinParam;
-import net.sourceforge.plantuml.Url;
 import net.sourceforge.plantuml.activitydiagram3.Branch;
 import net.sourceforge.plantuml.activitydiagram3.ForkStyle;
 import net.sourceforge.plantuml.activitydiagram3.Instruction;
@@ -56,27 +56,29 @@ import net.sourceforge.plantuml.activitydiagram3.ftile.vertical.FtileCircleStart
 import net.sourceforge.plantuml.activitydiagram3.ftile.vertical.FtileCircleStop;
 import net.sourceforge.plantuml.activitydiagram3.ftile.vertical.FtileDecorateIn;
 import net.sourceforge.plantuml.activitydiagram3.ftile.vertical.FtileDecorateOut;
-import net.sourceforge.plantuml.cucadiagram.Display;
-import net.sourceforge.plantuml.cucadiagram.Stereotype;
-import net.sourceforge.plantuml.graphic.StringBounder;
-import net.sourceforge.plantuml.graphic.USymbol;
-import net.sourceforge.plantuml.graphic.VerticalAlignment;
-import net.sourceforge.plantuml.graphic.color.Colors;
-import net.sourceforge.plantuml.skin.rose.Rose;
+import net.sourceforge.plantuml.decoration.symbol.USymbol;
+import net.sourceforge.plantuml.klimt.color.Colors;
+import net.sourceforge.plantuml.klimt.color.HColor;
+import net.sourceforge.plantuml.klimt.creole.Display;
+import net.sourceforge.plantuml.klimt.font.FontParam;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
+import net.sourceforge.plantuml.klimt.font.UFont;
+import net.sourceforge.plantuml.klimt.geom.VerticalAlignment;
+import net.sourceforge.plantuml.stereo.Stereotype;
+import net.sourceforge.plantuml.style.ISkinParam;
 import net.sourceforge.plantuml.style.PName;
 import net.sourceforge.plantuml.style.SName;
 import net.sourceforge.plantuml.style.Style;
 import net.sourceforge.plantuml.style.StyleBuilder;
 import net.sourceforge.plantuml.style.StyleSignatureBasic;
-import net.sourceforge.plantuml.ugraphic.UFont;
-import net.sourceforge.plantuml.ugraphic.color.HColor;
+import net.sourceforge.plantuml.url.Url;
 
 public class VCompactFactory implements FtileFactory {
 
 	private final ISkinParam skinParam;
-	private final Rose rose = new Rose();
 	private final StringBounder stringBounder;
 
+	@Override
 	public StringBounder getStringBounder() {
 		return stringBounder;
 	}
@@ -106,99 +108,111 @@ public class VCompactFactory implements FtileFactory {
 		return StyleSignatureBasic.of(SName.root, SName.element, SName.activityDiagram, SName.circle, SName.start);
 	}
 
+	@Override
 	public Ftile start(Swimlane swimlane) {
 		final Style style = getSignatureCircleStart().getMergedStyle(skinParam.getCurrentStyleBuilder());
-		final HColor color = style.value(PName.LineColor).asColor(skinParam.getThemeStyle(),
-				skinParam.getIHtmlColorSet());
+		final HColor color = style.value(PName.LineColor).asColor(skinParam.getIHtmlColorSet());
 
 		return new FtileCircleStart(skinParam(), color, swimlane, style);
 	}
 
+	@Override
 	public Ftile stop(Swimlane swimlane) {
 		final Style style = getSignatureCircleStop().getMergedStyle(skinParam.getCurrentStyleBuilder());
-		final HColor borderColor = style.value(PName.LineColor).asColor(skinParam.getThemeStyle(),
-				skinParam.getIHtmlColorSet());
+		final HColor borderColor = style.value(PName.LineColor).asColor(skinParam.getIHtmlColorSet());
 		final HColor backgroundColor = skinParam.getBackgroundColor();
 		return new FtileCircleStop(skinParam(), backgroundColor, borderColor, swimlane, style);
 	}
 
+	@Override
 	public Ftile spot(Swimlane swimlane, String spot, HColor color) {
 		final UFont font = skinParam.getFont(null, false, FontParam.ACTIVITY);
 		final Style style = getSignatureCircleSpot().getMergedStyle(skinParam.getCurrentStyleBuilder());
 		return new FtileCircleSpot(skinParam(), swimlane, spot, font, color, style);
 	}
 
+	@Override
 	public Ftile end(Swimlane swimlane) {
-
 		final Style style = getSignatureCircleEnd().getMergedStyle(skinParam.getCurrentStyleBuilder());
-		final HColor borderColor = style.value(PName.LineColor).asColor(skinParam.getThemeStyle(),
-				skinParam.getIHtmlColorSet());
+		final HColor borderColor = style.value(PName.LineColor).asColor(skinParam.getIHtmlColorSet());
 		final HColor backgroundColor = skinParam.getBackgroundColor();
 
 		return new FtileCircleEnd(skinParam(), backgroundColor, borderColor, swimlane, style);
 	}
 
+	@Override
 	public Ftile activity(Display label, Swimlane swimlane, BoxStyle boxStyle, Colors colors, Stereotype stereotype) {
 		return FtileBox.create(colors.mute(skinParam), label, swimlane, boxStyle, stereotype);
 	}
 
+	@Override
 	public Ftile addNote(Ftile ftile, Swimlane swimlane, Collection<PositionedNote> notes,
 			VerticalAlignment verticalAlignment) {
 		return ftile;
 	}
 
+	@Override
 	public Ftile addUrl(Ftile ftile, Url url) {
 		return ftile;
 	}
 
+	@Override
 	public Ftile assembly(Ftile tile1, Ftile tile2) {
 		return new FtileAssemblySimple(tile1, tile2);
 	}
 
+	@Override
 	public Ftile repeat(BoxStyle boxStyleIn, Swimlane swimlane, Swimlane swimlaneOut, Display startLabel, Ftile repeat,
 			Display test, Display yes, Display out, Colors colors, Ftile backward, boolean noOut,
 			LinkRendering incoming1, LinkRendering incoming2) {
 		return repeat;
 	}
 
+	@Override
 	public Ftile createWhile(LinkRendering afterEndwhile, Swimlane swimlane, Ftile whileBlock, Display test,
 			Display yes, HColor color, Instruction specialOut, Ftile back, LinkRendering incoming1,
 			LinkRendering incoming2) {
 		return whileBlock;
 	}
 
+	@Override
 	public Ftile createIf(Swimlane swimlane, List<Branch> thens, Branch elseBranch, LinkRendering afterEndwhile,
 			LinkRendering topInlinkRendering, Url url) {
 		final List<Ftile> ftiles = new ArrayList<>();
-		for (Branch branch : thens) {
+		for (Branch branch : thens)
 			ftiles.add(branch.getFtile());
-		}
+
 		ftiles.add(elseBranch.getFtile());
 		return new FtileForkInner(ftiles);
 	}
 
+	@Override
 	public Ftile createSwitch(Swimlane swimlane, List<Branch> branches, LinkRendering afterEndwhile,
 			LinkRendering topInlinkRendering, Display labelTest) {
 		final List<Ftile> ftiles = new ArrayList<>();
-		for (Branch branch : branches) {
+		for (Branch branch : branches)
 			ftiles.add(branch.getFtile());
-		}
+
 		return new FtileForkInner(ftiles);
 	}
 
+	@Override
 	public Ftile createParallel(List<Ftile> all, ForkStyle style, String label, Swimlane in, Swimlane out) {
 		return new FtileForkInner(all);
 	}
 
-	public Ftile createGroup(Ftile list, Display name, HColor backColor, HColor titleColor, PositionedNote note,
-			HColor borderColor, USymbol type, double roundCorner) {
+	@Override
+	public Ftile createGroup(Ftile list, Display name, HColor backColor, PositionedNote note, USymbol type,
+			Style style) {
 		return list;
 	}
 
+	@Override
 	public Ftile decorateIn(final Ftile ftile, final LinkRendering linkRendering) {
 		return new FtileDecorateIn(ftile, linkRendering);
 	}
 
+	@Override
 	public Ftile decorateOut(final Ftile ftile, final LinkRendering linkRendering) {
 		// if (ftile instanceof FtileWhile) {
 		// if (linkRendering != null) {
@@ -209,6 +223,7 @@ public class VCompactFactory implements FtileFactory {
 		return new FtileDecorateOut(ftile, linkRendering);
 	}
 
+	@Override
 	public ISkinParam skinParam() {
 		return skinParam;
 	}

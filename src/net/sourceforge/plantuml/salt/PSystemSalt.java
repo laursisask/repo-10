@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,8 +35,6 @@
  */
 package net.sourceforge.plantuml.salt;
 
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
-import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -41,25 +42,29 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import net.sourceforge.plantuml.Dimension2DDouble;
+import net.sourceforge.plantuml.FileFormat;
 import net.sourceforge.plantuml.FileFormatOption;
-import net.sourceforge.plantuml.Log;
 import net.sourceforge.plantuml.ScaleSimple;
 import net.sourceforge.plantuml.TitledDiagram;
 import net.sourceforge.plantuml.UmlDiagram;
-import net.sourceforge.plantuml.UmlDiagramType;
 import net.sourceforge.plantuml.WithSprite;
 import net.sourceforge.plantuml.api.ImageDataSimple;
-import net.sourceforge.plantuml.api.ThemeStyle;
-import net.sourceforge.plantuml.command.BlocLines;
 import net.sourceforge.plantuml.command.Command;
 import net.sourceforge.plantuml.command.CommandExecutionResult;
 import net.sourceforge.plantuml.command.CommandFactorySprite;
 import net.sourceforge.plantuml.core.DiagramDescription;
 import net.sourceforge.plantuml.core.ImageData;
 import net.sourceforge.plantuml.core.UmlSource;
-import net.sourceforge.plantuml.graphic.InnerStrategy;
-import net.sourceforge.plantuml.graphic.StringBounder;
+import net.sourceforge.plantuml.klimt.color.HColor;
+import net.sourceforge.plantuml.klimt.color.HColors;
+import net.sourceforge.plantuml.klimt.color.NoSuchColorException;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
+import net.sourceforge.plantuml.klimt.shape.AbstractTextBlock;
+import net.sourceforge.plantuml.klimt.shape.TextBlock;
+import net.sourceforge.plantuml.klimt.sprite.Sprite;
+import net.sourceforge.plantuml.log.Logme;
 import net.sourceforge.plantuml.salt.element.Element;
 import net.sourceforge.plantuml.salt.factory.AbstractElementFactoryComplex;
 import net.sourceforge.plantuml.salt.factory.ElementFactory;
@@ -80,28 +85,24 @@ import net.sourceforge.plantuml.salt.factory.ElementFactoryTab;
 import net.sourceforge.plantuml.salt.factory.ElementFactoryText;
 import net.sourceforge.plantuml.salt.factory.ElementFactoryTextField;
 import net.sourceforge.plantuml.salt.factory.ElementFactoryTree;
-import net.sourceforge.plantuml.sprite.Sprite;
+import net.sourceforge.plantuml.skin.UmlDiagramType;
 import net.sourceforge.plantuml.style.ClockwiseTopRightBottomLeft;
-import net.sourceforge.plantuml.svek.TextBlockBackcolored;
-import net.sourceforge.plantuml.ugraphic.MinMax;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.color.HColor;
-import net.sourceforge.plantuml.ugraphic.color.HColorUtils;
-import net.sourceforge.plantuml.ugraphic.color.NoSuchColorException;
+import net.sourceforge.plantuml.utils.BlocLines;
+import net.sourceforge.plantuml.utils.Log;
 
 public class PSystemSalt extends TitledDiagram implements WithSprite {
 
 	private final List<String> data;
-	private final Dictionary dictionary = new Dictionary();
+	private final SaltDictionary dictionary = new SaltDictionary();
 
 	@Deprecated
-	public PSystemSalt(ThemeStyle style, UmlSource source, List<String> data) {
-		super(style, source, UmlDiagramType.SALT, null);
+	public PSystemSalt(UmlSource source, List<String> data) {
+		super(source, UmlDiagramType.SALT, null);
 		this.data = data;
 	}
 
-	public PSystemSalt(ThemeStyle style, UmlSource source) {
-		this(style, source, new ArrayList<String>());
+	public PSystemSalt(UmlSource source) {
+		this(source, new ArrayList<String>());
 	}
 
 	public void add(String s) {
@@ -114,35 +115,36 @@ public class PSystemSalt extends TitledDiagram implements WithSprite {
 		try {
 			final Element salt = createElement(manageSprite());
 			final StringBounder stringBounder = fileFormatOption.getDefaultStringBounder(getSkinParam());
-			final Dimension2D size = salt.getPreferredDimension(stringBounder, 0, 0);
+			final XDimension2D size = salt.getPreferredDimension(stringBounder, 0, 0);
 			return createImageBuilder(fileFormatOption).drawable(getTextBlock(salt, size)).write(os);
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logme.error(e);
 			UmlDiagram.exportDiagramError(os, e, fileFormatOption, seed(), getMetadata(), "none",
 					new ArrayList<String>());
 			return ImageDataSimple.error();
 		}
 	}
 
-	private TextBlockBackcolored getTextBlock(final Element salt, final Dimension2D size) {
-		return new TextBlockBackcolored() {
+	@Override
+	protected TextBlock getTextBlock() {
+		final FileFormatOption fileFormatOption = new FileFormatOption(FileFormat.PNG);
+		final Element salt = createElement(manageSprite());
+		final StringBounder stringBounder = fileFormatOption.getDefaultStringBounder(getSkinParam());
+		final XDimension2D size = salt.getPreferredDimension(stringBounder, 0, 0);
+		return getTextBlock(salt, size);
+	}
+
+	private TextBlock getTextBlock(final Element salt, final XDimension2D size) {
+		return new AbstractTextBlock() {
 
 			public void drawU(UGraphic ug) {
 				ug = ug.apply(getBlack());
-				salt.drawU(ug, 0, new Dimension2DDouble(size.getWidth(), size.getHeight()));
-				salt.drawU(ug, 1, new Dimension2DDouble(size.getWidth(), size.getHeight()));
+				salt.drawU(ug, 0, new XDimension2D(size.getWidth(), size.getHeight()));
+				salt.drawU(ug, 1, new XDimension2D(size.getWidth(), size.getHeight()));
 			}
 
-			public Dimension2D calculateDimension(StringBounder stringBounder) {
+			public XDimension2D calculateDimension(StringBounder stringBounder) {
 				return size;
-			}
-
-			public MinMax getMinMax(StringBounder stringBounder) {
-				throw new UnsupportedOperationException();
-			}
-
-			public Rectangle2D getInnerPosition(String member, StringBounder stringBounder, InnerStrategy strategy) {
-				return null;
 			}
 
 			public HColor getBackcolor() {
@@ -224,7 +226,7 @@ public class PSystemSalt extends TitledDiagram implements WithSprite {
 	}
 
 	private static void addSimpleFactory(final AbstractElementFactoryComplex cpxFactory, final DataSource source,
-			Dictionary dictionary) {
+			SaltDictionary dictionary) {
 		cpxFactory.addFactory(new ElementFactoryMenu(source, dictionary));
 		cpxFactory.addFactory(new ElementFactoryTree(source, dictionary));
 		cpxFactory.addFactory(new ElementFactoryTab(source, dictionary));
@@ -257,6 +259,7 @@ public class PSystemSalt extends TitledDiagram implements WithSprite {
 	}
 
 	private HColor getBlack() {
-		return HColorUtils.BLACK;
+		return HColors.BLACK;
 	}
+
 }

@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -37,14 +40,36 @@ import java.io.PrintStream;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import net.sourceforge.plantuml.core.Diagram;
-import net.sourceforge.plantuml.cucadiagram.dot.GraphvizUtils;
+import net.sourceforge.plantuml.dot.GraphvizUtils;
+import net.sourceforge.plantuml.log.Logme;
 import net.sourceforge.plantuml.security.SFile;
 import net.sourceforge.plantuml.security.SecurityUtils;
+import net.sourceforge.plantuml.utils.Log;
 
 public class OptionFlags {
+	// ::remove file when __HAXE__
 
 	private static final OptionFlags singleton = new OptionFlags();
+	static public final boolean STRICT_SELFMESSAGE_POSITION = true;
+	static public final boolean USE_INTERFACE_EYE1 = false;
+	static public final boolean USE_INTERFACE_EYE2 = false;
+	static public final boolean FORCE_TEOZ = false;
 
+	private boolean replaceWhiteBackgroundByTransparent;
+
+	public static OptionFlags getInstance() {
+		return singleton;
+	}
+
+	public final boolean isReplaceWhiteBackgroundByTransparent() {
+		return replaceWhiteBackgroundByTransparent;
+	}
+
+	public final void setReplaceWhiteBackgroundByTransparent(boolean replaceWhiteBackgroundByTransparent) {
+		this.replaceWhiteBackgroundByTransparent = replaceWhiteBackgroundByTransparent;
+	}
+
+	// ::comment when __CORE__
 	// static public final boolean PBBACK = false;
 	// static public boolean GRAPHVIZCACHE = false;
 	// static public final boolean TRACE_DOT = false;
@@ -60,12 +85,8 @@ public class OptionFlags {
 
 	static public final boolean USE_HECTOR = false;
 	static public boolean ADD_NICE_FOR_DOT = false;
-	static public final boolean STRICT_SELFMESSAGE_POSITION = true;
 
 	// static public final boolean USE_IF_VERTICAL = true;
-	static public final boolean FORCE_TEOZ = false;
-	static public final boolean USE_INTERFACE_EYE1 = false;
-	static public final boolean USE_INTERFACE_EYE2 = false;
 	// static public final boolean SWI2 = false;
 	// static public final boolean USE_COMPOUND = false;
 	// static public final boolean OMEGA_CROSSING = false;
@@ -119,17 +140,12 @@ public class OptionFlags {
 	private boolean enableStats = false;
 	private boolean stdLib;
 	private boolean silentlyCompletelyIgnoreErrors;
-	private boolean replaceWhiteBackgroundByTransparent;
 	private boolean extractStdLib;
 	private boolean clipboardLoop;
 	private boolean clipboard;
 	private String fileSeparator = "_";
 	private long timeoutMs = 15 * 60 * 1000L; // 15 minutes
 	private SFile logData;
-
-	public static OptionFlags getInstance() {
-		return singleton;
-	}
 
 	public final boolean isVerbose() {
 		return verbose;
@@ -214,7 +230,7 @@ public class OptionFlags {
 				ps.println();
 			} catch (FileNotFoundException e) {
 				Log.error("Cannot open " + logData);
-				e.printStackTrace();
+				Logme.error(e);
 			}
 		}
 	}
@@ -226,7 +242,7 @@ public class OptionFlags {
 			ps.println();
 		} catch (FileNotFoundException e) {
 			Log.error("Cannot open " + logData);
-			e.printStackTrace();
+			Logme.error(e);
 		}
 	}
 
@@ -299,7 +315,7 @@ public class OptionFlags {
 	}
 
 	public boolean isEnableStats() {
-		return enableStats;
+		return false;
 	}
 
 	public void setEnableStats(boolean enableStats) {
@@ -354,11 +370,5 @@ public class OptionFlags {
 		this.silentlyCompletelyIgnoreErrors = silentlyCompletelyIgnoreErrors;
 	}
 
-	public final boolean isReplaceWhiteBackgroundByTransparent() {
-		return replaceWhiteBackgroundByTransparent;
-	}
-
-	public final void setReplaceWhiteBackgroundByTransparent(boolean replaceWhiteBackgroundByTransparent) {
-		this.replaceWhiteBackgroundByTransparent = replaceWhiteBackgroundByTransparent;
-	}
+	// ::done
 }

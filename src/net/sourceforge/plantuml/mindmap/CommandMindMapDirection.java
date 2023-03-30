@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
  * 
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  * 
  * This file is part of PlantUML.
  *
@@ -35,16 +35,17 @@
  */
 package net.sourceforge.plantuml.mindmap;
 
-import net.sourceforge.plantuml.Direction;
-import net.sourceforge.plantuml.LineLocation;
 import net.sourceforge.plantuml.command.CommandExecutionResult;
 import net.sourceforge.plantuml.command.SingleLineCommand2;
-import net.sourceforge.plantuml.command.regex.IRegex;
-import net.sourceforge.plantuml.command.regex.RegexConcat;
-import net.sourceforge.plantuml.command.regex.RegexLeaf;
-import net.sourceforge.plantuml.command.regex.RegexResult;
+import net.sourceforge.plantuml.regex.IRegex;
+import net.sourceforge.plantuml.regex.RegexConcat;
+import net.sourceforge.plantuml.regex.RegexLeaf;
+import net.sourceforge.plantuml.regex.RegexResult;
+import net.sourceforge.plantuml.utils.Direction;
+import net.sourceforge.plantuml.utils.LineLocation;
 
 public class CommandMindMapDirection extends SingleLineCommand2<MindMapDiagram> {
+    // ::remove folder when __HAXE__
 
 	public CommandMindMapDirection() {
 		super(getRegexConcat());
@@ -54,15 +55,19 @@ public class CommandMindMapDirection extends SingleLineCommand2<MindMapDiagram> 
 		return RegexConcat.build(CommandMindMapDirection.class.getName(), RegexLeaf.start(), //
 				new RegexLeaf("[^*]*"), //
 				new RegexLeaf("\\b"), //
-				new RegexLeaf("DIRECTION", "(left|right)"), //
+				new RegexLeaf("DIRECTION", "(left|right|top|bottom)"), //
 				new RegexLeaf("\\b"), //
-				new RegexLeaf("[^*]*"), RegexLeaf.end());
+				new RegexLeaf("[^*]*"), //
+				new RegexLeaf("(side|direction)"), //
+				new RegexLeaf("[^*]*"), //
+				RegexLeaf.end());
 	}
 
 	@Override
 	protected CommandExecutionResult executeArg(MindMapDiagram diagram, LineLocation location, RegexResult arg) {
-		final String direction = arg.get("DIRECTION", 0);
-		diagram.setDefaultDirection(Direction.valueOf(direction.toUpperCase()));
+		final String dir = arg.get("DIRECTION", 0);
+		final Direction direction = Direction.lazzyValueOf(dir);
+		diagram.setDefaultDirection(direction);
 		return CommandExecutionResult.ok();
 	}
 

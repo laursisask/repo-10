@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -53,7 +56,7 @@ public enum ComponentType implements Styleable {
 	DELAY_LINE, PARTICIPANT_LINE, CONTINUE_LINE,
 
 	//
-	GROUPING_ELSE, GROUPING_HEADER, GROUPING_SPACE,
+	GROUPING_ELSE_LEGACY, GROUPING_ELSE_TEOZ, GROUPING_HEADER_LEGACY, GROUPING_HEADER_TEOZ, GROUPING_SPACE,
 	//
 	NEWPAGE, NOTE, NOTE_HEXAGONAL, NOTE_BOX, DIVIDER, REFERENCE, ENGLOBER,
 

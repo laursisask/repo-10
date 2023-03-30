@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,12 +35,10 @@
  */
 package net.sourceforge.plantuml.bpm;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import net.sourceforge.plantuml.AbstractPSystem;
-import net.sourceforge.plantuml.ISkinSimple;
-import net.sourceforge.plantuml.api.ThemeStyle;
 import net.sourceforge.plantuml.command.Command;
 import net.sourceforge.plantuml.command.PSystemCommandFactory;
 import net.sourceforge.plantuml.core.DiagramType;
@@ -50,8 +51,7 @@ public class BpmDiagramFactory extends PSystemCommandFactory {
 	}
 
 	@Override
-	protected List<Command> createCommands() {
-		final List<Command> result = new ArrayList<>();
+	protected void initCommandsList(List<Command> result) {
 		result.add(new CommandDockedEvent());
 		result.add(new CommandMerge());
 		result.add(new CommandResume());
@@ -59,12 +59,11 @@ public class BpmDiagramFactory extends PSystemCommandFactory {
 		result.add(new CommandNewBranch());
 		result.add(new CommandElseBranch());
 		result.add(new CommandEndBranch());
-		return result;
 	}
 
 	@Override
-	public AbstractPSystem createEmptyDiagram(ThemeStyle style, UmlSource source, ISkinSimple skinParam) {
-		return new BpmDiagram(style, source);
+	public AbstractPSystem createEmptyDiagram(UmlSource source, Map<String, String> skinParam) {
+		return new BpmDiagram(source);
 	}
 
 }

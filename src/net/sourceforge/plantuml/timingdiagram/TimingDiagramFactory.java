@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,11 +35,9 @@
  */
 package net.sourceforge.plantuml.timingdiagram;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-import net.sourceforge.plantuml.ISkinSimple;
-import net.sourceforge.plantuml.api.ThemeStyle;
 import net.sourceforge.plantuml.command.Command;
 import net.sourceforge.plantuml.command.CommandFootboxIgnored;
 import net.sourceforge.plantuml.command.CommonCommands;
@@ -67,15 +68,12 @@ import net.sourceforge.plantuml.timingdiagram.command.CommandUseDateFormat;
 public class TimingDiagramFactory extends PSystemCommandFactory {
 
 	@Override
-	public TimingDiagram createEmptyDiagram(ThemeStyle style, UmlSource source, ISkinSimple skinParam) {
-		return new TimingDiagram(style, source);
+	public TimingDiagram createEmptyDiagram(UmlSource source, Map<String, String> skinParam) {
+		return new TimingDiagram(source);
 	}
 
 	@Override
-	protected List<Command> createCommands() {
-
-		final List<Command> cmds = new ArrayList<>();
-
+	protected void initCommandsList(List<Command> cmds) {
 		CommonCommands.addCommonCommands1(cmds);
 		cmds.add(new CommandFootboxIgnored());
 		cmds.add(new CommandRobustConcise());
@@ -99,8 +97,6 @@ public class TimingDiagramFactory extends PSystemCommandFactory {
 		cmds.add(new CommandTicks());
 		cmds.add(new CommandPixelHeight());
 		cmds.add(new CommandUseDateFormat());
-
-		return cmds;
 	}
 
 }

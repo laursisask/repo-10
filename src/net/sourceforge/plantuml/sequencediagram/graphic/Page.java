@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,7 +35,7 @@
  */
 package net.sourceforge.plantuml.sequencediagram.graphic;
 
-import net.sourceforge.plantuml.cucadiagram.Display;
+import net.sourceforge.plantuml.klimt.creole.Display;
 
 public final class Page {
 
@@ -48,8 +51,8 @@ public final class Page {
 		return "headerHeight=" + headerHeight + " newpage1=" + newpage1 + " newpage2=" + newpage2;
 	}
 
-	public Page(double headerHeight, double newpage1, double newpage2, double tailHeight,
-			double signatureHeight, Display title) {
+	public Page(double headerHeight, double newpage1, double newpage2, double tailHeight, double signatureHeight,
+			Display title) {
 		if (headerHeight < 0) {
 			throw new IllegalArgumentException();
 		}

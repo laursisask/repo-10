@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -38,9 +41,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import net.sourceforge.plantuml.ISkinParam;
-import net.sourceforge.plantuml.graphic.StringBounder;
-import net.sourceforge.plantuml.graphic.SymbolContext;
+import net.sourceforge.plantuml.klimt.Fashion;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
 import net.sourceforge.plantuml.sequencediagram.AbstractMessage;
 import net.sourceforge.plantuml.sequencediagram.Event;
 import net.sourceforge.plantuml.sequencediagram.LifeEvent;
@@ -51,8 +55,7 @@ import net.sourceforge.plantuml.sequencediagram.Participant;
 import net.sourceforge.plantuml.skin.Context2D;
 import net.sourceforge.plantuml.skin.SimpleContext2D;
 import net.sourceforge.plantuml.skin.rose.Rose;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
+import net.sourceforge.plantuml.style.ISkinParam;
 
 public class LiveBoxes {
 
@@ -72,10 +75,11 @@ public class LiveBoxes {
 
 	public void addStep(Event event, double y) {
 		if (event.dealWith(p)) {
-			if (event instanceof LifeEvent && ((LifeEvent) event).isDeactivate() && eventsStep.containsValue(y)) {
+			if (event instanceof LifeEvent && ((LifeEvent) event).isDeactivate() && eventsStep.containsValue(y))
 				y += 5.0;
-			}
+
 			eventsStep.put(event, y);
+			event.setY(y);
 		}
 	}
 
@@ -94,12 +98,12 @@ public class LiveBoxes {
 			final Event current = it.next();
 			if (current instanceof LifeEvent) {
 				final LifeEvent le = (LifeEvent) current;
-				if (le.getParticipant() == p && le.isActivate()) {
+				if (le.getParticipant() == p && le.isActivate())
 					level++;
-				}
-				if (le.getParticipant() == p && le.isDeactivateOrDestroy()) {
+
+				if (le.getParticipant() == p && le.isDeactivateOrDestroy())
 					level--;
-				}
+
 			}
 			if (event == current) {
 				if (current instanceof AbstractMessage) {
@@ -108,20 +112,20 @@ public class LiveBoxes {
 						final LifeEvent le = (LifeEvent) next;
 						final AbstractMessage msg = (AbstractMessage) current;
 						if (mode != EventsHistoryMode.IGNORE_FUTURE_ACTIVATE && le.isActivate() && msg.dealWith(p)
-								&& le.getParticipant() == p) {
+								&& le.getParticipant() == p)
 							level++;
-						}
+
 						if (mode == EventsHistoryMode.CONSIDERE_FUTURE_DEACTIVATE && le.isDeactivateOrDestroy()
-								&& msg.dealWith(p) && le.getParticipant() == p) {
+								&& msg.dealWith(p) && le.getParticipant() == p)
 							level--;
-						}
+
 						// System.err.println("Warning, this is message " + current + " next=" + next);
 					}
 
 				}
-				if (level < 0) {
+				if (level < 0)
 					return 0;
-				}
+
 				// System.err.println("<-result1 is " + level);
 				return level;
 			}
@@ -133,9 +137,9 @@ public class LiveBoxes {
 	private boolean isNextEventADestroy(Event event) {
 		for (Iterator<Event> it = events.iterator(); it.hasNext();) {
 			final Event current = it.next();
-			if (event != current) {
+			if (event != current)
 				continue;
-			}
+
 			if (current instanceof Message) {
 				final Event next = nextButSkippingNotes(it);
 				if (next instanceof LifeEvent) {
@@ -148,25 +152,25 @@ public class LiveBoxes {
 		return false;
 	}
 
-	private SymbolContext getActivateColor(Event event) {
+	private Fashion getActivateColor(Event event) {
 		if (event instanceof LifeEvent) {
 			final LifeEvent le = (LifeEvent) event;
-			if (le.isActivate()) {
+			if (le.isActivate())
 				return le.getSpecificColors();
-			}
+
 		}
 		for (Iterator<Event> it = events.iterator(); it.hasNext();) {
 			final Event current = it.next();
-			if (event != current) {
+			if (event != current)
 				continue;
-			}
+
 			if (current instanceof Message || current instanceof MessageExo) {
 				final Event next = nextButSkippingNotes(it);
 				if (next instanceof LifeEvent) {
 					final LifeEvent le = (LifeEvent) next;
-					if (le.isActivate()) {
+					if (le.isActivate())
 						return le.getSpecificColors();
-					}
+
 					return null;
 				}
 			}
@@ -177,13 +181,13 @@ public class LiveBoxes {
 
 	private Event nextButSkippingNotes(Iterator<Event> it) {
 		while (true) {
-			if (it.hasNext() == false) {
+			if (it.hasNext() == false)
 				return null;
-			}
+
 			final Event next = it.next();
-			if (next instanceof Note) {
+			if (next instanceof Note)
 				continue;
-			}
+
 			// System.err.println("nextButSkippingNotes=" + next);
 			return next;
 		}
@@ -197,7 +201,7 @@ public class LiveBoxes {
 			if (position != null) {
 				assert position <= totalHeight : "position=" + position + " totalHeight=" + totalHeight;
 				indent = getLevelAt(event, EventsHistoryMode.CONSIDERE_FUTURE_DEACTIVATE);
-				final SymbolContext activateColor = getActivateColor(event);
+				final Fashion activateColor = getActivateColor(event);
 				final Step step = new Step(Math.max(createY, position), isNextEventADestroy(event), indent,
 						activateColor);
 				stair.addStep(step);
@@ -221,15 +225,15 @@ public class LiveBoxes {
 		for (Event current : events) {
 			if (current instanceof LifeEvent) {
 				final LifeEvent le = (LifeEvent) current;
-				if (le.getParticipant() == p && le.isActivate()) {
+				if (le.getParticipant() == p && le.isActivate())
 					level++;
-				}
-				if (level > max) {
+
+				if (level > max)
 					max = level;
-				}
-				if (le.getParticipant() == p && le.isDeactivateOrDestroy()) {
+
+				if (le.getParticipant() == p && le.isDeactivateOrDestroy())
 					level--;
-				}
+
 			}
 		}
 		return max;
@@ -244,19 +248,19 @@ public class LiveBoxes {
 	public void drawBoxes(UGraphic ug, Context2D context, double createY, double endY) {
 		final Stairs stairs = getStairs(createY, endY);
 		final int max = stairs.getMaxIndent();
-		if (max == 0) {
+		if (max == 0)
 			drawDestroys(ug, stairs, context);
-		}
-		for (int i = 1; i <= max; i++) {
+
+		for (int i = 1; i <= max; i++)
 			drawOneLevel(ug, i, stairs, context);
-		}
+
 	}
 
 	private void drawDestroys(UGraphic ug, Stairs stairs, Context2D context) {
 		final LiveBoxesDrawer drawer = new LiveBoxesDrawer(context, skin, skinParam, delays);
-		for (Step yposition : stairs.getSteps()) {
+		for (Step yposition : stairs.getSteps())
 			drawer.drawDestroyIfNeeded(ug, yposition);
-		}
+
 	}
 
 	private void drawOneLevel(UGraphic ug, int levelToDraw, Stairs stairs, Context2D context) {

@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
  * 
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  * 
  * This file is part of PlantUML.
  *
@@ -42,11 +42,13 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import net.sourceforge.plantuml.Url;
-import net.sourceforge.plantuml.cucadiagram.Stereostyles;
-import net.sourceforge.plantuml.cucadiagram.Stereotype;
+import net.sourceforge.plantuml.stereo.Stereostyles;
+import net.sourceforge.plantuml.stereo.Stereotype;
+import net.sourceforge.plantuml.stereo.StereotypeDecoration;
+import net.sourceforge.plantuml.url.Url;
 
 public class StyleSignatureBasic implements StyleSignature {
+    // ::remove file when __HAXE__
 
 	private final Set<String> names = new LinkedHashSet<>();
 	private final boolean withDot;
@@ -94,6 +96,18 @@ public class StyleSignatureBasic implements StyleSignature {
 		return new StyleSignatureBasic(withDot || s.contains("."), result);
 	}
 
+	public StyleSignatureBasic addS(String s) {
+		if (s == null)
+			return this;
+
+		if (s.contains("&"))
+			throw new IllegalArgumentException();
+
+		final Set<String> result = new LinkedHashSet<>(names);
+		result.add(StereotypeDecoration.PREFIX + clean(s));
+		return new StyleSignatureBasic(withDot || s.contains("."), result);
+	}
+
 	public StyleSignatureBasic add(SName name) {
 		return add(name.name().toLowerCase().replace("_", ""));
 	}
@@ -132,18 +146,43 @@ public class StyleSignatureBasic implements StyleSignature {
 	}
 
 	public boolean matchAll(StyleSignatureBasic other) {
-		if (other.isStarred() && names.contains("*") == false)
+		final boolean namesContainsStar = names.contains("*");
+		if (other.isStarred() && namesContainsStar == false)
 			return false;
+
+		final int depthInNames = depthFromTokens(other.names);
 
 		for (String token : names) {
 			if (token.equals("*"))
 				continue;
 
-			if (other.names.contains(token) == false)
-				return false;
+			if (namesContainsStar && depthInNames != -1 && depthFromToken(token) != -1) {
+				// depth comparaison
+				if (depthInNames < depthFromToken(token))
+					return false;
+			} else {
+				if (other.names.contains(token) == false)
+					return false;
+			}
 
 		}
 		return true;
+	}
+
+	private static int depthFromToken(String token) {
+		if (token.startsWith("depth("))
+			return Integer.parseInt(token.substring("depth(".length(), token.length() - 1));
+		return -1;
+	}
+
+	private static int depthFromTokens(Collection<String> tokens) {
+		for (String token : tokens) {
+			final int depth = depthFromToken(token);
+			if (depth != -1)
+				return depth;
+		}
+		return -1;
+
 	}
 
 	public final Set<String> getNames() {
@@ -159,7 +198,7 @@ public class StyleSignatureBasic implements StyleSignature {
 	}
 
 	public StyleSignature forStereotypeItself(Stereotype stereotype) {
-		if (stereotype == null || stereotype.getStyleNames().size()==0)
+		if (stereotype == null || stereotype.getStyleNames().size() == 0)
 			return this;
 
 		final StyleSignatures result = new StyleSignatures();
@@ -175,7 +214,7 @@ public class StyleSignatureBasic implements StyleSignature {
 
 	@Override
 	public StyleSignature withTOBECHANGED(Stereotype stereotype) {
-		if (stereotype == null || stereotype.getStyleNames().size()==0)
+		if (stereotype == null || stereotype.getStyleNames().size() == 0)
 			return this;
 
 		final StyleSignatures result = new StyleSignatures();
@@ -193,12 +232,15 @@ public class StyleSignatureBasic implements StyleSignature {
 			return this;
 		final List<String> result = new ArrayList<>(names);
 		for (String name : stereostyles.getStyleNames())
-			result.add(clean(name));
+			result.add(StereotypeDecoration.PREFIX + clean(name));
 
 		return new StyleSignatureBasic(true, result);
 	}
 
 	private String clean(String name) {
+		if (name.startsWith("."))
+			name = StereotypeDecoration.PREFIX + name;
+
 		return name.toLowerCase().replace("_", "").replace(".", "");
 	}
 

@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,11 +35,9 @@
  */
 package net.sourceforge.plantuml.statediagram;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-import net.sourceforge.plantuml.ISkinSimple;
-import net.sourceforge.plantuml.api.ThemeStyle;
 import net.sourceforge.plantuml.classdiagram.command.CommandHideShow2;
 import net.sourceforge.plantuml.classdiagram.command.CommandNamespaceSeparator;
 import net.sourceforge.plantuml.classdiagram.command.CommandRemoveRestore;
@@ -49,9 +50,12 @@ import net.sourceforge.plantuml.command.PSystemCommandFactory;
 import net.sourceforge.plantuml.command.note.CommandFactoryNote;
 import net.sourceforge.plantuml.command.note.CommandFactoryNoteOnEntity;
 import net.sourceforge.plantuml.command.note.CommandFactoryNoteOnLink;
-import net.sourceforge.plantuml.command.regex.RegexLeaf;
-import net.sourceforge.plantuml.command.regex.RegexOr;
 import net.sourceforge.plantuml.core.UmlSource;
+import net.sourceforge.plantuml.objectdiagram.command.CommandCreateJson;
+import net.sourceforge.plantuml.objectdiagram.command.CommandCreateJsonSingleLine;
+import net.sourceforge.plantuml.objectdiagram.command.CommandCreateMap;
+import net.sourceforge.plantuml.regex.RegexLeaf;
+import net.sourceforge.plantuml.regex.RegexOr;
 import net.sourceforge.plantuml.statediagram.command.CommandAddField;
 import net.sourceforge.plantuml.statediagram.command.CommandConcurrentState;
 import net.sourceforge.plantuml.statediagram.command.CommandCreatePackage2;
@@ -64,13 +68,12 @@ import net.sourceforge.plantuml.statediagram.command.CommandLinkStateReverse;
 public class StateDiagramFactory extends PSystemCommandFactory {
 
 	@Override
-	public StateDiagram createEmptyDiagram(ThemeStyle style, UmlSource source, ISkinSimple skinParam) {
-		return new StateDiagram(style, source, skinParam);
+	public StateDiagram createEmptyDiagram(UmlSource source, Map<String, String> skinParam) {
+		return new StateDiagram(source, skinParam);
 	}
 
 	@Override
-	protected List<Command> createCommands() {
-		final List<Command> cmds = new ArrayList<>();
+	protected void initCommandsList(List<Command> cmds) {
 		cmds.add(new CommandFootboxIgnored());
 		cmds.add(new CommandRankDir());
 		cmds.add(new CommandRemoveRestore());
@@ -100,11 +103,12 @@ public class StateDiagramFactory extends PSystemCommandFactory {
 		cmds.add(factoryNoteCommand.createSingleLine());
 		cmds.add(factoryNoteCommand.createMultiLine(false));
 
+		cmds.add(new CommandCreateMap());
+		cmds.add(new CommandCreateJson());
+		cmds.add(new CommandCreateJsonSingleLine());
+
 		CommonCommands.addCommonCommands1(cmds);
 		cmds.add(new CommandHideShow2());
-		cmds.add(new CommandNamespaceSeparator());
-
-		return cmds;
 	}
 
 }

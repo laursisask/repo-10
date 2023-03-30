@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,32 +35,31 @@
  */
 package net.sourceforge.plantuml.activitydiagram3.ftile.vcompact;
 
-import java.awt.geom.Point2D;
-
 import net.sourceforge.plantuml.activitydiagram3.ftile.AbstractConnection;
-import net.sourceforge.plantuml.activitydiagram3.ftile.Arrows;
 import net.sourceforge.plantuml.activitydiagram3.ftile.ConnectionTranslatable;
 import net.sourceforge.plantuml.activitydiagram3.ftile.Ftile;
 import net.sourceforge.plantuml.activitydiagram3.ftile.Snake;
-import net.sourceforge.plantuml.graphic.Rainbow;
-import net.sourceforge.plantuml.graphic.StringBounder;
-import net.sourceforge.plantuml.graphic.TextBlock;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
+import net.sourceforge.plantuml.decoration.Rainbow;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
+import net.sourceforge.plantuml.klimt.geom.XPoint2D;
+import net.sourceforge.plantuml.klimt.shape.TextBlock;
+import net.sourceforge.plantuml.style.ISkinParam;
 
 public class ConnectionVerticalDown extends AbstractConnection implements ConnectionTranslatable {
 
-	private final Point2D p1;
-	private final Point2D p2;
+	private final XPoint2D p1;
+	private final XPoint2D p2;
 	private final Rainbow color;
 	private final TextBlock textBlock;
 
-	public ConnectionVerticalDown(Ftile ftile1, Ftile ftile2, Point2D p1, Point2D p2, Rainbow color,
+	public ConnectionVerticalDown(Ftile ftile1, Ftile ftile2, XPoint2D p1, XPoint2D p2, Rainbow color,
 			TextBlock textBlock) {
 		super(ftile1, ftile2);
-		if (color.size() == 0) {
+		if (color.size() == 0)
 			throw new IllegalArgumentException();
-		}
+
 		this.p1 = p1;
 		this.p2 = p2;
 		this.color = color;
@@ -73,7 +75,8 @@ public class ConnectionVerticalDown extends AbstractConnection implements Connec
 	}
 
 	private Snake getSimpleSnake() {
-		final Snake snake = Snake.create(getFtile1().skinParam(), color, Arrows.asToDown()).withLabel(textBlock,
+		final ISkinParam skinParam = getFtile1().skinParam();
+		final Snake snake = Snake.create(skinParam, color, skinParam.arrows().asToDown()).withLabel(textBlock,
 				arrowHorizontalAlignment());
 		snake.addPoint(p1);
 		snake.addPoint(p2);
@@ -82,21 +85,17 @@ public class ConnectionVerticalDown extends AbstractConnection implements Connec
 
 	@Override
 	public void drawTranslate(UGraphic ug, UTranslate translate1, UTranslate translate2) {
-		final Snake snake = Snake.create(getFtile1().skinParam(), color, Arrows.asToDown()).withLabel(textBlock,
+		final ISkinParam skinParam = getFtile1().skinParam();
+		final Snake snake = Snake.create(skinParam, color, skinParam.arrows().asToDown()).withLabel(textBlock,
 				arrowHorizontalAlignment());
-		final Point2D mp1a = translate1.getTranslated(p1);
-		final Point2D mp2b = translate2.getTranslated(p2);
+		final XPoint2D mp1a = translate1.getTranslated(p1);
+		final XPoint2D mp2b = translate2.getTranslated(p2);
 		final double middle = (mp1a.getY() + mp2b.getY()) / 2.0;
 		snake.addPoint(mp1a);
 		snake.addPoint(mp1a.getX(), middle);
 		snake.addPoint(mp2b.getX(), middle);
 		snake.addPoint(mp2b);
 		ug.draw(snake);
-
-		// final Snake small = Snake.create(color, Arrows.asToDown());
-		// small.addPoint(mp2b.getX(), middle);
-		// small.addPoint(mp2b);
-		// ug.draw(small);
 
 	}
 

@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
  * 
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  * 
  * This file is part of PlantUML.
  *
@@ -38,12 +38,12 @@ import java.awt.Font;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sourceforge.plantuml.api.ThemeStyle;
 import net.sourceforge.plantuml.command.PSystemBasicFactory;
 import net.sourceforge.plantuml.core.DiagramType;
 import net.sourceforge.plantuml.core.UmlSource;
 
 public class PSystemDitaaFactory extends PSystemBasicFactory<PSystemDitaa> {
+    // ::remove folder when __HAXE__
 
 	// private StringBuilder data;
 	// // -E,--no-separation
@@ -52,12 +52,12 @@ public class PSystemDitaaFactory extends PSystemBasicFactory<PSystemDitaa> {
 	// // -S,--no-shadows
 	// private boolean dropShadows;
 
-	public PSystemDitaaFactory(DiagramType diagramType) {
-		super(diagramType);
+	public PSystemDitaaFactory() {
+		super(DiagramType.DITAA);
 	}
 
 	@Override
-	public PSystemDitaa initDiagram(ThemeStyle style, UmlSource source, String startLine) {
+	public PSystemDitaa initDiagram(UmlSource source, String startLine) {
 		boolean performSeparationOfCommonEdges = true;
 		if (startLine != null && (startLine.contains("-E") || startLine.contains("--no-separation")))
 			performSeparationOfCommonEdges = false;
@@ -80,17 +80,14 @@ public class PSystemDitaaFactory extends PSystemBasicFactory<PSystemDitaa> {
 
 		final float scale = extractScale(startLine);
 		final Font font = extractFont(startLine);
-		if (getDiagramType() == DiagramType.UML)
-			return null;
-		else if (getDiagramType() == DiagramType.DITAA)
-			return new PSystemDitaa(source, "", performSeparationOfCommonEdges, dropShadows, allCornersAreRound, transparentBackground, scale, font, forceFontSize);
-		else
-			throw new IllegalStateException(getDiagramType().name());
+
+		return new PSystemDitaa(source, "", performSeparationOfCommonEdges, dropShadows, allCornersAreRound,
+				transparentBackground, scale, font, forceFontSize);
 
 	}
 
 	@Override
-	public PSystemDitaa executeLine(ThemeStyle style, UmlSource source, PSystemDitaa system, String line) {
+	public PSystemDitaa executeLine(UmlSource source, PSystemDitaa system, String line) {
 		if (system == null && (line.equals("ditaa") || line.startsWith("ditaa("))) {
 			boolean performSeparationOfCommonEdges = true;
 			if (line.contains("-E") || line.contains("--no-separation"))
@@ -114,7 +111,8 @@ public class PSystemDitaaFactory extends PSystemBasicFactory<PSystemDitaa> {
 
 			final float scale = extractScale(line);
 			final Font font = extractFont(line);
-			return new PSystemDitaa(source, "", performSeparationOfCommonEdges, dropShadows, allCornersAreRound, transparentBackground, scale, font, forceFontSize);
+			return new PSystemDitaa(source, "", performSeparationOfCommonEdges, dropShadows, allCornersAreRound,
+					transparentBackground, scale, font, forceFontSize);
 		}
 		if (system == null)
 			return null;
@@ -142,35 +140,31 @@ public class PSystemDitaaFactory extends PSystemBasicFactory<PSystemDitaa> {
 		final Pattern pName = Pattern.compile("font-family=([a-zA-Z0-0 ]+)");
 		final Matcher mName = pName.matcher(line);
 		String fontName = "Dialog";
-		if (mName.find())
-		{
+		if (mName.find()) {
 			fontName = mName.group(1);
 		}
 
 		final Pattern pVariant = Pattern.compile("font-variant=(BOLD|ITALIC|PLAIN)");
 		final Matcher mVariant = pVariant.matcher(line);
 		int fontVariant = Font.BOLD;
-		if (mVariant.find())
-		{
-			switch (mVariant.group(1))
-			{
-				case "BOLD":
-					fontVariant = Font.BOLD;
-					break;
-				case "ITALIC":
-					fontVariant = Font.ITALIC;
-					break;
-				case "PLAIN":
-					fontVariant = Font.PLAIN;
-					break;
+		if (mVariant.find()) {
+			switch (mVariant.group(1)) {
+			case "BOLD":
+				fontVariant = Font.BOLD;
+				break;
+			case "ITALIC":
+				fontVariant = Font.ITALIC;
+				break;
+			case "PLAIN":
+				fontVariant = Font.PLAIN;
+				break;
 			}
 		}
 
 		final Pattern pSize = Pattern.compile("font-size=([\\d]+)");
 		final Matcher mSize = pSize.matcher(line);
 		int fontSize = 12;
-		if (mSize.find())
-		{
+		if (mSize.find()) {
 			fontSize = Integer.parseInt(mSize.group(1));
 		}
 

@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
  * 
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  * 
  * This file is part of PlantUML.
  *
@@ -35,32 +35,32 @@
  */
 package net.sourceforge.plantuml.wire;
 
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import net.sourceforge.plantuml.Dimension2DDouble;
-import net.sourceforge.plantuml.FontParam;
-import net.sourceforge.plantuml.ISkinParam;
-import net.sourceforge.plantuml.command.Position;
-import net.sourceforge.plantuml.cucadiagram.Display;
-import net.sourceforge.plantuml.graphic.AbstractTextBlock;
-import net.sourceforge.plantuml.graphic.FontConfiguration;
-import net.sourceforge.plantuml.graphic.HorizontalAlignment;
-import net.sourceforge.plantuml.graphic.StringBounder;
-import net.sourceforge.plantuml.graphic.TextBlock;
-import net.sourceforge.plantuml.ugraphic.MinMax;
-import net.sourceforge.plantuml.ugraphic.UEllipse;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.URectangle;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
-import net.sourceforge.plantuml.ugraphic.color.HColor;
-import net.sourceforge.plantuml.ugraphic.color.HColorUtils;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.color.HColor;
+import net.sourceforge.plantuml.klimt.color.HColors;
+import net.sourceforge.plantuml.klimt.creole.Display;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.font.FontConfiguration;
+import net.sourceforge.plantuml.klimt.font.FontParam;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
+import net.sourceforge.plantuml.klimt.geom.HorizontalAlignment;
+import net.sourceforge.plantuml.klimt.geom.MinMax;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
+import net.sourceforge.plantuml.klimt.shape.AbstractTextBlock;
+import net.sourceforge.plantuml.klimt.shape.TextBlock;
+import net.sourceforge.plantuml.klimt.shape.UEllipse;
+import net.sourceforge.plantuml.klimt.shape.URectangle;
+import net.sourceforge.plantuml.style.ISkinParam;
+import net.sourceforge.plantuml.utils.Position;
 
 public class Block extends AbstractTextBlock {
+	// ::remove folder when __CORE__
 
 	static class Pos {
 		final double x;
@@ -78,7 +78,7 @@ public class Block extends AbstractTextBlock {
 
 	private final Map<Block, Pos> children = new LinkedHashMap<Block, Pos>();
 	private final Display display;
-	private final Dimension2DDouble fixedDim;
+	private final XDimension2D fixedDim;
 	private final ISkinParam skinParam;
 
 	private final List<String> left = new ArrayList<>();
@@ -96,7 +96,7 @@ public class Block extends AbstractTextBlock {
 		this(skinParam, Display.empty(), null);
 	}
 
-	private Block(ISkinParam skinParam, Display display, Dimension2DDouble fixedDim) {
+	private Block(ISkinParam skinParam, Display display, XDimension2D fixedDim) {
 		this.skinParam = skinParam;
 		this.display = display;
 		this.fixedDim = fixedDim;
@@ -117,7 +117,7 @@ public class Block extends AbstractTextBlock {
 		throw new IllegalArgumentException();
 	}
 
-	public Dimension2D calculateDimension(StringBounder stringBounder) {
+	public XDimension2D calculateDimension(StringBounder stringBounder) {
 		if (fixedDim == null)
 			return minMax.getDimension();
 
@@ -135,7 +135,7 @@ public class Block extends AbstractTextBlock {
 				ent.getKey().drawU(ent.getValue().move(ug));
 			}
 		}
-		ug.draw(new URectangle(calculateDimension(ug.getStringBounder())));
+		ug.draw(URectangle.build(calculateDimension(ug.getStringBounder())));
 
 		drawPins(Position.BOTTOM, ug);
 		drawPins(Position.TOP, ug);
@@ -145,7 +145,7 @@ public class Block extends AbstractTextBlock {
 	}
 
 	private HColor getBlack() {
-		return HColorUtils.BLACK.withDark(HColorUtils.WHITE);
+		return HColors.BLACK.withDark(HColors.WHITE);
 	}
 
 	private void drawPins(Position pos, UGraphic ug) {
@@ -163,7 +163,7 @@ public class Block extends AbstractTextBlock {
 			py = calculateDimension(ug.getStringBounder()).getHeight() - 2;
 		}
 		for (String pin : getPins(pos)) {
-			ug.apply(new UTranslate(px, py)).draw(new UEllipse(4, 4));
+			ug.apply(new UTranslate(px, py)).draw(UEllipse.build(4, 4));
 			if (pos == Position.LEFT || pos == Position.RIGHT) {
 				py += 15;
 			} else {
@@ -180,7 +180,7 @@ public class Block extends AbstractTextBlock {
 	}
 
 	public Block addNewBlock(String name, int width, int height) {
-		final Dimension2DDouble dim = new Dimension2DDouble(width, height);
+		final XDimension2D dim = new XDimension2D(width, height);
 		final Block child = new Block(skinParam, Display.create(name), dim);
 		children.put(child, new Pos(x, y));
 		y += dim.getHeight() + 10;

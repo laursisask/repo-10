@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,17 +35,18 @@
  */
 package net.sourceforge.plantuml.svek;
 
-import net.sourceforge.plantuml.Dimension2DDouble;
-import net.sourceforge.plantuml.Url;
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
-import net.sourceforge.plantuml.graphic.AbstractTextBlock;
-import net.sourceforge.plantuml.graphic.StringBounder;
-import net.sourceforge.plantuml.graphic.TextBlock;
+import java.util.Objects;
+
+import net.sourceforge.plantuml.klimt.UStroke;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.color.HColor;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
+import net.sourceforge.plantuml.klimt.shape.AbstractTextBlock;
+import net.sourceforge.plantuml.klimt.shape.TextBlock;
 import net.sourceforge.plantuml.svek.image.EntityImageState;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.UStroke;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
-import net.sourceforge.plantuml.ugraphic.color.HColor;
+import net.sourceforge.plantuml.url.Url;
 
 public final class InnerStateAutonom extends AbstractTextBlock implements IEntityImage {
 
@@ -56,10 +60,12 @@ public final class InnerStateAutonom extends AbstractTextBlock implements IEntit
 	private final UStroke stroke;
 	private final double rounded;
 	private final double shadowing;
+	private final HColor bodyColor;
 
 	public InnerStateAutonom(IEntityImage im, TextBlock title, TextBlock attribute, HColor borderColor,
-			HColor backColor, Url url, boolean withSymbol, UStroke stroke, double rounded, double shadowing) {
-		this.im = im;
+			HColor backColor, Url url, boolean withSymbol, UStroke stroke, double rounded, double shadowing,
+			HColor bodyColor) {
+		this.im = Objects.requireNonNull(im);
 		this.withSymbol = withSymbol;
 		this.title = title;
 		this.borderColor = borderColor;
@@ -69,17 +75,19 @@ public final class InnerStateAutonom extends AbstractTextBlock implements IEntit
 		this.url = url;
 		this.stroke = stroke;
 		this.rounded = rounded;
+		this.bodyColor = bodyColor;
 	}
 
 	public void drawU(UGraphic ug) {
-		final Dimension2D text = title.calculateDimension(ug.getStringBounder());
-		final Dimension2D attr = attribute.calculateDimension(ug.getStringBounder());
-		final Dimension2D total = calculateDimension(ug.getStringBounder());
+		final XDimension2D text = title.calculateDimension(ug.getStringBounder());
+		final XDimension2D attr = attribute.calculateDimension(ug.getStringBounder());
+		final XDimension2D total = calculateDimension(ug.getStringBounder());
 		final double marginForFields = attr.getHeight() > 0 ? IEntityImage.MARGIN : 0;
 
 		final double titreHeight = IEntityImage.MARGIN + text.getHeight() + IEntityImage.MARGIN_LINE;
+
 		final RoundedContainer r = new RoundedContainer(total, titreHeight, attr.getHeight() + marginForFields,
-				borderColor, backColor, im.getBackcolor(), stroke, rounded, shadowing);
+				borderColor, backColor, bodyColor, stroke, rounded, shadowing);
 
 		if (url != null)
 			ug.startUrl(url);
@@ -101,8 +109,8 @@ public final class InnerStateAutonom extends AbstractTextBlock implements IEntit
 	}
 
 	private double getSpaceYforURL(StringBounder stringBounder) {
-		final Dimension2D text = title.calculateDimension(stringBounder);
-		final Dimension2D attr = attribute.calculateDimension(stringBounder);
+		final XDimension2D text = title.calculateDimension(stringBounder);
+		final XDimension2D attr = attribute.calculateDimension(stringBounder);
 		final double marginForFields = attr.getHeight() > 0 ? IEntityImage.MARGIN : 0;
 		final double titreHeight = IEntityImage.MARGIN + text.getHeight() + IEntityImage.MARGIN_LINE;
 		final double suppY = titreHeight + marginForFields + attr.getHeight();
@@ -113,16 +121,15 @@ public final class InnerStateAutonom extends AbstractTextBlock implements IEntit
 		return null;
 	}
 
-	public Dimension2D calculateDimension(StringBounder stringBounder) {
-		final Dimension2D img = im.calculateDimension(stringBounder);
-		final Dimension2D text = title.calculateDimension(stringBounder);
-		final Dimension2D attr = attribute.calculateDimension(stringBounder);
+	public XDimension2D calculateDimension(StringBounder stringBounder) {
+		final XDimension2D img = im.calculateDimension(stringBounder);
+		final XDimension2D text = title.calculateDimension(stringBounder);
+		final XDimension2D attr = attribute.calculateDimension(stringBounder);
 
-		final Dimension2D dim = Dimension2DDouble.mergeTB(text, attr, img);
+		final XDimension2D dim = text.mergeTB(attr, img);
 		final double marginForFields = attr.getHeight() > 0 ? IEntityImage.MARGIN : 0;
 
-		final Dimension2D result = Dimension2DDouble.delta(dim,
-				IEntityImage.MARGIN * 2 + 2 * IEntityImage.MARGIN_LINE + marginForFields);
+		final XDimension2D result = dim.delta(IEntityImage.MARGIN * 2 + 2 * IEntityImage.MARGIN_LINE + marginForFields);
 
 		return result;
 	}

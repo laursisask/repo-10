@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
  * 
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  * 
  * This file is part of PlantUML.
  *
@@ -34,7 +34,6 @@
  */
 package net.sourceforge.plantuml.timingdiagram;
 
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -42,26 +41,27 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import net.sourceforge.plantuml.Dimension2DDouble;
-import net.sourceforge.plantuml.ISkinParam;
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
-import net.sourceforge.plantuml.command.Position;
-import net.sourceforge.plantuml.cucadiagram.Display;
-import net.sourceforge.plantuml.cucadiagram.Stereotype;
-import net.sourceforge.plantuml.graphic.AbstractTextBlock;
-import net.sourceforge.plantuml.graphic.FontConfiguration;
-import net.sourceforge.plantuml.graphic.HorizontalAlignment;
-import net.sourceforge.plantuml.graphic.StringBounder;
-import net.sourceforge.plantuml.graphic.TextBlock;
-import net.sourceforge.plantuml.graphic.UDrawable;
-import net.sourceforge.plantuml.graphic.color.Colors;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.color.Colors;
+import net.sourceforge.plantuml.klimt.creole.Display;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.font.FontConfiguration;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
+import net.sourceforge.plantuml.klimt.geom.HorizontalAlignment;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
+import net.sourceforge.plantuml.klimt.geom.XPoint2D;
+import net.sourceforge.plantuml.klimt.shape.AbstractTextBlock;
+import net.sourceforge.plantuml.klimt.shape.TextBlock;
+import net.sourceforge.plantuml.klimt.shape.UDrawable;
+import net.sourceforge.plantuml.klimt.shape.ULine;
+import net.sourceforge.plantuml.skin.ArrowConfiguration;
+import net.sourceforge.plantuml.stereo.Stereotype;
+import net.sourceforge.plantuml.style.ISkinParam;
 import net.sourceforge.plantuml.style.SName;
 import net.sourceforge.plantuml.style.StyleSignature;
 import net.sourceforge.plantuml.style.StyleSignatureBasic;
 import net.sourceforge.plantuml.timingdiagram.graphic.IntricatedPoint;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.ULine;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
+import net.sourceforge.plantuml.utils.Position;
 
 public class PlayerBinary extends Player {
 
@@ -93,8 +93,8 @@ public class PlayerBinary extends Player {
 
 	public IntricatedPoint getTimeProjection(StringBounder stringBounder, TimeTick tick) {
 		final double x = ruler.getPosInPixel(tick);
-		return new IntricatedPoint(new Point2D.Double(x, getYpos(stringBounder, HIGH_STRING)),
-				new Point2D.Double(x, getYpos(stringBounder, HIGH_STRING)));
+		return new IntricatedPoint(new XPoint2D(x, getYpos(stringBounder, HIGH_STRING)),
+				new XPoint2D(x, getYpos(stringBounder, HIGH_STRING)));
 	}
 
 	public void addNote(TimeTick now, Display note, Position position) {
@@ -126,8 +126,9 @@ public class PlayerBinary extends Player {
 		return LOW_STRING;
 	}
 
-	public void createConstraint(TimeTick tick1, TimeTick tick2, String message) {
-		this.constraints.add(new TimeConstraint(tick1, tick2, message, skinParam));
+	@Override
+	public void createConstraint(TimeTick tick1, TimeTick tick2, String message, ArrowConfiguration config) {
+		this.constraints.add(new TimeConstraint(2.5, tick1, tick2, message, skinParam, config));
 	}
 
 	private final double ymargin = 8;
@@ -152,14 +153,14 @@ public class PlayerBinary extends Player {
 			public void drawU(UGraphic ug) {
 				final StringBounder stringBounder = ug.getStringBounder();
 				final TextBlock title = getTitle();
-				final Dimension2D dim = title.calculateDimension(stringBounder);
+				final XDimension2D dim = title.calculateDimension(stringBounder);
 				final double y = (getFullHeight(stringBounder) - dim.getHeight()) / 2;
 				title.drawU(ug.apply(UTranslate.dy(y)));
 			}
 
-			public Dimension2D calculateDimension(StringBounder stringBounder) {
-				final Dimension2D dim = getTitle().calculateDimension(stringBounder);
-				return Dimension2DDouble.delta(dim, 5, 0);
+			public XDimension2D calculateDimension(StringBounder stringBounder) {
+				final XDimension2D dim = getTitle().calculateDimension(stringBounder);
+				return dim.delta(5, 0);
 			}
 		};
 	}

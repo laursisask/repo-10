@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,24 +35,23 @@
  */
 package net.sourceforge.plantuml.salt.element;
 
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
 import java.util.List;
 
-import net.sourceforge.plantuml.Dimension2DDouble;
-import net.sourceforge.plantuml.ISkinSimple;
-import net.sourceforge.plantuml.cucadiagram.Display;
-import net.sourceforge.plantuml.graphic.FontConfiguration;
-import net.sourceforge.plantuml.graphic.HorizontalAlignment;
-import net.sourceforge.plantuml.graphic.StringBounder;
-import net.sourceforge.plantuml.graphic.TextBlock;
-import net.sourceforge.plantuml.ugraphic.UEllipse;
-import net.sourceforge.plantuml.ugraphic.UFont;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.UPolygon;
-import net.sourceforge.plantuml.ugraphic.URectangle;
-import net.sourceforge.plantuml.ugraphic.UStroke;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
-import net.sourceforge.plantuml.ugraphic.color.HColorUtils;
+import net.sourceforge.plantuml.klimt.UStroke;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.color.HColors;
+import net.sourceforge.plantuml.klimt.creole.Display;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.font.FontConfiguration;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
+import net.sourceforge.plantuml.klimt.font.UFont;
+import net.sourceforge.plantuml.klimt.geom.HorizontalAlignment;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
+import net.sourceforge.plantuml.klimt.shape.TextBlock;
+import net.sourceforge.plantuml.klimt.shape.UEllipse;
+import net.sourceforge.plantuml.klimt.shape.UPolygon;
+import net.sourceforge.plantuml.klimt.shape.URectangle;
+import net.sourceforge.plantuml.style.ISkinSimple;
 
 public class ElementRadioCheckbox extends AbstractElement {
 
@@ -70,22 +72,22 @@ public class ElementRadioCheckbox extends AbstractElement {
 		this.checked = checked;
 	}
 
-	public Dimension2D getPreferredDimension(StringBounder stringBounder, double x, double y) {
-		final Dimension2D dim = block.calculateDimension(stringBounder);
-		return Dimension2DDouble.delta(dim, margin, 0);
+	public XDimension2D getPreferredDimension(StringBounder stringBounder, double x, double y) {
+		final XDimension2D dim = block.calculateDimension(stringBounder);
+		return dim.delta(margin, 0);
 	}
 
-	public void drawU(UGraphic ug, int zIndex, Dimension2D dimToUse) {
+	public void drawU(UGraphic ug, int zIndex, XDimension2D dimToUse) {
 		if (zIndex != 0)
 			return;
 
 		ug = ug.apply(getBlack());
 		block.drawU(ug.apply(UTranslate.dx(margin)));
 
-		final Dimension2D dim = getPreferredDimension(ug.getStringBounder(), 0, 0);
+		final XDimension2D dim = getPreferredDimension(ug.getStringBounder(), 0, 0);
 		final double height = dim.getHeight();
 
-		ug = ug.apply(new UStroke(stroke));
+		ug = ug.apply(UStroke.withThickness(stroke));
 		if (radio) {
 			drawRadio(ug, height);
 		} else {
@@ -94,25 +96,25 @@ public class ElementRadioCheckbox extends AbstractElement {
 	}
 
 	private void drawOther(UGraphic ug, final double height) {
-		ug.apply(new UTranslate(2, (height - RECTANGLE) / 2)).draw(new URectangle(RECTANGLE, RECTANGLE));
+		ug.apply(new UTranslate(2, (height - RECTANGLE) / 2)).draw(URectangle.build(RECTANGLE, RECTANGLE));
 		if (checked) {
 			final UPolygon poly = new UPolygon();
 			poly.addPoint(0, 0);
 			poly.addPoint(3, 3);
 			poly.addPoint(10, -6);
 			poly.addPoint(3, 1);
-			ug = ug.apply(HColorUtils.changeBack(ug));
+			ug = ug.apply(HColors.changeBack(ug));
 			ug = ug.apply(new UTranslate(3, 6));
 			ug.draw(poly);
 		}
 	}
 
 	private void drawRadio(UGraphic ug, final double height) {
-		ug.apply(new UTranslate(2, (height - ELLIPSE) / 2)).draw(new UEllipse(ELLIPSE, ELLIPSE));
+		ug.apply(new UTranslate(2, (height - ELLIPSE) / 2)).draw(UEllipse.build(ELLIPSE, ELLIPSE));
 		if (checked) {
-			ug = ug.apply(HColorUtils.changeBack(ug));
+			ug = ug.apply(HColors.changeBack(ug));
 			ug = ug.apply(new UTranslate(2 + (ELLIPSE - ELLIPSE2) / 2, (height - ELLIPSE2) / 2));
-			ug.draw(new UEllipse(ELLIPSE2, ELLIPSE2));
+			ug.draw(UEllipse.build(ELLIPSE2, ELLIPSE2));
 		}
 	}
 }

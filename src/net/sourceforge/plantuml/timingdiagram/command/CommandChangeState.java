@@ -2,14 +2,14 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
  * 
- * http://plantuml.com/patreon (only 1$ per month!)
- * http://plantuml.com/paypal
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
  * 
  * This file is part of PlantUML.
  *
@@ -37,17 +37,17 @@ package net.sourceforge.plantuml.timingdiagram.command;
 
 import net.sourceforge.plantuml.command.CommandExecutionResult;
 import net.sourceforge.plantuml.command.SingleLineCommand2;
-import net.sourceforge.plantuml.command.regex.IRegex;
-import net.sourceforge.plantuml.command.regex.RegexLeaf;
-import net.sourceforge.plantuml.command.regex.RegexOr;
-import net.sourceforge.plantuml.command.regex.RegexResult;
-import net.sourceforge.plantuml.graphic.color.ColorParser;
-import net.sourceforge.plantuml.graphic.color.ColorType;
-import net.sourceforge.plantuml.graphic.color.Colors;
+import net.sourceforge.plantuml.klimt.color.ColorParser;
+import net.sourceforge.plantuml.klimt.color.ColorType;
+import net.sourceforge.plantuml.klimt.color.Colors;
+import net.sourceforge.plantuml.klimt.color.NoSuchColorException;
+import net.sourceforge.plantuml.regex.IRegex;
+import net.sourceforge.plantuml.regex.RegexLeaf;
+import net.sourceforge.plantuml.regex.RegexOr;
+import net.sourceforge.plantuml.regex.RegexResult;
 import net.sourceforge.plantuml.timingdiagram.Player;
 import net.sourceforge.plantuml.timingdiagram.TimeTick;
 import net.sourceforge.plantuml.timingdiagram.TimingDiagram;
-import net.sourceforge.plantuml.ugraphic.color.NoSuchColorException;
 
 abstract class CommandChangeState extends SingleLineCommand2<TimingDiagram> {
 
@@ -55,7 +55,7 @@ abstract class CommandChangeState extends SingleLineCommand2<TimingDiagram> {
 		super(pattern);
 	}
 
-	static final String STATE_CODE = "([%pLN_][%pLN_.]*)";
+	static final String STATE_CODE = "([-%pLN_][-%pLN_.]*)";
 
 	static ColorParser color() {
 		return ColorParser.simpleColor(ColorType.BACK);
@@ -64,8 +64,7 @@ abstract class CommandChangeState extends SingleLineCommand2<TimingDiagram> {
 	protected CommandExecutionResult addState(TimingDiagram diagram, RegexResult arg, final Player player,
 			final TimeTick now) throws NoSuchColorException {
 		final String comment = arg.get("COMMENT", 0);
-		final Colors colors = color().getColor(diagram.getSkinParam().getThemeStyle(), arg,
-				diagram.getSkinParam().getIHtmlColorSet());
+		final Colors colors = color().getColor(arg, diagram.getSkinParam().getIHtmlColorSet());
 		player.setState(now, comment, colors, getStates(arg));
 		return CommandExecutionResult.ok();
 	}

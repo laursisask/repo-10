@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,16 +35,17 @@
  */
 package net.sourceforge.plantuml.braille;
 
-import net.sourceforge.plantuml.posimo.DotPath;
-import net.sourceforge.plantuml.ugraphic.UDriver;
-import net.sourceforge.plantuml.ugraphic.UParam;
-import net.sourceforge.plantuml.ugraphic.color.ColorMapper;
+import net.sourceforge.plantuml.klimt.UParam;
+import net.sourceforge.plantuml.klimt.color.ColorMapper;
+import net.sourceforge.plantuml.klimt.drawing.UDriver;
+import net.sourceforge.plantuml.klimt.shape.DotPath;
 
 public class DriverDotPathBraille implements UDriver<DotPath, BrailleGrid> {
+    // ::remove folder when __HAXE__
 
 	public void draw(DotPath shape, double x, double y, ColorMapper mapper, UParam param, BrailleGrid grid) {
-		if (param.getColor() != null) {
+		if (param.getColor().isTransparent() == false)
 			grid.drawDotPath(x, y, shape);
-		}
+
 	}
 }

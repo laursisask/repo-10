@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,20 +35,19 @@
  */
 package net.sourceforge.plantuml.asciiart;
 
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
-import java.awt.geom.Point2D;
-
 import net.sourceforge.plantuml.FileFormat;
 import net.sourceforge.plantuml.StringUtils;
-import net.sourceforge.plantuml.cucadiagram.Display;
-import net.sourceforge.plantuml.graphic.StringBounder;
+import net.sourceforge.plantuml.klimt.creole.Display;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.drawing.txt.UGraphicTxt;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
+import net.sourceforge.plantuml.klimt.geom.XPoint2D;
 import net.sourceforge.plantuml.skin.Area;
 import net.sourceforge.plantuml.skin.ArrowComponent;
 import net.sourceforge.plantuml.skin.ArrowConfiguration;
 import net.sourceforge.plantuml.skin.ComponentType;
 import net.sourceforge.plantuml.skin.Context2D;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.txt.UGraphicTxt;
 
 public class ComponentTextSelfArrow extends AbstractComponentText implements ArrowComponent {
 
@@ -66,7 +68,7 @@ public class ComponentTextSelfArrow extends AbstractComponentText implements Arr
 		if (config.isHidden()) {
 			return;
 		}
-		final Dimension2D dimensionToUse = area.getDimensionToUse();
+		final XDimension2D dimensionToUse = area.getDimensionToUse();
 		final UmlCharArea charArea = ((UGraphicTxt) ug).getCharArea();
 		final int width = (int) dimensionToUse.getWidth();
 		final int height = (int) dimensionToUse.getHeight() - 1;
@@ -108,12 +110,12 @@ public class ComponentTextSelfArrow extends AbstractComponentText implements Arr
 		return StringUtils.getWcWidth(stringsToDisplay) + 6;
 	}
 
-	public Point2D getStartPoint(StringBounder stringBounder, Dimension2D dimensionToUse) {
-		return new Point2D.Double(0, 0);
+	public XPoint2D getStartPoint(StringBounder stringBounder, XDimension2D dimensionToUse) {
+		return new XPoint2D(0, 0);
 	}
 
-	public Point2D getEndPoint(StringBounder stringBounder, Dimension2D dimensionToUse) {
-		return new Point2D.Double(0, 0);
+	public XPoint2D getEndPoint(StringBounder stringBounder, XDimension2D dimensionToUse) {
+		return new XPoint2D(0, 0);
 	}
 
 	public double getPaddingY() {
@@ -123,10 +125,9 @@ public class ComponentTextSelfArrow extends AbstractComponentText implements Arr
 	public double getYPoint(StringBounder stringBounder) {
 		throw new UnsupportedOperationException();
 	}
-	
+
 	public double getPosArrow(StringBounder stringBounder) {
 		throw new UnsupportedOperationException();
 	}
-
 
 }

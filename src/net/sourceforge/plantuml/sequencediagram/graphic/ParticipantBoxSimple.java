@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -35,15 +38,13 @@ package net.sourceforge.plantuml.sequencediagram.graphic;
 import java.util.Collection;
 import java.util.Collections;
 
-import net.sourceforge.plantuml.annotation.HaxeIgnored;
-import net.sourceforge.plantuml.graphic.StringBounder;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
 
 public class ParticipantBoxSimple implements Pushable {
 
 	private double pos = 0;
 	private final String name;
 
-	@HaxeIgnored
 	public ParticipantBoxSimple(double pos) {
 		this(pos, null);
 	}
@@ -65,7 +66,7 @@ public class ParticipantBoxSimple implements Pushable {
 	public void pushToLeft(double deltaX) {
 		pos += deltaX;
 	}
-	
+
 	public double getPreferredWidth(StringBounder stringBounder) {
 		return 0;
 	}
@@ -73,6 +74,5 @@ public class ParticipantBoxSimple implements Pushable {
 	public Collection<Segment> getDelays(StringBounder stringBounder) {
 		return Collections.emptyList();
 	}
-
 
 }

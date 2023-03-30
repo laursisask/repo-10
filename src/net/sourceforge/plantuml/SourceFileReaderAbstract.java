@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -51,38 +54,52 @@ import java.util.List;
 import java.util.Set;
 
 import net.sourceforge.plantuml.api.ImageDataSimple;
-import net.sourceforge.plantuml.api.ThemeStyle;
 import net.sourceforge.plantuml.core.Diagram;
 import net.sourceforge.plantuml.error.PSystemError;
+import net.sourceforge.plantuml.file.SuggestedFile;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
+import net.sourceforge.plantuml.log.Logme;
 import net.sourceforge.plantuml.preproc.Defines;
 import net.sourceforge.plantuml.preproc.FileWithSuffix;
 import net.sourceforge.plantuml.security.SFile;
 import net.sourceforge.plantuml.security.SecurityUtils;
+import net.sourceforge.plantuml.utils.Log;
 
 public abstract class SourceFileReaderAbstract implements ISourceFileReader {
+	// ::remove file when __CORE__
+	// ::remove file when __HAXE__
 
-	protected File file;
-	protected File outputDirectory;
-	protected File outputFile;
+	final private File file;
 
-	protected final BlockUmlBuilder builder;
-	protected /* final */ FileFormatOption fileFormatOption;
+	private FileFormatOption fileFormatOption;
 	private boolean checkMetadata;
 	private boolean noerror;
+
+	final private Charset charset;
+
+	private final BlockUmlBuilder builder;
+	private int cpt;
+
+	protected final SuggestedFile getSuggestedFile(File outputDirectory, String newName) {
+		final File outFile = new File(outputDirectory, newName);
+		return SuggestedFile.fromOutputFile(outFile, getFileFormatOption().getFileFormat(), cpt++);
+	}
 
 	public SourceFileReaderAbstract(File file, FileFormatOption fileFormatOption, Defines defines, List<String> config,
 			String charsetName) throws IOException {
 
-		if (!file.exists()) {
+		if (file.exists() == false)
 			throw new IllegalArgumentException();
-		}
-
-		final Charset charset = charsetOrDefault(charsetName);
 
 		this.file = file;
+		this.charset = charsetOrDefault(charsetName);
 		this.fileFormatOption = fileFormatOption;
-		this.builder = new BlockUmlBuilder(fileFormatOption.getStyle(), config, charset, defines, getReader(charset),
+		this.builder = new BlockUmlBuilder(config, charset, defines, getReader(charset),
 				SFile.fromFile(file.getAbsoluteFile().getParentFile()), FileWithSuffix.getFileName(file));
+	}
+
+	protected final FileFormatOption getFileFormatOption() {
+		return fileFormatOption;
 	}
 
 	public void setCheckMetadata(boolean checkMetadata) {
@@ -90,11 +107,9 @@ public abstract class SourceFileReaderAbstract implements ISourceFileReader {
 	}
 
 	public boolean hasError() {
-		for (final BlockUml b : builder.getBlockUmls()) {
-			if (b.getDiagram() instanceof PSystemError) {
+		for (final BlockUml b : builder.getBlockUmls())
+			if (b.getDiagram() instanceof PSystemError)
 				return true;
-			}
-		}
 		return false;
 	}
 
@@ -106,13 +121,14 @@ public abstract class SourceFileReaderAbstract implements ISourceFileReader {
 		return new InputStreamReader(new BufferedInputStream(new FileInputStream(file)), charset);
 	}
 
-	public final Set<FileWithSuffix> getIncludedFiles() {
+	public final Set<FileWithSuffix> getIncludedFiles() throws IOException {
 		return builder.getIncludedFiles();
 	}
 
-	@Deprecated
-	public final void setFileFormatOption(FileFormatOption fileFormatOption) {
+	@Override
+	public final ISourceFileReader setFileFormatOption(FileFormatOption fileFormatOption) {
 		this.fileFormatOption = fileFormatOption;
+		return this;
 	}
 
 	protected boolean endsWithSlashOrAntislash(String newName) {
@@ -141,8 +157,6 @@ public abstract class SourceFileReaderAbstract implements ISourceFileReader {
 		}
 	}
 
-	protected int cpt;
-
 	final public List<GeneratedImage> getGeneratedImages() throws IOException {
 		Log.info("Reading file: " + file);
 
@@ -156,29 +170,27 @@ public abstract class SourceFileReaderAbstract implements ISourceFileReader {
 			try {
 				system = blockUml.getDiagram();
 			} catch (Throwable t) {
-				t.printStackTrace();
-				if (OptionFlags.getInstance().isSilentlyCompletelyIgnoreErrors() || noerror) {
+				Logme.error(t);
+				if (OptionFlags.getInstance().isSilentlyCompletelyIgnoreErrors() || noerror)
 					continue;
-				}
+
 				return getCrashedImage(blockUml, t, suggested.getFile(0));
 			}
 
-			if (OptionFlags.getInstance().isSilentlyCompletelyIgnoreErrors() && system instanceof PSystemError) {
+			if (OptionFlags.getInstance().isSilentlyCompletelyIgnoreErrors() && system instanceof PSystemError)
 				continue;
-			}
 
 			OptionFlags.getInstance().logData(SFile.fromFile(file), system);
 			final List<FileImageData> exportDiagrams;
 			if (noerror && system instanceof PSystemError) {
 				exportDiagrams = new ArrayList<FileImageData>();
-				exportDiagrams.add(
-						new FileImageData(null, new ImageDataSimple(new Dimension2DDouble(0, 0), FileImageData.ERROR)));
+				exportDiagrams
+						.add(new FileImageData(null, new ImageDataSimple(new XDimension2D(0, 0), FileImageData.ERROR)));
 			} else
 				exportDiagrams = PSystemUtils.exportDiagrams(system, suggested, fileFormatOption, checkMetadata);
 
-			if (exportDiagrams.size() > 1) {
+			if (exportDiagrams.size() > 1)
 				cpt += exportDiagrams.size() - 1;
-			}
 
 			for (FileImageData fdata : exportDiagrams) {
 				final String desc = "[" + file.getName() + "] " + system.getDescription();
@@ -200,6 +212,10 @@ public abstract class SourceFileReaderAbstract implements ISourceFileReader {
 	protected final void setNoerror(boolean noerror) {
 		this.noerror = noerror;
 
+	}
+
+	final protected String getFileName() {
+		return file.getName();
 	}
 
 }

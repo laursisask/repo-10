@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -40,23 +43,22 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import net.sourceforge.plantuml.ISkinParam;
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
-import net.sourceforge.plantuml.cucadiagram.Display;
-import net.sourceforge.plantuml.graphic.FontConfiguration;
-import net.sourceforge.plantuml.graphic.HorizontalAlignment;
-import net.sourceforge.plantuml.graphic.StringBounder;
-import net.sourceforge.plantuml.graphic.TextBlock;
+import net.sourceforge.plantuml.klimt.UStroke;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.color.HColor;
+import net.sourceforge.plantuml.klimt.creole.Display;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.font.FontConfiguration;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
+import net.sourceforge.plantuml.klimt.geom.HorizontalAlignment;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
+import net.sourceforge.plantuml.klimt.shape.TextBlock;
+import net.sourceforge.plantuml.klimt.shape.ULine;
+import net.sourceforge.plantuml.style.ISkinParam;
 import net.sourceforge.plantuml.style.PName;
 import net.sourceforge.plantuml.style.SName;
 import net.sourceforge.plantuml.style.Style;
 import net.sourceforge.plantuml.style.StyleSignatureBasic;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.ULine;
-import net.sourceforge.plantuml.ugraphic.UStroke;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
-import net.sourceforge.plantuml.ugraphic.color.HColor;
-import net.sourceforge.plantuml.ugraphic.color.HColorUtils;
 
 public class TimingRuler {
 
@@ -71,8 +73,7 @@ public class TimingRuler {
 
 	static UGraphic applyForVLines(UGraphic ug, Style style, ISkinParam skinParam) {
 		final UStroke stroke = new UStroke(3, 5, 0.5);
-		final HColor color = style.value(PName.LineColor).asColor(skinParam.getThemeStyle(),
-				skinParam.getIHtmlColorSet());
+		final HColor color = style.value(PName.LineColor).asColor(skinParam.getIHtmlColorSet());
 
 		return ug.apply(stroke).apply(color);
 	}
@@ -150,6 +151,8 @@ public class TimingRuler {
 	}
 
 	public double getWidth() {
+		if (times.size() == 0)
+			return 100;
 		final double delta = getMax().getTime().doubleValue() - getMin().getTime().doubleValue();
 
 		return (delta / tickUnitary() + 1) * tickIntervalInPixels;
@@ -176,11 +179,12 @@ public class TimingRuler {
 
 	}
 
-	private FontConfiguration getFontConfiguration() {
-		return FontConfiguration.create(skinParam, getStyle());
+	private Style getStyleTimegrid() {
+		return StyleSignatureBasic.of(SName.root, SName.element, SName.timingDiagram, SName.timegrid)
+				.getMergedStyle(skinParam.getCurrentStyleBuilder());
 	}
 
-	private Style getStyle() {
+	private Style getStyleTimeline() {
 		return StyleSignatureBasic.of(SName.root, SName.element, SName.timingDiagram, SName.timeline)
 				.getMergedStyle(skinParam.getCurrentStyleBuilder());
 	}
@@ -191,19 +195,19 @@ public class TimingRuler {
 
 	private TextBlock getTimeTextBlock(String string) {
 		final Display display = Display.getWithNewlines(string);
-		return display.create(getFontConfiguration(), HorizontalAlignment.LEFT, skinParam);
+		final FontConfiguration fontConfiguration = FontConfiguration.create(skinParam, getStyleTimeline());
+		return display.create(fontConfiguration, HorizontalAlignment.LEFT, skinParam);
 	}
 
 	public void drawTimeAxis(UGraphic ug, TimeAxisStategy timeAxisStategy, Map<String, TimeTick> codes) {
 		if (timeAxisStategy == TimeAxisStategy.HIDDEN)
 			return;
 
-		final Style style = StyleSignatureBasic.of(SName.root, SName.timingDiagram, SName.timeline)
-				.getMergedStyle(skinParam.getCurrentStyleBuilder());
+		final Style styleTimeline = getStyleTimeline();
+		final Style styleTimegrid = getStyleTimegrid();
 
-		final HColor color = style.value(PName.LineColor).asColor(skinParam.getThemeStyle(),
-				skinParam.getIHtmlColorSet());
-		final UStroke stroke = style.getStroke();
+		final HColor color = styleTimeline.value(PName.LineColor).asColor(skinParam.getIHtmlColorSet());
+		final UStroke stroke = styleTimeline.getStroke();
 
 		ug = ug.apply(stroke).apply(color);
 
@@ -230,7 +234,7 @@ public class TimingRuler {
 			if (label.length() == 0)
 				continue;
 			final TextBlock text = getTimeTextBlock(label);
-			final Dimension2D dim = text.calculateDimension(ug.getStringBounder());
+			final XDimension2D dim = text.calculateDimension(ug.getStringBounder());
 			text.drawU(ug.apply(new UTranslate(getPosInPixel(tick) - dim.getWidth() / 2, tickHeight + 1)));
 
 		}
@@ -249,7 +253,7 @@ public class TimingRuler {
 
 		for (long round : roundValues()) {
 			final TextBlock text = getTimeTextBlock(round);
-			final Dimension2D dim = text.calculateDimension(ug.getStringBounder());
+			final XDimension2D dim = text.calculateDimension(ug.getStringBounder());
 			text.drawU(ug.apply(new UTranslate(getPosInPixelInternal(round) - dim.getWidth() / 2, tickHeight + 1)));
 		}
 	}
@@ -291,7 +295,7 @@ public class TimingRuler {
 	}
 
 	public void drawVlines(UGraphic ug, double height) {
-		ug = applyForVLines(ug, getStyle(), skinParam);
+		ug = applyForVLines(ug, getStyleTimegrid(), skinParam);
 		final ULine line = ULine.vline(height);
 		final int nb = getNbTick();
 		for (int i = 0; i <= nb; i++)

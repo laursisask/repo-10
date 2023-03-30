@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -34,45 +37,45 @@ package net.sourceforge.plantuml.activitydiagram.command;
 
 import java.util.List;
 
-import net.sourceforge.plantuml.BackSlash;
-import net.sourceforge.plantuml.Direction;
-import net.sourceforge.plantuml.StringLocated;
 import net.sourceforge.plantuml.StringUtils;
-import net.sourceforge.plantuml.Url;
-import net.sourceforge.plantuml.UrlBuilder;
-import net.sourceforge.plantuml.UrlMode;
+import net.sourceforge.plantuml.abel.Entity;
+import net.sourceforge.plantuml.abel.GroupType;
+import net.sourceforge.plantuml.abel.LeafType;
+import net.sourceforge.plantuml.abel.Link;
+import net.sourceforge.plantuml.abel.LinkArg;
 import net.sourceforge.plantuml.activitydiagram.ActivityDiagram;
 import net.sourceforge.plantuml.classdiagram.command.CommandLinkClass;
-import net.sourceforge.plantuml.command.BlocLines;
 import net.sourceforge.plantuml.command.CommandExecutionResult;
 import net.sourceforge.plantuml.command.CommandMultilines2;
 import net.sourceforge.plantuml.command.MultilinesStrategy;
-import net.sourceforge.plantuml.command.regex.IRegex;
-import net.sourceforge.plantuml.command.regex.MyPattern;
-import net.sourceforge.plantuml.command.regex.RegexConcat;
-import net.sourceforge.plantuml.command.regex.RegexLeaf;
-import net.sourceforge.plantuml.command.regex.RegexOptional;
-import net.sourceforge.plantuml.command.regex.RegexOr;
-import net.sourceforge.plantuml.command.regex.RegexResult;
-import net.sourceforge.plantuml.cucadiagram.Code;
-import net.sourceforge.plantuml.cucadiagram.Display;
-import net.sourceforge.plantuml.cucadiagram.GroupType;
-import net.sourceforge.plantuml.cucadiagram.IEntity;
-import net.sourceforge.plantuml.cucadiagram.Ident;
-import net.sourceforge.plantuml.cucadiagram.LeafType;
-import net.sourceforge.plantuml.cucadiagram.Link;
-import net.sourceforge.plantuml.cucadiagram.LinkDecor;
-import net.sourceforge.plantuml.cucadiagram.LinkType;
-import net.sourceforge.plantuml.cucadiagram.NamespaceStrategy;
-import net.sourceforge.plantuml.cucadiagram.Stereotype;
+import net.sourceforge.plantuml.command.Trim;
+import net.sourceforge.plantuml.decoration.LinkDecor;
+import net.sourceforge.plantuml.decoration.LinkType;
 import net.sourceforge.plantuml.descdiagram.command.CommandLinkElement;
-import net.sourceforge.plantuml.graphic.color.ColorType;
-import net.sourceforge.plantuml.ugraphic.color.NoSuchColorException;
+import net.sourceforge.plantuml.klimt.color.ColorType;
+import net.sourceforge.plantuml.klimt.color.NoSuchColorException;
+import net.sourceforge.plantuml.klimt.creole.Display;
+import net.sourceforge.plantuml.plasma.Quark;
+import net.sourceforge.plantuml.regex.IRegex;
+import net.sourceforge.plantuml.regex.MyPattern;
+import net.sourceforge.plantuml.regex.RegexConcat;
+import net.sourceforge.plantuml.regex.RegexLeaf;
+import net.sourceforge.plantuml.regex.RegexOptional;
+import net.sourceforge.plantuml.regex.RegexOr;
+import net.sourceforge.plantuml.regex.RegexResult;
+import net.sourceforge.plantuml.stereo.Stereotype;
+import net.sourceforge.plantuml.text.BackSlash;
+import net.sourceforge.plantuml.text.StringLocated;
+import net.sourceforge.plantuml.url.Url;
+import net.sourceforge.plantuml.url.UrlBuilder;
+import net.sourceforge.plantuml.url.UrlMode;
+import net.sourceforge.plantuml.utils.BlocLines;
+import net.sourceforge.plantuml.utils.Direction;
 
 public class CommandLinkLongActivity extends CommandMultilines2<ActivityDiagram> {
 
 	public CommandLinkLongActivity() {
-		super(getRegexConcat(), MultilinesStrategy.REMOVE_STARTING_QUOTE);
+		super(getRegexConcat(), MultilinesStrategy.REMOVE_STARTING_QUOTE, Trim.BOTH);
 	}
 
 	@Override
@@ -93,7 +96,7 @@ public class CommandLinkLongActivity extends CommandMultilines2<ActivityDiagram>
 				RegexLeaf.spaceZeroOrMore(), //
 				new RegexLeaf("BACKCOLOR", "(#\\w+)?"), //
 				RegexLeaf.spaceZeroOrMore(), //
-				new RegexLeaf("URL", "(" + UrlBuilder.getRegexp() + ")?"), //
+				UrlBuilder.OPTIONAL, //
 
 				new RegexLeaf("ARROW_BODY1", "([-.]+)"), //
 				new RegexLeaf("ARROW_STYLE1", "(?:\\[(" + CommandLinkElement.LINE_STYLE + ")\\])?"), //
@@ -117,18 +120,17 @@ public class CommandLinkLongActivity extends CommandMultilines2<ActivityDiagram>
 		lines = lines.trim();
 		final RegexResult line0 = getStartingPattern().matcher(lines.getFirst().getTrimmed().getString());
 
-		final IEntity entity1 = CommandLinkActivity.getEntity(diagram, line0, true);
-		if (entity1 == null) {
+		final Entity entity1 = CommandLinkActivity.getEntity(diagram, line0, true);
+		if (entity1 == null)
 			return CommandExecutionResult.error("No such entity");
-		}
 
-		if (line0.get("STEREOTYPE", 0) != null) {
+		if (line0.get("STEREOTYPE", 0) != null)
 			entity1.setStereotype(Stereotype.build(line0.get("STEREOTYPE", 0)));
-		}
+
 		final String stringColor = line0.get("BACKCOLOR", 0);
 		if (stringColor != null) {
-			entity1.setSpecificColorTOBEREMOVED(ColorType.BACK, diagram.getSkinParam().getIHtmlColorSet()
-					.getColor(diagram.getSkinParam().getThemeStyle(), stringColor));
+			entity1.setSpecificColorTOBEREMOVED(ColorType.BACK,
+					diagram.getSkinParam().getIHtmlColorSet().getColor(stringColor));
 		}
 		final StringBuilder sb = new StringBuilder();
 
@@ -146,22 +148,22 @@ public class CommandLinkLongActivity extends CommandMultilines2<ActivityDiagram>
 			i++;
 			if (i == 1 && urlActivity == null) {
 				urlActivity = extractUrl(diagram, cs);
-				if (urlActivity != null) {
+				if (urlActivity != null)
 					continue;
-				}
+
 			}
 			sb.append(cs.getString());
-			if (i < lines.size() - 2) {
+			if (i < lines.size() - 2)
 				sb.append(BackSlash.BS_BS_N);
-			}
+
 		}
 
 		final List<String> lineLast = StringUtils.getSplit(MyPattern.cmpile(getPatternEnd()),
 				lines.getLast().getString());
 		if (StringUtils.isNotEmpty(lineLast.get(0))) {
-			if (sb.length() > 0 && sb.toString().endsWith(BackSlash.BS_BS_N) == false) {
+			if (sb.length() > 0 && sb.toString().endsWith(BackSlash.BS_BS_N) == false)
 				sb.append(BackSlash.BS_BS_N);
-			}
+
 			sb.append(lineLast.get(0));
 		}
 
@@ -174,31 +176,29 @@ public class CommandLinkLongActivity extends CommandMultilines2<ActivityDiagram>
 			partition = StringUtils.eventuallyRemoveStartingAndEndingDoubleQuote(partition);
 		}
 		if (partition != null) {
-			final Ident idNewLong = diagram.buildLeafIdent(partition);
-			diagram.gotoGroup(idNewLong, diagram.buildCode(partition), Display.getWithNewlines(partition),
-					GroupType.PACKAGE, null, NamespaceStrategy.SINGLE);
+			final Quark<Entity> idNewLong = diagram.quarkInContext(true, diagram.cleanId(partition));
+			diagram.gotoGroup(idNewLong, Display.getWithNewlines(partition), GroupType.PACKAGE);
 		}
-		final Ident ident = diagram.buildLeafIdent(idShort);
-		final Code code = diagram.V1972() ? ident : diagram.buildCode(idShort);
-		final IEntity entity2 = diagram.getOrCreate(ident, code, Display.getWithNewlines(display), LeafType.ACTIVITY);
-		if (entity2 == null) {
-			return CommandExecutionResult.error("No such entity");
-		}
+		final Quark<Entity> ident = diagram.quarkInContext(true, diagram.cleanId(idShort));
 
-		if (partition != null) {
+		Entity entity2 = ident.getData();
+		if (entity2 == null)
+			entity2 = diagram.reallyCreateLeaf(ident, Display.getWithNewlines(display), LeafType.ACTIVITY, null);
+
+		diagram.setLastEntityConsulted(entity2);
+
+		if (partition != null)
 			diagram.endGroup();
-		}
-		if (urlActivity != null) {
-			entity2.addUrl(urlActivity);
-		}
 
-		if (lineLast.get(2) != null) {
+		if (urlActivity != null)
+			entity2.addUrl(urlActivity);
+
+		if (lineLast.get(2) != null)
 			entity2.setStereotype(Stereotype.build(lineLast.get(2)));
-		}
+
 		if (lineLast.get(4) != null) {
 			String s = lineLast.get(4);
-			entity2.setSpecificColorTOBEREMOVED(ColorType.BACK,
-					diagram.getSkinParam().getIHtmlColorSet().getColor(diagram.getSkinParam().getThemeStyle(), s));
+			entity2.setSpecificColorTOBEREMOVED(ColorType.BACK, diagram.getSkinParam().getIHtmlColorSet().getColor(s));
 		}
 
 		final String arrowBody1 = CommandLinkClass.notNull(line0.get("ARROW_BODY1", 0));
@@ -212,15 +212,15 @@ public class CommandLinkLongActivity extends CommandMultilines2<ActivityDiagram>
 		final Display linkLabel = Display.getWithNewlines(line0.get("BRACKET", 0));
 
 		LinkType type = new LinkType(LinkDecor.ARROW, LinkDecor.NONE);
-		if (arrow.contains(".")) {
+		if (arrow.contains("."))
 			type = type.goDotted();
-		}
-		Link link = new Link(entity1, entity2, type, linkLabel, lenght,
-				diagram.getSkinParam().getCurrentStyleBuilder());
+
+		final LinkArg linkArg = LinkArg.build(linkLabel, lenght, diagram.getSkinParam().classAttributeIconSize() > 0);
+		Link link = new Link(diagram.getEntityFactory(), diagram.getSkinParam().getCurrentStyleBuilder(), entity1,
+				entity2, type, linkArg);
 		final Direction direction = StringUtils.getArrowDirection(arrowBody1 + arrowDirection + arrowBody2 + ">");
-		if (direction == Direction.LEFT || direction == Direction.UP) {
+		if (direction == Direction.LEFT || direction == Direction.UP)
 			link = link.getInv();
-		}
 
 		if (line0.get("URL", 0) != null) {
 			final UrlBuilder urlBuilder = new UrlBuilder(diagram.getSkinParam().getValue("topurl"), UrlMode.STRICT);
@@ -228,7 +228,7 @@ public class CommandLinkLongActivity extends CommandMultilines2<ActivityDiagram>
 			link.setUrl(urlLink);
 		}
 
-		link.applyStyle(diagram.getSkinParam().getThemeStyle(), line0.getLazzy("ARROW_STYLE", 0));
+		link.applyStyle(line0.getLazzy("ARROW_STYLE", 0));
 		diagram.addLink(link);
 
 		return CommandExecutionResult.ok();

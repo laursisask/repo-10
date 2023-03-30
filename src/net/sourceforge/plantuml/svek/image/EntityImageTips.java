@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,44 +35,40 @@
  */
 package net.sourceforge.plantuml.svek.image;
 
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 import java.util.Map;
 
-import net.sourceforge.plantuml.Dimension2DDouble;
-import net.sourceforge.plantuml.Direction;
-import net.sourceforge.plantuml.ISkinParam;
-import net.sourceforge.plantuml.LineBreakStrategy;
-import net.sourceforge.plantuml.UmlDiagramType;
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
-import net.sourceforge.plantuml.command.Position;
+import net.atmp.InnerStrategy;
+import net.sourceforge.plantuml.abel.Entity;
 import net.sourceforge.plantuml.cucadiagram.BodyFactory;
-import net.sourceforge.plantuml.cucadiagram.Display;
-import net.sourceforge.plantuml.cucadiagram.IEntity;
-import net.sourceforge.plantuml.cucadiagram.ILeaf;
-import net.sourceforge.plantuml.graphic.FontConfiguration;
-import net.sourceforge.plantuml.graphic.HorizontalAlignment;
-import net.sourceforge.plantuml.graphic.InnerStrategy;
-import net.sourceforge.plantuml.graphic.StringBounder;
-import net.sourceforge.plantuml.graphic.TextBlock;
-import net.sourceforge.plantuml.graphic.color.ColorType;
-import net.sourceforge.plantuml.skin.rose.Rose;
+import net.sourceforge.plantuml.klimt.UStroke;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.color.ColorType;
+import net.sourceforge.plantuml.klimt.color.HColor;
+import net.sourceforge.plantuml.klimt.creole.Display;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.font.FontConfiguration;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
+import net.sourceforge.plantuml.klimt.geom.HorizontalAlignment;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
+import net.sourceforge.plantuml.klimt.geom.XPoint2D;
+import net.sourceforge.plantuml.klimt.geom.XRectangle2D;
+import net.sourceforge.plantuml.klimt.shape.TextBlock;
+import net.sourceforge.plantuml.skin.UmlDiagramType;
+import net.sourceforge.plantuml.style.ISkinParam;
 import net.sourceforge.plantuml.style.PName;
 import net.sourceforge.plantuml.style.SName;
 import net.sourceforge.plantuml.style.Style;
+import net.sourceforge.plantuml.style.StyleSignature;
 import net.sourceforge.plantuml.style.StyleSignatureBasic;
 import net.sourceforge.plantuml.svek.AbstractEntityImage;
 import net.sourceforge.plantuml.svek.Bibliotekon;
 import net.sourceforge.plantuml.svek.ShapeType;
 import net.sourceforge.plantuml.svek.SvekNode;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.UStroke;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
-import net.sourceforge.plantuml.ugraphic.color.HColor;
+import net.sourceforge.plantuml.utils.Direction;
+import net.sourceforge.plantuml.utils.Position;
 
 public class EntityImageTips extends AbstractEntityImage {
 
-	final private Rose rose = new Rose();
 	private final ISkinParam skinParam;
 
 	private final HColor noteBackgroundColor;
@@ -80,29 +79,27 @@ public class EntityImageTips extends AbstractEntityImage {
 
 	private final double ySpacing = 10;
 
-	public EntityImageTips(ILeaf entity, ISkinParam skinParam, Bibliotekon bibliotekon, UmlDiagramType type) {
+	public EntityImageTips(Entity entity, ISkinParam skinParam, Bibliotekon bibliotekon, UmlDiagramType type) {
 		super(entity, EntityImageNote.getSkin(skinParam, entity));
 		this.skinParam = skinParam;
 		this.bibliotekon = bibliotekon;
 
 		style = getDefaultStyleDefinition(type.getStyleName()).getMergedStyle(skinParam.getCurrentStyleBuilder());
 		if (entity.getColors().getColor(ColorType.BACK) == null)
-			this.noteBackgroundColor = style.value(PName.BackGroundColor).asColor(skinParam.getThemeStyle(),
-					skinParam.getIHtmlColorSet());
+			this.noteBackgroundColor = style.value(PName.BackGroundColor).asColor(skinParam.getIHtmlColorSet());
 		else
 			this.noteBackgroundColor = entity.getColors().getColor(ColorType.BACK);
 
-		this.borderColor = style.value(PName.LineColor).asColor(skinParam.getThemeStyle(),
-				skinParam.getIHtmlColorSet());
+		this.borderColor = style.value(PName.LineColor).asColor(skinParam.getIHtmlColorSet());
 
 	}
 
-	private StyleSignatureBasic getDefaultStyleDefinition(SName sname) {
-		return StyleSignatureBasic.of(SName.root, SName.element, sname, SName.note);
+	private StyleSignature getDefaultStyleDefinition(SName sname) {
+		return StyleSignatureBasic.of(SName.root, SName.element, sname, SName.note).withTOBECHANGED(getStereo());
 	}
 
 	private Position getPosition() {
-		if (getEntity().getCodeGetName().endsWith(Position.RIGHT.name()))
+		if (getEntity().getName().endsWith(Position.RIGHT.name()))
 			return Position.RIGHT;
 
 		return Position.LEFT;
@@ -112,46 +109,51 @@ public class EntityImageTips extends AbstractEntityImage {
 		return ShapeType.RECTANGLE;
 	}
 
-	public Dimension2D calculateDimension(StringBounder stringBounder) {
+	public XDimension2D calculateDimension(StringBounder stringBounder) {
 		double width = 0;
 		double height = 0;
 		for (Map.Entry<String, Display> ent : getEntity().getTips().entrySet()) {
 			final Display display = ent.getValue();
-			final Dimension2D dim = getOpale(display).calculateDimension(stringBounder);
+			final XDimension2D dim = getOpale(display).calculateDimension(stringBounder);
 			height += dim.getHeight();
 			height += ySpacing;
 			width = Math.max(width, dim.getWidth());
 		}
-		return new Dimension2DDouble(width, height);
+		return new XDimension2D(width, height);
 	}
 
 	public void drawU(UGraphic ug) {
 		final StringBounder stringBounder = ug.getStringBounder();
 
-		final IEntity other = bibliotekon.getOnlyOther(getEntity());
+		final Entity tmp = getEntity();
+		final Entity other = bibliotekon.getOnlyOther(tmp);
+		if (other == null) {
+			System.err.println("Error1 in EntityImageTips");
+			return;
+		}
 
 		final SvekNode nodeMe = bibliotekon.getNode(getEntity());
 		final SvekNode nodeOther = bibliotekon.getNode(other);
-		final Point2D positionMe = nodeMe.getPosition();
 		if (nodeOther == null) {
-			System.err.println("Error in EntityImageTips");
+			System.err.println("Error2 in EntityImageTips");
 			return;
 		}
-		final Point2D positionOther = nodeOther.getPosition();
+		final XPoint2D positionOther = nodeOther.getPosition();
 		bibliotekon.getNode(getEntity());
 		final Position position = getPosition();
 		Direction direction = position.reverseDirection();
+		final XPoint2D positionMe = nodeMe.getPosition();
 		double height = 0;
 		for (Map.Entry<String, Display> ent : getEntity().getTips().entrySet()) {
 			final Display display = ent.getValue();
-			final Rectangle2D memberPosition = nodeOther.getImage().getInnerPosition(ent.getKey(), stringBounder,
+			final XRectangle2D memberPosition = nodeOther.getImage().getInnerPosition(ent.getKey(), stringBounder,
 					InnerStrategy.STRICT);
 			if (memberPosition == null)
 				return;
 
 			final Opale opale = getOpale(display);
-			final Dimension2D dim = opale.calculateDimension(stringBounder);
-			final Point2D pp1 = new Point2D.Double(0, dim.getHeight() / 2);
+			final XDimension2D dim = opale.calculateDimension(stringBounder);
+			final XPoint2D pp1 = new XPoint2D(0, dim.getHeight() / 2);
 			double x = positionOther.getX() - positionMe.getX();
 			if (direction == Direction.RIGHT && x < 0)
 				direction = direction.getInv();
@@ -162,7 +164,7 @@ public class EntityImageTips extends AbstractEntityImage {
 				x += 4;
 
 			final double y = positionOther.getY() - positionMe.getY() - height + memberPosition.getCenterY();
-			final Point2D pp2 = new Point2D.Double(x, y);
+			final XPoint2D pp2 = new XPoint2D(x, y);
 			opale.setOpale(direction, pp1, pp2);
 			opale.drawU(ug);
 			ug = ug.apply(UTranslate.dy(dim.getHeight() + ySpacing));
@@ -175,12 +177,11 @@ public class EntityImageTips extends AbstractEntityImage {
 	private Opale getOpale(final Display display) {
 
 		final double shadowing = style.value(PName.Shadowing).asDouble();
-		final FontConfiguration fc = style.getFontConfiguration(skinParam.getThemeStyle(),
-				skinParam.getIHtmlColorSet());
+		final FontConfiguration fc = style.getFontConfiguration(skinParam.getIHtmlColorSet());
 		final UStroke stroke = style.getStroke();
 
 		final TextBlock textBlock = BodyFactory.create3(display, skinParam, HorizontalAlignment.LEFT, fc,
-				LineBreakStrategy.NONE, style);
+				style.wrapWidth(), style);
 		return new Opale(shadowing, borderColor, noteBackgroundColor, textBlock, true, stroke);
 	}
 

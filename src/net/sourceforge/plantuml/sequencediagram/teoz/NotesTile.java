@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,12 +35,13 @@
  */
 package net.sourceforge.plantuml.sequencediagram.teoz;
 
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sourceforge.plantuml.ISkinParam;
-import net.sourceforge.plantuml.graphic.StringBounder;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
 import net.sourceforge.plantuml.real.Real;
 import net.sourceforge.plantuml.real.RealUtils;
 import net.sourceforge.plantuml.sequencediagram.Event;
@@ -50,8 +54,7 @@ import net.sourceforge.plantuml.skin.Component;
 import net.sourceforge.plantuml.skin.ComponentType;
 import net.sourceforge.plantuml.skin.Context2D;
 import net.sourceforge.plantuml.skin.rose.Rose;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
+import net.sourceforge.plantuml.style.ISkinParam;
 
 public class NotesTile extends AbstractTile implements Tile {
 
@@ -59,42 +62,51 @@ public class NotesTile extends AbstractTile implements Tile {
 	private final Rose skin;
 	private final ISkinParam skinParam;
 	private final Notes notes;
+	private final YGauge yGauge;
 
 	public Event getEvent() {
 		return notes;
 	}
 
 	public NotesTile(StringBounder stringBounder, LivingSpaces livingSpaces, Notes notes, Rose skin,
-			ISkinParam skinParam) {
-		super(stringBounder);
+			ISkinParam skinParam, YGauge currentY) {
+		super(stringBounder, currentY);
 		this.livingSpaces = livingSpaces;
 		this.notes = notes;
 		this.skin = skin;
 		this.skinParam = skinParam;
+		this.yGauge = YGauge.create(currentY.getMax(), getPreferredHeight());
+	}
+
+	@Override
+	public YGauge getYGauge() {
+		return yGauge;
 	}
 
 	private Component getComponent(StringBounder stringBounder, Note note) {
 		final Component comp = skin.createComponentNote(note.getUsedStyles(), getNoteComponentType(note.getNoteStyle()),
-				note.getSkinParamBackcolored(skinParam), note.getStrings(), note.getPosition());
+				note.getSkinParamBackcolored(skinParam), note.getStrings(), note.getColors(), note.getPosition());
 		return comp;
 	}
 
 	private ComponentType getNoteComponentType(NoteStyle noteStyle) {
-		if (noteStyle == NoteStyle.HEXAGONAL) {
+		if (noteStyle == NoteStyle.HEXAGONAL)
 			return ComponentType.NOTE_HEXAGONAL;
-		}
-		if (noteStyle == NoteStyle.BOX) {
+
+		if (noteStyle == NoteStyle.BOX)
 			return ComponentType.NOTE_BOX;
-		}
+
 		return ComponentType.NOTE;
 	}
 
 	public void drawU(UGraphic ug) {
+		if (YGauge.USE_ME)
+			ug = ug.apply(UTranslate.dy(getYGauge().getMin().getCurrentValue()));
 		final StringBounder stringBounder = ug.getStringBounder();
 
 		for (Note note : notes) {
 			final Component comp = getComponent(stringBounder, note);
-			final Dimension2D dim = comp.getPreferredDimension(stringBounder);
+			final XDimension2D dim = comp.getPreferredDimension(stringBounder);
 			final double x = getX(stringBounder, note).getCurrentValue();
 			final Area area = Area.create(getUsedWidth(stringBounder, note), dim.getHeight());
 
@@ -105,7 +117,7 @@ public class NotesTile extends AbstractTile implements Tile {
 
 	private double getUsedWidth(StringBounder stringBounder, Note note) {
 		final Component comp = getComponent(stringBounder, note);
-		final Dimension2D dim = comp.getPreferredDimension(stringBounder);
+		final XDimension2D dim = comp.getPreferredDimension(stringBounder);
 		final double width = dim.getWidth();
 		return width;
 	}
@@ -141,7 +153,7 @@ public class NotesTile extends AbstractTile implements Tile {
 		double result = 0;
 		for (Note note : notes) {
 			final Component comp = getComponent(getStringBounder(), note);
-			final Dimension2D dim = comp.getPreferredDimension(getStringBounder());
+			final XDimension2D dim = comp.getPreferredDimension(getStringBounder());
 			result = Math.max(result, dim.getHeight());
 		}
 		return result;
@@ -168,9 +180,9 @@ public class NotesTile extends AbstractTile implements Tile {
 
 	public Real getMinX() {
 		final List<Real> reals = new ArrayList<>();
-		for (Note note : notes) {
+		for (Note note : notes)
 			reals.add(getX(getStringBounder(), note));
-		}
+
 		return RealUtils.min(reals);
 	}
 
@@ -180,9 +192,9 @@ public class NotesTile extends AbstractTile implements Tile {
 
 	public Real getMaxX() {
 		final List<Real> reals = new ArrayList<>();
-		for (Note note : notes) {
+		for (Note note : notes)
 			reals.add(getX2(getStringBounder(), note));
-		}
+
 		return RealUtils.max(reals);
 	}
 

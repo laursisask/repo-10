@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -35,22 +38,22 @@ package net.sourceforge.plantuml.sequencediagram.teoz;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import net.sourceforge.plantuml.AnnotatedWorker;
-import net.sourceforge.plantuml.Dimension2DDouble;
+import net.sourceforge.plantuml.AnnotatedBuilder;
 import net.sourceforge.plantuml.FileFormatOption;
-import net.sourceforge.plantuml.FontParam;
-import net.sourceforge.plantuml.ISkinParam;
 import net.sourceforge.plantuml.activitydiagram3.ftile.EntityImageLegend;
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
 import net.sourceforge.plantuml.core.ImageData;
-import net.sourceforge.plantuml.cucadiagram.Display;
 import net.sourceforge.plantuml.cucadiagram.DisplaySection;
-import net.sourceforge.plantuml.graphic.HorizontalAlignment;
-import net.sourceforge.plantuml.graphic.StringBounder;
-import net.sourceforge.plantuml.graphic.TextBlock;
-import net.sourceforge.plantuml.graphic.TextBlockUtils;
-import net.sourceforge.plantuml.graphic.UDrawable;
-import net.sourceforge.plantuml.graphic.VerticalAlignment;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.creole.Display;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.font.FontParam;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
+import net.sourceforge.plantuml.klimt.geom.HorizontalAlignment;
+import net.sourceforge.plantuml.klimt.geom.VerticalAlignment;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
+import net.sourceforge.plantuml.klimt.shape.TextBlock;
+import net.sourceforge.plantuml.klimt.shape.TextBlockUtils;
+import net.sourceforge.plantuml.klimt.shape.UDrawable;
 import net.sourceforge.plantuml.png.PngTitler;
 import net.sourceforge.plantuml.real.Real;
 import net.sourceforge.plantuml.real.RealOrigin;
@@ -60,11 +63,10 @@ import net.sourceforge.plantuml.sequencediagram.SequenceDiagram;
 import net.sourceforge.plantuml.sequencediagram.graphic.FileMaker;
 import net.sourceforge.plantuml.skin.SimpleContext2D;
 import net.sourceforge.plantuml.skin.rose.Rose;
+import net.sourceforge.plantuml.style.ISkinParam;
 import net.sourceforge.plantuml.style.SName;
 import net.sourceforge.plantuml.style.Style;
 import net.sourceforge.plantuml.style.StyleSignatureBasic;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
 import net.sourceforge.plantuml.utils.MathUtils;
 
 public class SequenceDiagramFileMakerTeoz implements FileMaker {
@@ -72,7 +74,8 @@ public class SequenceDiagramFileMakerTeoz implements FileMaker {
 	private final SequenceDiagram diagram;
 	private final FileFormatOption fileFormatOption;
 	private final Rose skin;
-	private final AnnotatedWorker annotatedWorker;
+	private final AnnotatedBuilder annotatedBuilder;
+
 	private final int index;
 
 	public SequenceDiagramFileMakerTeoz(SequenceDiagram diagram, Rose skin, FileFormatOption fileFormatOption,
@@ -85,13 +88,13 @@ public class SequenceDiagramFileMakerTeoz implements FileMaker {
 		this.body = new PlayingSpaceWithParticipants(createMainTile());
 		this.footer = getFooterOrHeader(FontParam.FOOTER);
 		this.header = getFooterOrHeader(FontParam.HEADER);
-		this.annotatedWorker = new AnnotatedWorker(diagram, diagram.getSkinParam(), stringBounder);
+		this.annotatedBuilder = new AnnotatedBuilder(diagram, diagram.getSkinParam(), stringBounder);
 
 		this.min1 = body.getMinX(stringBounder);
 
 		this.title = getTitle();
 		this.legend = getLegend();
-		this.caption = annotatedWorker.getCaption();
+		this.caption = annotatedBuilder.getCaption();
 
 		this.heightEnglober1 = dolls.getOffsetForEnglobers(stringBounder);
 		this.heightEnglober2 = heightEnglober1 == 0 ? 0 : 10;
@@ -105,8 +108,8 @@ public class SequenceDiagramFileMakerTeoz implements FileMaker {
 				+ header.calculateDimension(stringBounder).getHeight()
 				+ legend.calculateDimension(stringBounder).getHeight()
 				+ caption.calculateDimension(stringBounder).getHeight()
-				+ footer.calculateDimension(stringBounder).getHeight() + (annotatedWorker.hasMainFrame() ? 10 : 0);
-		this.dimTotal = new Dimension2DDouble(totalWidth, totalHeight);
+				+ footer.calculateDimension(stringBounder).getHeight() + (annotatedBuilder.hasMainFrame() ? 10 : 0);
+		this.dimTotal = new XDimension2D(totalWidth, totalHeight);
 	}
 
 	private Dolls dolls;
@@ -120,7 +123,7 @@ public class SequenceDiagramFileMakerTeoz implements FileMaker {
 	private final TextBlock title;
 	private final TextBlock legend;
 	private final TextBlock caption;
-	private final Dimension2D dimTotal;
+	private final XDimension2D dimTotal;
 	private final Real min1;
 
 	private final LivingSpaces livingSpaces = new LivingSpaces();
@@ -173,24 +176,28 @@ public class SequenceDiagramFileMakerTeoz implements FileMaker {
 	}
 
 	private PlayingSpace createMainTile() {
-		final RealOrigin origin = RealUtils.createOrigin();
-		Real currentPos = origin.addAtLeast(0);
+		final RealOrigin xorigin = RealUtils.createOrigin();
+		Real xcurrent = xorigin.addAtLeast(0);
+		final RealOrigin yorigin = RealUtils.createOrigin();
 		for (Participant p : diagram.participants()) {
-			final LivingSpace livingSpace = new LivingSpace(p, diagram.getEnglober(p), skin, getSkinParam(), currentPos,
+			final LivingSpace livingSpace = new LivingSpace(p, diagram.getEnglober(p), skin, getSkinParam(), xcurrent,
 					diagram.events());
 			livingSpaces.put(p, livingSpace);
-			currentPos = livingSpace.getPosD(stringBounder).addAtLeast(0);
+			xcurrent = livingSpace.getPosD(stringBounder).addAtLeast(0);
 		}
 
 		final TileArguments tileArguments = new TileArguments(stringBounder, livingSpaces, skin, diagram.getSkinParam(),
-				origin);
+				xorigin, yorigin);
 
 		this.dolls = new Dolls(tileArguments);
 		final PlayingSpace mainTile = new PlayingSpace(diagram, dolls, tileArguments);
 		this.livingSpaces.addConstraints(stringBounder);
 		mainTile.addConstraints();
 		this.dolls.addConstraints(stringBounder);
-		origin.compileNow();
+		xorigin.compileNow();
+		if (YGauge.USE_ME)
+			System.err.println("COMPILING Y");
+		yorigin.compileNow();
 		tileArguments.setBordered(mainTile);
 		return mainTile;
 	}
@@ -206,7 +213,7 @@ public class SequenceDiagramFileMakerTeoz implements FileMaker {
 		final Style style = StyleSignatureBasic.of(SName.root, SName.document, SName.title)
 				.getMergedStyle(diagram.getSkinParam().getCurrentStyleBuilder());
 		final TextBlock compTitle = style.createTextBlockBordered(diagram.getTitle().getDisplay(),
-				diagram.getSkinParam().getIHtmlColorSet(), diagram.getSkinParam());
+				diagram.getSkinParam().getIHtmlColorSet(), diagram.getSkinParam(), Style.ID_TITLE);
 		return compTitle;
 
 	}
@@ -262,8 +269,8 @@ public class SequenceDiagramFileMakerTeoz implements FileMaker {
 		}
 
 		ug = ug.apply(UTranslate.dy(heightEnglober1));
-		final TextBlock bodyFramed = annotatedWorker.addFrame(body);
-		printAligned(ug.apply(UTranslate.dx((annotatedWorker.hasMainFrame() ? 4 : 0))), HorizontalAlignment.CENTER,
+		final TextBlock bodyFramed = annotatedBuilder.decoreWithFrame(body);
+		printAligned(ug.apply(UTranslate.dx((annotatedBuilder.hasMainFrame() ? 4 : 0))), HorizontalAlignment.CENTER,
 				bodyFramed);
 		ug = goDown(ug, bodyFramed);
 		ug = ug.apply(UTranslate.dy(heightEnglober2));
@@ -276,6 +283,11 @@ public class SequenceDiagramFileMakerTeoz implements FileMaker {
 		ug = goDown(ug, caption);
 
 		printAligned(ug, diagram.getFooterOrHeaderTeoz(FontParam.FOOTER).getHorizontalAlignment(), footer);
+	}
+
+	@Override
+	public void createOneGraphic(UGraphic ug) {
+		throw new UnsupportedOperationException();
 	}
 
 }

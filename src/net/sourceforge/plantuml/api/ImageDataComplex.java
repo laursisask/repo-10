@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,25 +35,23 @@
  */
 package net.sourceforge.plantuml.api;
 
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
-
-import net.sourceforge.plantuml.CMapData;
-import net.sourceforge.plantuml.annotation.HaxeIgnored;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
+import net.sourceforge.plantuml.url.CMapData;
 
 public class ImageDataComplex extends ImageDataAbstract {
 
 	private final CMapData cmap;
 	private final String warningOrError;
 
-	@SuppressWarnings("unused")  // available publicly so retained for backwards compatibility
-	@HaxeIgnored
-	public ImageDataComplex(Dimension2D info, CMapData cmap, String warningOrError) {
+	@SuppressWarnings("unused") // available publicly so retained for backwards compatibility
+
+	public ImageDataComplex(XDimension2D info, CMapData cmap, String warningOrError) {
 		super(info);
 		this.cmap = cmap;
 		this.warningOrError = warningOrError;
 	}
 
-	public ImageDataComplex(Dimension2D info, CMapData cmap, String warningOrError, int status) {
+	public ImageDataComplex(XDimension2D info, CMapData cmap, String warningOrError, int status) {
 		super(info);
 		this.cmap = cmap;
 		this.warningOrError = warningOrError;

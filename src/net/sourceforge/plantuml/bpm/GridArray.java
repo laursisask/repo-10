@@ -2,12 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2023, Arnaud Roques
+ * (C) Copyright 2009-2024, Arnaud Roques
  *
- * Project Info:  http://plantuml.com
+ * Project Info:  https://plantuml.com
  * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
+ * https://plantuml.com/patreon (only 1$ per month!)
+ * https://plantuml.com/paypal
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,16 +35,15 @@
  */
 package net.sourceforge.plantuml.bpm;
 
-import net.sourceforge.plantuml.awt.geom.Dimension2D;
-import java.awt.geom.Point2D;
-
-import net.sourceforge.plantuml.ISkinParam;
-import net.sourceforge.plantuml.graphic.StringBounder;
-import net.sourceforge.plantuml.graphic.UDrawable;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.ULine;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
-import net.sourceforge.plantuml.ugraphic.color.HColorUtils;
+import net.sourceforge.plantuml.klimt.UTranslate;
+import net.sourceforge.plantuml.klimt.color.HColors;
+import net.sourceforge.plantuml.klimt.drawing.UGraphic;
+import net.sourceforge.plantuml.klimt.font.StringBounder;
+import net.sourceforge.plantuml.klimt.geom.XDimension2D;
+import net.sourceforge.plantuml.klimt.geom.XPoint2D;
+import net.sourceforge.plantuml.klimt.shape.UDrawable;
+import net.sourceforge.plantuml.klimt.shape.ULine;
+import net.sourceforge.plantuml.style.ISkinParam;
 
 public class GridArray implements UDrawable {
 
@@ -115,8 +117,8 @@ public class GridArray implements UDrawable {
 		// // System.err.println("Drawing " + edge);
 		// final int from[] = getCoord(edge.getFrom());
 		// final int to[] = getCoord(edge.getTo());
-		// final Point2D pt1 = getCenterOf(stringBounder, from[0], from[1]);
-		// final Point2D pt2 = getCenterOf(stringBounder, to[0], to[1]);
+		// final XPoint2D pt1 = getCenterOf(stringBounder, from[0], from[1]);
+		// final XPoint2D pt2 = getCenterOf(stringBounder, to[0], to[1]);
 		// drawArrow(ug, pt1, pt2);
 		// }
 
@@ -129,11 +131,11 @@ public class GridArray implements UDrawable {
 				final double widthOfCol = getWidthOfCol(stringBounder, r);
 				final Placeable cell = data[l][r];
 				if (cell != null) {
-					final Dimension2D dim = cell.getDimension(stringBounder, skinParam);
+					final XDimension2D dim = cell.getDimension(stringBounder, skinParam);
 
-					cell.toTextBlock(skinParam).drawU(
-							ug.apply(new UTranslate(dx + (widthOfCol + margin - dim.getWidth()) / 2, dy
-											+ (heightOfLine + margin - dim.getHeight()) / 2)));
+					cell.toTextBlock(skinParam)
+							.drawU(ug.apply(new UTranslate(dx + (widthOfCol + margin - dim.getWidth()) / 2,
+									dy + (heightOfLine + margin - dim.getHeight()) / 2)));
 				}
 				dx += widthOfCol + margin;
 			}
@@ -151,7 +153,7 @@ public class GridArray implements UDrawable {
 		for (int c = 0; c < cols; c++) {
 			widthMax += getWidthOfCol(ug.getStringBounder(), c) + margin;
 		}
-		ug = ug.apply(HColorUtils.BLACK);
+		ug = ug.apply(HColors.BLACK);
 		double y = 0;
 		for (int l = 0; l < lines; l++) {
 			ug.apply(UTranslate.dy(y)).draw(ULine.hline(widthMax));
@@ -165,13 +167,13 @@ public class GridArray implements UDrawable {
 
 	}
 
-	private void drawArrow(UGraphic ug, Point2D pt1, Point2D pt2) {
-		ug = ug.apply(HColorUtils.BLUE);
+	private void drawArrow(UGraphic ug, XPoint2D pt1, XPoint2D pt2) {
+		ug = ug.apply(HColors.BLUE);
 		final ULine line = new ULine(pt2.getX() - pt1.getX(), pt2.getY() - pt1.getY());
-		ug.apply(new UTranslate(pt1)).draw(line);
+		ug.apply(UTranslate.point(pt1)).draw(line);
 	}
 
-	private Point2D getCenterOf(StringBounder stringBounder, int c, int l) {
+	private XPoint2D getCenterOf(StringBounder stringBounder, int c, int l) {
 		double x = getWidthOfCol(stringBounder, c) / 2 + margin / 2;
 		for (int i = 0; i < c; i++) {
 			final double widthOfCol = getWidthOfCol(stringBounder, i);
@@ -182,7 +184,7 @@ public class GridArray implements UDrawable {
 			final double heightOfLine = getHeightOfLine(stringBounder, i);
 			y += heightOfLine + margin;
 		}
-		return new Point2D.Double(x, y);
+		return new XPoint2D(x, y);
 	}
 
 	private int[] getCoord(Cell someCell) {
