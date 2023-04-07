@@ -119,7 +119,7 @@ public enum SecurityProfile {
 			return UNSECURE;
 		// ::comment when __CORE__
 
-		return LEGACY;
+		return INTERNET;
 		// ::done
 	}
 

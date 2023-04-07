@@ -74,7 +74,7 @@ public class OptionFlags {
 	// static public boolean GRAPHVIZCACHE = false;
 	// static public final boolean TRACE_DOT = false;
 
-	static public boolean ALLOW_INCLUDE = true;
+	static public boolean ALLOW_INCLUDE = false;
 
 	static public void setAllowIncludeFalse() {
 		ALLOW_INCLUDE = false;
