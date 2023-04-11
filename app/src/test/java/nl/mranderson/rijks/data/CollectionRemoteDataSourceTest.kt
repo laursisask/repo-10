@@ -1,5 +1,9 @@
 package nl.mranderson.rijks.data
 
+import io.mockk.coEvery
+import io.mockk.mockk
+import io.mockk.unmockkAll
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import nl.mranderson.rijks.data.api.CollectionApiService
 import nl.mranderson.rijks.data.mapper.ArtDetailsMapper
@@ -9,17 +13,14 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.mockito.Mockito
-import org.mockito.kotlin.any
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class CollectionRemoteDataSourceTest {
 
     private lateinit var collectionRemoteDataSource: CollectionRemoteDataSource
 
-    private var collectionApiService: CollectionApiService = mock()
-    private var artDetailsMapper: ArtDetailsMapper = mock()
+    private var collectionApiService = mockk<CollectionApiService>()
+    private var artDetailsMapper = mockk<ArtDetailsMapper>()
 
     @BeforeEach
     fun setUp() {
@@ -31,10 +32,7 @@ class CollectionRemoteDataSourceTest {
 
     @AfterEach
     fun tearDown() {
-        Mockito.reset(
-            collectionApiService,
-            artDetailsMapper
-        )
+        unmockkAll()
     }
 
     @Test
@@ -42,10 +40,10 @@ class CollectionRemoteDataSourceTest {
         runTest {
             // Given
             val artId = "ID-001"
-            val artDetailResponse: ArtDetailResponse = mock()
-            val artDetails: ArtDetails = mock()
-            whenever(collectionApiService.getArtDetails(any())).thenReturn(artDetailResponse)
-            whenever(artDetailsMapper.map(any())).thenReturn(artDetails)
+            val artDetailResponse = mockk<ArtDetailResponse>()
+            val artDetails = mockk<ArtDetails>()
+            coEvery { collectionApiService.getArtDetails(any()) } returns artDetailResponse
+            coEvery { artDetailsMapper.map(any()) } returns artDetails
 
             // When
             val result = collectionRemoteDataSource.getArtDetails(artId)

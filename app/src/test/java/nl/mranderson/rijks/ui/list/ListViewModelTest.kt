@@ -1,16 +1,20 @@
 package nl.mranderson.rijks.ui.list
 
+import TestCoroutineExtension
 import androidx.paging.AsyncPagingDataDiffer
 import androidx.paging.PagingData
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListUpdateCallback
 import app.cash.turbine.test
+import io.mockk.coEvery
+import io.mockk.mockk
+import io.mockk.unmockkAll
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import nl.mranderson.rijks.TestCoroutineExtension
 import nl.mranderson.rijks.domain.model.Art
 import nl.mranderson.rijks.domain.usecase.GetCollection
 import nl.mranderson.rijks.ui.list.ListViewModel.ArtUIModel
@@ -19,13 +23,10 @@ import nl.mranderson.rijks.ui.list.ListViewModel.ArtUIModel.AuthorSeparator
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
-import org.mockito.Mockito
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @ExperimentalTime
 class ListViewModelTest {
 
@@ -33,22 +34,15 @@ class ListViewModelTest {
     @RegisterExtension
     val coroutines = TestCoroutineExtension()
 
-    private var getCollection: GetCollection = mock()
+    private var getCollection = mockk<GetCollection>()
 
     private fun viewModel() = ListViewModel(
         getCollection = getCollection
     )
 
-    @BeforeEach
-    fun setUp() {
-        getCollection = mock()
-    }
-
     @AfterEach
     fun tearDown() {
-        Mockito.reset(
-            getCollection
-        )
+        unmockkAll()
     }
 
     @Test
@@ -65,7 +59,7 @@ class ListViewModelTest {
             updateCallback = NoopListCallback(),
             workerDispatcher = Dispatchers.Main
         )
-        whenever(getCollection()).thenReturn(flowOf(PagingData.from(listOf(art))))
+        coEvery { getCollection() } returns flowOf(PagingData.from(listOf(art)))
 
         // When
         val viewModel = viewModel()
@@ -105,16 +99,16 @@ class ListViewModelTest {
                 updateCallback = NoopListCallback(),
                 workerDispatcher = Dispatchers.Main
             )
-            whenever(getCollection()).thenReturn(
-                flowOf(
-                    PagingData.from(
-                        listOf(
-                            artPiece,
-                            anotherArtPiece
+            coEvery { getCollection() } returns
+                    flowOf(
+                        PagingData.from(
+                            listOf(
+                                artPiece,
+                                anotherArtPiece
+                            )
                         )
                     )
-                )
-            )
+
 
             // When
             val viewModel = viewModel()

@@ -38,13 +38,15 @@ class ListScreenTest {
         composeTestRule.setContent {
             RijksTheme {
                 Surface {
-                    ListScreen(artCollection = flowOf(
-                        PagingData.from(listOf(separator, artPiece))
-                    ), interaction = object : ListInteraction {
-                        override fun onCollectionClicked(id: String) {
-                            // NO-OP
-                        }
-                    })
+                    ListScreen(  onArtClicked = {},
+//                        artCollection = flowOf(
+//                        PagingData.from(listOf(separator, artPiece))
+//                    ), interaction = object : ListInteraction {
+//                        override fun onCollectionClicked(id: String) {
+//                            // NO-OP
+//                        }
+//                    }
+                    )
                 }
             }
         }

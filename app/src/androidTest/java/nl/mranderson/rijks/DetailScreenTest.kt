@@ -41,16 +41,18 @@ class DetailScreenTest {
             RijksTheme {
                 Surface {
                     DetailScreen(
-                        state = Loading,
-                        interaction = object : DetailInteraction {
-                            override fun onBackClicked() {
-                                //NO-OP
-                            }
-
-                            override fun onRetryClicked() {
-                                //NO-OP
-                            }
-                        })
+                        onBackClicked = {}
+//                        state = Loading,
+//                        interaction = object : DetailInteraction {
+//                            override fun onBackClicked() {
+//                                //NO-OP
+//                            }
+//
+//                            override fun onRetryClicked() {
+//                                //NO-OP
+//                            }
+//                        },
+                    )
                 }
             }
         }
@@ -64,16 +66,18 @@ class DetailScreenTest {
             RijksTheme {
                 Surface {
                     DetailScreen(
-                        state = Error,
-                        interaction = object : DetailInteraction {
-                            override fun onBackClicked() {
-                                //NO-OP
-                            }
-
-                            override fun onRetryClicked() {
-                                //NO-OP
-                            }
-                        })
+                        onBackClicked = {}
+//                        state = Error,
+//                        interaction = object : DetailInteraction {
+//                            override fun onBackClicked() {
+//                                //NO-OP
+//                            }
+//
+//                            override fun onRetryClicked() {
+//                                //NO-OP
+//                            }
+//                        }
+                    )
                 }
             }
         }
@@ -90,16 +94,18 @@ class DetailScreenTest {
             RijksTheme {
                 Surface {
                     DetailScreen(
-                        state = DetailViewModel.ScreenState.Data(artDetails),
-                        interaction = object : DetailInteraction {
-                            override fun onBackClicked() {
-                                //NO-OP
-                            }
-
-                            override fun onRetryClicked() {
-                                //NO-OP
-                            }
-                        })
+                        onBackClicked = {}
+//                        state = DetailViewModel.ScreenState.Data(artDetails),
+//                        interaction = object : DetailInteraction {
+//                            override fun onBackClicked() {
+//                                //NO-OP
+//                            }
+//
+//                            override fun onRetryClicked() {
+//                                //NO-OP
+//                            }
+//                        }
+                    )
                 }
             }
         }

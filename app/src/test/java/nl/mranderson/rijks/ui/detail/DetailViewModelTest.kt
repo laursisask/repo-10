@@ -1,10 +1,16 @@
 package nl.mranderson.rijks.ui.detail
 
+import TestCoroutineExtension
 import androidx.lifecycle.Observer
 import androidx.lifecycle.SavedStateHandle
+import io.mockk.coEvery
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.unmockkAll
+import io.mockk.verify
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import nl.mranderson.rijks.InstantExecutorExtension
-import nl.mranderson.rijks.TestCoroutineExtension
 import nl.mranderson.rijks.domain.model.ArtDetails
 import nl.mranderson.rijks.domain.usecase.GetArtDetails
 import nl.mranderson.rijks.ui.detail.DetailViewModel.ScreenState
@@ -17,12 +23,8 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.RegisterExtension
-import org.mockito.Mockito
-import org.mockito.kotlin.any
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @ExtendWith(InstantExecutorExtension::class)
 class DetailViewModelTest {
 
@@ -30,9 +32,9 @@ class DetailViewModelTest {
     @RegisterExtension
     val coroutines = TestCoroutineExtension()
 
-    private var getArtDetails: GetArtDetails = mock()
-    private var savedStateHandle: SavedStateHandle = mock()
-    private val stateCallback: Observer<ScreenState> = mock()
+    private var getArtDetails = mockk<GetArtDetails>()
+    private var savedStateHandle = mockk<SavedStateHandle>()
+    private val stateCallback = mockk<Observer<ScreenState>>()
 
     private fun viewModel() = DetailViewModel(
         savedState = savedStateHandle,
@@ -41,53 +43,56 @@ class DetailViewModelTest {
 
     @BeforeEach
     fun setUp() {
-        whenever(savedStateHandle.get<String>(Screens.Detail.arg)).thenReturn("AB-001")
+        every { savedStateHandle.get<String>(Screens.Detail.argArtId) } returns "AB-001"
     }
 
     @AfterEach
     fun tearDown() {
-        Mockito.reset(
-            getArtDetails
-        )
+        unmockkAll()
     }
 
     @Test
     fun `When initializing viewmodel, Then state should be loading`() = runTest {
+        // Given
+        every { stateCallback.onChanged(any()) } answers { Loading }
+
         // When
         val viewModel = viewModel()
         viewModel.state.observeForever(stateCallback)
 
         // Then
-        verify(stateCallback).onChanged(Loading)
+        verify { stateCallback.onChanged(Loading) }
     }
 
     @Test
     fun `Given fetching details is success, When initializing viewmodel, Then state should be returning data`() =
         runTest {
             // Given
-            val artDetails: ArtDetails = mock()
-            whenever(getArtDetails(any())).thenReturn(Result.success(artDetails))
+            val artDetails = mockk<ArtDetails>()
+            coEvery { getArtDetails(any()) } returns Result.success(artDetails)
+            every { stateCallback.onChanged(any()) } answers { Data(artDetails) }
 
             // When
             val viewModel = viewModel()
             viewModel.state.observeForever(stateCallback)
 
             // Then
-            verify(stateCallback).onChanged(Data(artDetails))
+            verify { stateCallback.onChanged(Data(artDetails)) }
         }
 
     @Test
     fun `Given fetching details is failure, When initializing viewmodel, Then state should be error`() =
         runTest {
             // Given
-            whenever(getArtDetails(any())).thenReturn(Result.failure(RuntimeException()))
+            coEvery { getArtDetails(any()) } returns Result.failure(RuntimeException())
+            every { stateCallback.onChanged(any()) } answers { Error }
 
             // When
             val viewModel = viewModel()
             viewModel.state.observeForever(stateCallback)
 
             // Then
-            verify(stateCallback).onChanged(Error)
+            verify { stateCallback.onChanged(Error) }
         }
 
     @Test
@@ -102,7 +107,8 @@ class DetailViewModelTest {
                 author = "",
                 imageUrl = ""
             )
-            whenever(getArtDetails(any())).thenReturn(Result.success(artDetails))
+            coEvery { getArtDetails(any()) } returns Result.success(artDetails)
+            every { stateCallback.onChanged(any()) } answers { Data(artDetails) }
 
             // When
             val viewModel = viewModel()
@@ -110,6 +116,6 @@ class DetailViewModelTest {
             viewModel.state.observeForever(stateCallback)
 
             // Then
-            verify(stateCallback).onChanged(Data(artDetails))
+            verify { stateCallback.onChanged(Data(artDetails)) }
         }
 }

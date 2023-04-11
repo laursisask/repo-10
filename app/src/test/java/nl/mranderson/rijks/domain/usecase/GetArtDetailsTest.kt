@@ -1,23 +1,24 @@
 package nl.mranderson.rijks.domain.usecase
 
+import io.mockk.coEvery
+import io.mockk.mockk
+import io.mockk.unmockkAll
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import nl.mranderson.rijks.domain.CollectionRepository
 import nl.mranderson.rijks.domain.model.ArtDetails
+import org.junit.Test
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.mockito.Mockito
-import org.mockito.kotlin.any
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class GetArtDetailsTest {
 
     private lateinit var getArtDetails: GetArtDetails
 
-    private var collectionRepository: CollectionRepository = mock()
+    private var collectionRepository = mockk<CollectionRepository>()
 
     @BeforeEach
     fun setUp() {
@@ -28,9 +29,7 @@ class GetArtDetailsTest {
 
     @AfterEach
     fun tearDown() {
-        Mockito.reset(
-            collectionRepository
-        )
+        unmockkAll()
     }
 
     @Test
@@ -38,10 +37,8 @@ class GetArtDetailsTest {
         runTest {
             // Given
             val artId = "ID-001"
-            val artDetails: ArtDetails = mock()
-            whenever(collectionRepository.getArtDetails(any())).thenReturn(
-                Result.success(artDetails)
-            )
+            val artDetails: ArtDetails = mockk()
+            coEvery { collectionRepository.getArtDetails(any()) } returns Result.success(artDetails)
 
             // When
             val result = getArtDetails(artId)
@@ -56,9 +53,7 @@ class GetArtDetailsTest {
         runTest {
             // Given
             val artId = "ID-001"
-            whenever(collectionRepository.getArtDetails(any())).thenReturn(
-                Result.failure(Throwable())
-            )
+            coEvery { collectionRepository.getArtDetails(any()) } returns Result.failure(Throwable())
 
             // When
             val result = getArtDetails(artId)
