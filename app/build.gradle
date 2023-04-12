@@ -3,12 +3,9 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
     id 'com.google.dagger.hilt.android'
+    id 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
     id 'org.jetbrains.kotlin.plugin.serialization' version '1.6.10'
-    id "com.google.android.secrets-gradle-plugin" version "1.1.0"
 }
-
-def localProperties = new Properties()
-localProperties.load(new FileInputStream(rootProject.file("app/local.properties")))
 
 android {
     compileSdk 33
@@ -21,8 +18,6 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-
-        buildConfigField ("String", "API_KEY", localProperties['apiKey'])
     }
 
     buildTypes {
