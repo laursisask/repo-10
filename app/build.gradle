@@ -46,6 +46,10 @@ android {
     }
 }
 
+secrets {
+    defaultPropertiesFileName = 'local.defaults.properties'
+}
+
 dependencies {
     def navVersion = "2.5.3"
     def composeVersion = "1.1.1"
