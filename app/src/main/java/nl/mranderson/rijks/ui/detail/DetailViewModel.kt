@@ -35,7 +35,7 @@ class DetailViewModel @Inject constructor(
     private fun fetchArtDetails() {
         viewModelScope.launch {
             _state.value = Loading
-            val artId : String? = savedState[Screens.Detail.arg]
+            val artId : String? = savedState[Screens.Detail.argArtId]
             if (artId != null) {
                 getArtDetails(artId = artId).onSuccess {
                     _state.value = Data(artDetail = it)
