@@ -3,17 +3,17 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
     id 'com.google.dagger.hilt.android'
+    id 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
     id 'org.jetbrains.kotlin.plugin.serialization' version '1.6.10'
-    id "com.google.android.secrets-gradle-plugin" version "1.1.0"
 }
 
 android {
-    compileSdk 32
+    compileSdk 33
 
     defaultConfig {
         applicationId "nl.mranderson.rijks"
         minSdk 21
-        targetSdk 32
+        targetSdk 33
         versionCode 1
         versionName "1.0"
 
@@ -44,6 +44,10 @@ android {
             useJUnitPlatform()
         }
     }
+}
+
+secrets {
+    defaultPropertiesFileName = 'local.defaults.properties'
 }
 
 dependencies {

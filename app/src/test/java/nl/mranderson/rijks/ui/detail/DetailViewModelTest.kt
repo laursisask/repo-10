@@ -41,7 +41,7 @@ class DetailViewModelTest {
 
     @BeforeEach
     fun setUp() {
-        whenever(savedStateHandle.get<String>(Screens.Detail.arg)).thenReturn("AB-001")
+        whenever(savedStateHandle.get<String>(Screens.Detail.argArtId)).thenReturn("AB-001")
     }
 
     @AfterEach
