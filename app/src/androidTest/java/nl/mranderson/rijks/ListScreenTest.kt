@@ -1,11 +1,13 @@
 package nl.mranderson.rijks
 
+import androidx.activity.compose.setContent
 import androidx.compose.material.Surface
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.paging.PagingData
+import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.coroutines.flow.flowOf
 import nl.mranderson.rijks.ui.MainActivity
@@ -35,16 +37,20 @@ class ListScreenTest {
 
     @Test
     fun checkIfListIsDisplayed() {
-        composeTestRule.setContent {
+        composeTestRule.activity.setContent {
             RijksTheme {
                 Surface {
-                    ListScreen(artCollection = flowOf(
-                        PagingData.from(listOf(separator, artPiece))
-                    ), interaction = object : ListInteraction {
-                        override fun onCollectionClicked(id: String) {
-                            // NO-OP
-                        }
-                    })
+                    ListScreen(
+                        onArtClicked = {},
+                        artCollection = flowOf(
+                            PagingData.from(
+                                listOf(
+                                    separator,
+                                    artPiece
+                                )
+                            )
+                        ).collectAsLazyPagingItems()
+                    )
                 }
             }
         }

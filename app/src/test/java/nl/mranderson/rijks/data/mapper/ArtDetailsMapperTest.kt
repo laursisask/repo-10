@@ -1,5 +1,8 @@
 package nl.mranderson.rijks.data.mapper
 
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.unmockkAll
 import nl.mranderson.rijks.data.model.ArtDetailResponse
 import nl.mranderson.rijks.data.model.ArtPieceDetailResponse
 import nl.mranderson.rijks.data.model.ImageResponse
@@ -8,43 +11,38 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.mockito.Mockito
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 
 class ArtDetailsMapperTest {
 
     private val artDetailsMapper = ArtDetailsMapper
 
-    private var artDetailResponse: ArtDetailResponse = mock()
-    private var artPieceDetailResponse: ArtPieceDetailResponse = mock()
-    private var imageResponse: ImageResponse = mock()
+    private var artDetailResponse = mockk<ArtDetailResponse>()
+    private var artPieceDetailResponse = mockk<ArtPieceDetailResponse>()
+    private var imageResponse = mockk<ImageResponse>()
 
     @BeforeEach
     fun setUp() {
-        whenever(artDetailResponse.artObject).thenReturn(artPieceDetailResponse)
-        whenever(artPieceDetailResponse.objectNumber).thenReturn("")
-        whenever(artPieceDetailResponse.id).thenReturn("")
-        whenever(artPieceDetailResponse.title).thenReturn("")
-        whenever(artPieceDetailResponse.principalOrFirstMaker).thenReturn("")
-        whenever(artPieceDetailResponse.webImage).thenReturn(imageResponse)
-        whenever(imageResponse.url).thenReturn("")
+        every { artDetailResponse.artObject } returns artPieceDetailResponse
+        every { artPieceDetailResponse.objectNumber } returns ""
+        every { artPieceDetailResponse.id } returns ""
+        every { artPieceDetailResponse.title } returns ""
+        every { artPieceDetailResponse.principalOrFirstMaker } returns ""
+        every { artPieceDetailResponse.webImage } returns imageResponse
+        every { artPieceDetailResponse.objectTypes } returns emptyList()
+        every { artPieceDetailResponse.description } returns ""
+        every { imageResponse.url } returns ""
     }
 
     @AfterEach
     fun tearDown() {
-        Mockito.reset(
-            artDetailResponse,
-            artPieceDetailResponse,
-            imageResponse
-        )
+        unmockkAll()
     }
 
     @Test
     fun `Given art title, When art detail is mapped, Then art title is correctly mapped`() {
         // Given
         val title = "Nachtwacht"
-        whenever(artPieceDetailResponse.title).thenReturn(title)
+        every { artPieceDetailResponse.title } returns title
 
         // When
         val result = artDetailsMapper.map(artDetailResponse).title
@@ -57,7 +55,7 @@ class ArtDetailsMapperTest {
     fun `Given art author, When art detail is mapped, Then art author is correctly mapped`() {
         // Given
         val author = "Rembrandt"
-        whenever(artPieceDetailResponse.principalOrFirstMaker).thenReturn(author)
+        every { artPieceDetailResponse.principalOrFirstMaker } returns author
 
         // When
         val result = artDetailsMapper.map(artDetailResponse).author
@@ -70,7 +68,7 @@ class ArtDetailsMapperTest {
     fun `Given art objectNumber, When art detail is mapped, Then art objectNumber is correctly mapped`() {
         // Given
         val objectNumber = "ID-001"
-        whenever(artPieceDetailResponse.objectNumber).thenReturn(objectNumber)
+        every { artPieceDetailResponse.objectNumber } returns objectNumber
 
         // When
         val result = artDetailsMapper.map(artDetailResponse).objectNumber
@@ -83,7 +81,7 @@ class ArtDetailsMapperTest {
     fun `Given art image url, When art detail is mapped, Then art image url is correctly mapped`() {
         // Given
         val url = "www.mranderson.nl"
-        whenever(imageResponse.url).thenReturn(url)
+        every { imageResponse.url } returns url
 
         // When
         val result = artDetailsMapper.map(artDetailResponse).imageUrl
@@ -95,7 +93,7 @@ class ArtDetailsMapperTest {
     @Test
     fun `Given art description is empty, When art detail is mapped, Then art description is correctly mapped`() {
         // Given
-        whenever(artPieceDetailResponse.description).thenReturn(null)
+        every { artPieceDetailResponse.description } returns null
 
         // When
         val result = artDetailsMapper.map(artDetailResponse).description
@@ -108,7 +106,7 @@ class ArtDetailsMapperTest {
     fun `Given art description, When art detail is mapped, Then art description is correctly mapped`() {
         // Given
         val description = "Testing"
-        whenever(artPieceDetailResponse.description).thenReturn(description)
+        every { artPieceDetailResponse.description } returns description
 
         // When
         val result = artDetailsMapper.map(artDetailResponse).description
@@ -121,7 +119,7 @@ class ArtDetailsMapperTest {
     fun `Given art object types, When art detail is mapped, Then art object types is correctly mapped`() {
         // Given
         val types = listOf("Testing", "Painting")
-        whenever(artPieceDetailResponse.objectTypes).thenReturn(types)
+        every { artPieceDetailResponse.objectTypes } returns types
 
         // When
         val result = artDetailsMapper.map(artDetailResponse).types

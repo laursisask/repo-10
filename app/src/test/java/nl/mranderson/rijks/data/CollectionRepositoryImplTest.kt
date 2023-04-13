@@ -1,6 +1,10 @@
 package nl.mranderson.rijks.data
 
+import io.mockk.coEvery
+import io.mockk.mockk
+import io.mockk.unmockkAll
 import kotlin.time.ExperimentalTime
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import nl.mranderson.rijks.domain.model.ArtDetails
 import org.junit.jupiter.api.AfterEach
@@ -8,18 +12,15 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.mockito.Mockito
-import org.mockito.kotlin.any
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @ExperimentalTime
 class CollectionRepositoryImplTest {
 
     private lateinit var collectionRepository: CollectionRepositoryImpl
 
-    private var collectionPagingSource: CollectionPagingSource = mock()
-    private var collectionRemoteDataSource: CollectionRemoteDataSource = mock()
+    private var collectionPagingSource = mockk<CollectionPagingSource>()
+    private var collectionRemoteDataSource = mockk<CollectionRemoteDataSource>()
 
     @BeforeEach
     fun setUp() {
@@ -31,10 +32,7 @@ class CollectionRepositoryImplTest {
 
     @AfterEach
     fun tearDown() {
-        Mockito.reset(
-            collectionPagingSource,
-            collectionRemoteDataSource
-        )
+        unmockkAll()
     }
 
     @Test
@@ -42,10 +40,8 @@ class CollectionRepositoryImplTest {
         runTest {
             // Given
             val artId = "ID-001"
-            val artDetails: ArtDetails = mock()
-            whenever(collectionRemoteDataSource.getArtDetails(any())).thenReturn(
-                artDetails
-            )
+            val artDetails = mockk<ArtDetails>()
+            coEvery { collectionRemoteDataSource.getArtDetails(any()) } returns artDetails
 
             // When
             val result = collectionRepository.getArtDetails(artId)
@@ -60,7 +56,7 @@ class CollectionRepositoryImplTest {
         runTest {
             // Given
             val artId = "ID-001"
-            whenever(collectionRemoteDataSource.getArtDetails(any())).thenThrow(RuntimeException())
+            coEvery { collectionRemoteDataSource.getArtDetails(any()) } throws RuntimeException()
 
             // When
             val result = collectionRepository.getArtDetails(artId)

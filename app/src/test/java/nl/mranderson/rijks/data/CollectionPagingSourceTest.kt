@@ -1,6 +1,11 @@
 package nl.mranderson.rijks.data
 
 import androidx.paging.PagingSource
+import io.mockk.coEvery
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.unmockkAll
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import nl.mranderson.rijks.data.api.CollectionApiService
 import nl.mranderson.rijks.data.mapper.CollectionMapper
@@ -10,17 +15,14 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.mockito.Mockito
-import org.mockito.kotlin.any
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class CollectionPagingSourceTest {
 
     private lateinit var collectionPagingSource: CollectionPagingSource
 
-    private var collectionApiService: CollectionApiService = mock()
-    private var collectionMapper: CollectionMapper = mock()
+    private var collectionApiService = mockk<CollectionApiService>()
+    private var collectionMapper = mockk<CollectionMapper>()
 
     @BeforeEach
     fun setUp() {
@@ -32,25 +34,22 @@ class CollectionPagingSourceTest {
 
     @AfterEach
     fun tearDown() {
-        Mockito.reset(
-            collectionApiService,
-            collectionMapper
-        )
+        unmockkAll()
     }
 
     @Test
     fun `given first load, when paging source loading, then load successful and set next keys`() =
         runTest {
             // Given
-            val collectionResponse: CollectionResponse = mock()
-            val art: Art = mock()
-            whenever(
+            val collectionResponse = mockk<CollectionResponse>()
+            val art = mockk<Art>()
+            coEvery {
                 collectionApiService.getCollection(
                     any(),
                     any()
                 )
-            ).thenReturn(collectionResponse)
-            whenever(collectionMapper.map(any())).thenReturn(listOf(art))
+            } returns collectionResponse
+            every { collectionMapper.map(any())} returns listOf(art)
 
             val expectedResult = PagingSource.LoadResult.Page(
                 data = listOf(art),
@@ -75,14 +74,14 @@ class CollectionPagingSourceTest {
     fun `given first load but no response, when paging source loading, then load failed and set next keys`() =
         runTest {
             // Given
-            val collectionResponse: CollectionResponse = mock()
-            whenever(
+            val collectionResponse  = mockk<CollectionResponse>()
+            coEvery {
                 collectionApiService.getCollection(
                     any(),
                     any()
                 )
-            ).thenReturn(collectionResponse)
-            whenever(collectionMapper.map(any())).thenReturn(emptyList())
+            } returns collectionResponse
+            every { collectionMapper.map(any())} returns emptyList()
 
             val expectedResult = PagingSource.LoadResult.Page(
                 data = emptyList(),
@@ -107,15 +106,15 @@ class CollectionPagingSourceTest {
     fun `given another load, when paging source loading, then load successful and set next keys`() =
         runTest {
             // Given
-            val collectionResponse: CollectionResponse = mock()
-            val art: Art = mock()
-            whenever(
+            val collectionResponse = mockk<CollectionResponse>()
+            val art = mockk<Art>()
+            coEvery {
                 collectionApiService.getCollection(
                     any(),
                     any()
                 )
-            ).thenReturn(collectionResponse)
-            whenever(collectionMapper.map(any())).thenReturn(listOf(art))
+            } returns collectionResponse
+            every { collectionMapper.map(any())} returns listOf(art)
 
             val expectedResult = PagingSource.LoadResult.Page(
                 data = listOf(art),
@@ -140,7 +139,7 @@ class CollectionPagingSourceTest {
     fun `given an exception, when paging source loading, then return error`() = runTest {
         // Given
         val error = RuntimeException("404", Throwable())
-        whenever(collectionApiService.getCollection(any(), any())).thenThrow(error)
+        coEvery { collectionApiService.getCollection(any(), any()) } throws error
 
         val expectedResult = PagingSource.LoadResult.Error<Int, Art>(error)
 

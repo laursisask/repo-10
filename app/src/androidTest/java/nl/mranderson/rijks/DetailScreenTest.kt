@@ -1,5 +1,6 @@
 package nl.mranderson.rijks
 
+import androidx.activity.compose.setContent
 import androidx.compose.material.Surface
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -11,7 +12,7 @@ import nl.mranderson.rijks.domain.model.ArtDetails
 import nl.mranderson.rijks.ui.MainActivity
 import nl.mranderson.rijks.ui.components.LOADING_INDICATOR_TEST_TAG
 import nl.mranderson.rijks.ui.detail.DetailScreen
-import nl.mranderson.rijks.ui.detail.DetailViewModel
+import nl.mranderson.rijks.ui.detail.DetailViewModel.ScreenState.Data
 import nl.mranderson.rijks.ui.detail.DetailViewModel.ScreenState.Error
 import nl.mranderson.rijks.ui.detail.DetailViewModel.ScreenState.Loading
 import nl.mranderson.rijks.ui.theme.RijksTheme
@@ -37,20 +38,14 @@ class DetailScreenTest {
 
     @Test
     fun checkIfLoadingStateIsDisplayed() {
-        composeTestRule.setContent {
+        composeTestRule.activity.setContent {
             RijksTheme {
                 Surface {
                     DetailScreen(
-                        state = Loading,
-                        interaction = object : DetailInteraction {
-                            override fun onBackClicked() {
-                                //NO-OP
-                            }
-
-                            override fun onRetryClicked() {
-                                //NO-OP
-                            }
-                        })
+                        viewData = Loading,
+                        onBackClicked = {},
+                        onRetryClicked = {}
+                    )
                 }
             }
         }
@@ -60,20 +55,14 @@ class DetailScreenTest {
 
     @Test
     fun checkIfErrorStateIsDisplayed() {
-        composeTestRule.setContent {
+        composeTestRule.activity.setContent {
             RijksTheme {
                 Surface {
                     DetailScreen(
-                        state = Error,
-                        interaction = object : DetailInteraction {
-                            override fun onBackClicked() {
-                                //NO-OP
-                            }
-
-                            override fun onRetryClicked() {
-                                //NO-OP
-                            }
-                        })
+                        viewData = Error,
+                        onBackClicked = {},
+                        onRetryClicked = {}
+                    )
                 }
             }
         }
@@ -86,20 +75,14 @@ class DetailScreenTest {
 
     @Test
     fun checkIfDataStateIsDisplayed() {
-        composeTestRule.setContent {
+        composeTestRule.activity.setContent {
             RijksTheme {
                 Surface {
                     DetailScreen(
-                        state = DetailViewModel.ScreenState.Data(artDetails),
-                        interaction = object : DetailInteraction {
-                            override fun onBackClicked() {
-                                //NO-OP
-                            }
-
-                            override fun onRetryClicked() {
-                                //NO-OP
-                            }
-                        })
+                        viewData = Data(artDetails),
+                        onBackClicked = {},
+                        onRetryClicked = {}
+                    )
                 }
             }
         }

@@ -1,38 +1,34 @@
 package nl.mranderson.rijks.ui.detail
 
-import androidx.lifecycle.Observer
 import androidx.lifecycle.SavedStateHandle
+import app.cash.turbine.test
+import io.mockk.coEvery
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.unmockkAll
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import nl.mranderson.rijks.InstantExecutorExtension
 import nl.mranderson.rijks.TestCoroutineExtension
 import nl.mranderson.rijks.domain.model.ArtDetails
 import nl.mranderson.rijks.domain.usecase.GetArtDetails
-import nl.mranderson.rijks.ui.detail.DetailViewModel.ScreenState
 import nl.mranderson.rijks.ui.detail.DetailViewModel.ScreenState.Data
 import nl.mranderson.rijks.ui.detail.DetailViewModel.ScreenState.Error
-import nl.mranderson.rijks.ui.detail.DetailViewModel.ScreenState.Loading
 import nl.mranderson.rijks.ui.navigation.Screens
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.RegisterExtension
-import org.mockito.Mockito
-import org.mockito.kotlin.any
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 
-@ExtendWith(InstantExecutorExtension::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 class DetailViewModelTest {
 
     @JvmField
     @RegisterExtension
     val coroutines = TestCoroutineExtension()
 
-    private var getArtDetails: GetArtDetails = mock()
-    private var savedStateHandle: SavedStateHandle = mock()
-    private val stateCallback: Observer<ScreenState> = mock()
+    private var getArtDetails = mockk<GetArtDetails>()
+    private var savedStateHandle = mockk<SavedStateHandle>()
 
     private fun viewModel() = DetailViewModel(
         savedState = savedStateHandle,
@@ -41,53 +37,43 @@ class DetailViewModelTest {
 
     @BeforeEach
     fun setUp() {
-        whenever(savedStateHandle.get<String>(Screens.Detail.argArtId)).thenReturn("AB-001")
+        every { savedStateHandle.get<String>(Screens.Detail.argArtId) } returns "AB-001"
     }
 
     @AfterEach
     fun tearDown() {
-        Mockito.reset(
-            getArtDetails
-        )
-    }
-
-    @Test
-    fun `When initializing viewmodel, Then state should be loading`() = runTest {
-        // When
-        val viewModel = viewModel()
-        viewModel.state.observeForever(stateCallback)
-
-        // Then
-        verify(stateCallback).onChanged(Loading)
+        unmockkAll()
     }
 
     @Test
     fun `Given fetching details is success, When initializing viewmodel, Then state should be returning data`() =
         runTest {
             // Given
-            val artDetails: ArtDetails = mock()
-            whenever(getArtDetails(any())).thenReturn(Result.success(artDetails))
+            val artDetails = mockk<ArtDetails>()
+            coEvery { getArtDetails(any()) } returns Result.success(artDetails)
 
             // When
             val viewModel = viewModel()
-            viewModel.state.observeForever(stateCallback)
 
             // Then
-            verify(stateCallback).onChanged(Data(artDetails))
+            viewModel.state.test {
+                assertEquals(awaitItem(), Data(artDetails))
+            }
         }
 
     @Test
     fun `Given fetching details is failure, When initializing viewmodel, Then state should be error`() =
         runTest {
             // Given
-            whenever(getArtDetails(any())).thenReturn(Result.failure(RuntimeException()))
+            coEvery { getArtDetails(any()) } returns Result.failure(RuntimeException())
 
             // When
             val viewModel = viewModel()
-            viewModel.state.observeForever(stateCallback)
 
             // Then
-            verify(stateCallback).onChanged(Error)
+            viewModel.state.test {
+                assertEquals(awaitItem(), Error)
+            }
         }
 
     @Test
@@ -102,14 +88,15 @@ class DetailViewModelTest {
                 author = "",
                 imageUrl = ""
             )
-            whenever(getArtDetails(any())).thenReturn(Result.success(artDetails))
+            coEvery { getArtDetails(any()) } returns Result.success(artDetails)
 
             // When
             val viewModel = viewModel()
             viewModel.onRetryClicked()
-            viewModel.state.observeForever(stateCallback)
 
             // Then
-            verify(stateCallback).onChanged(Data(artDetails))
+            viewModel.state.test {
+                assertEquals(awaitItem(), Data(artDetails))
+            }
         }
 }

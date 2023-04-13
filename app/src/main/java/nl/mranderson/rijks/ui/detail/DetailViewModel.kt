@@ -1,12 +1,13 @@
 package nl.mranderson.rijks.ui.detail
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import nl.mranderson.rijks.domain.model.ArtDetails
 import nl.mranderson.rijks.domain.usecase.GetArtDetails
@@ -21,8 +22,8 @@ class DetailViewModel @Inject constructor(
     val getArtDetails: GetArtDetails
 ) : ViewModel() {
 
-    private val _state = MutableLiveData<ScreenState>()
-    val state: LiveData<ScreenState> = _state
+    private val _state: MutableStateFlow<ScreenState> = MutableStateFlow(Loading)
+    val state: StateFlow<ScreenState> get() = _state.asStateFlow()
 
     init {
         fetchArtDetails()

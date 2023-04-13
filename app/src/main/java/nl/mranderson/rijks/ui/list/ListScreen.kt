@@ -25,10 +25,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
-import androidx.paging.compose.collectAsLazyPagingItems
 import nl.mranderson.rijks.R
 import nl.mranderson.rijks.ui.components.ArtImage
 import nl.mranderson.rijks.ui.components.ErrorButton
@@ -40,14 +38,12 @@ import nl.mranderson.rijks.ui.list.ListViewModel.ArtUIModel.AuthorSeparator
 
 @Composable
 fun ListScreen(
-    listViewModel: ListViewModel = hiltViewModel(),
+    artCollection: LazyPagingItems<ArtUIModel>,
     onArtClicked: (String) -> Unit
 ) {
-    val lazyArtCollection = listViewModel.artCollectionFlow.collectAsLazyPagingItems()
-
     LazyColumn(contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)) {
-        items(lazyArtCollection.itemCount) { index ->
-            lazyArtCollection[index]?.let { art ->
+        items(artCollection.itemCount) { index ->
+            artCollection[index]?.let { art ->
                 when (art) {
                     is AuthorSeparator -> Separator(
                         author = art.author
@@ -60,8 +56,8 @@ fun ListScreen(
                 }
             }
         }
-        renderLoading(lazyArtCollection)
-        renderError(lazyArtCollection)
+        renderLoading(artCollection)
+        renderError(artCollection)
     }
 }
 
