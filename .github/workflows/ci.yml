@@ -18,4 +18,6 @@ jobs:
         distribution: 'temurin'
         cache: gradle
     - name: Unit tests
-      run: ./gradlew testDebugUnitTest --stacktrace
+      run: ./gradlew testDebugUnitTest
+    - name: UI tests
+      run: ./gradlew connectedDebugAndroidTest

@@ -1,6 +1,5 @@
 package nl.mranderson.rijks.ui.list
 
-import TestCoroutineExtension
 import androidx.paging.AsyncPagingDataDiffer
 import androidx.paging.PagingData
 import androidx.recyclerview.widget.DiffUtil
@@ -15,6 +14,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import nl.mranderson.rijks.TestCoroutineExtension
 import nl.mranderson.rijks.domain.model.Art
 import nl.mranderson.rijks.domain.usecase.GetCollection
 import nl.mranderson.rijks.ui.list.ListViewModel.ArtUIModel

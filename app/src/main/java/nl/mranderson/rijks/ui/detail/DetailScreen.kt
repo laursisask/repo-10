@@ -19,14 +19,11 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import nl.mranderson.rijks.R
 import nl.mranderson.rijks.domain.model.ArtDetails
 import nl.mranderson.rijks.ui.components.ArtImage
@@ -39,26 +36,24 @@ import nl.mranderson.rijks.ui.detail.DetailViewModel.ScreenState.Loading
 
 @Composable
 fun DetailScreen(
-    viewModel: DetailViewModel = hiltViewModel(),
+    viewData: DetailViewModel.ScreenState,
+    onRetryClicked: () -> Unit,
     onBackClicked: () -> Unit
 ) {
-    val detailState by viewModel.state.observeAsState()
-
-    when (val state = detailState) {
+    when (viewData) {
         is Data -> {
-            ArtDetail(state.artDetail) {
+            ArtDetail(viewData.artDetail) {
                 onBackClicked()
             }
         }
         is Error -> {
             ErrorView(message = stringResource(id = R.string.global_error_message)) {
-                viewModel.onRetryClicked()
+               onRetryClicked()
             }
         }
         is Loading -> {
             LoadingView()
         }
-        else -> Unit
     }
 }
 
