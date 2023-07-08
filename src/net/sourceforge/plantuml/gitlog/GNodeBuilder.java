@@ -44,7 +44,7 @@ import java.util.List;
 import java.util.Map;
 
 public class GNodeBuilder {
-    // ::remove folder when __HAXE__
+	// ::remove folder when __HAXE__
 
 	private final List<GNode> all = new ArrayList<>();
 
@@ -58,11 +58,9 @@ public class GNodeBuilder {
 			tmp.put(commit.getName(), node);
 		}
 
-		for (Commit commit : allCommits) {
-			for (Commit parent : commit.getAncestors()) {
+		for (Commit commit : allCommits)
+			for (Commit parent : commit.getAncestors())
 				GNode.link(tmp.get(commit.getName()), tmp.get(parent.getName()));
-			}
-		}
 
 		this.all.addAll(tmp.values());
 
@@ -82,9 +80,9 @@ public class GNodeBuilder {
 					break;
 				}
 			}
-			if (changed == false) {
+			if (changed == false)
 				return;
-			}
+
 		}
 	}
 

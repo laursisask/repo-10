@@ -26,6 +26,8 @@ jobs:
       do_release: ${{ steps.config.outputs.do_release }}
       do_snapshot_release: ${{ steps.config.outputs.do_snapshot_release }}
       pom_version: ${{ steps.config.outputs.pom_version }}
+      do_test_linux: ${{ steps.config.outputs.do_test_linux }}
+      do_test_windows: ${{ steps.config.outputs.do_test_windows }}
     steps:
       - name: Checkout the repository
         uses: actions/checkout@v3
@@ -57,33 +59,40 @@ jobs:
              ]]; then
             echo "::notice title=::This run will release '${REF}'"
             echo "do_release=true" >> $GITHUB_OUTPUT
+            echo "pom_version=${REF#v}"
             echo "pom_version=${REF#v}" >> $GITHUB_OUTPUT # pom_version is the tag without the 'v' prefix
 
           elif [[ "${GITHUB_EVENT_NAME}" =~ push|workflow_dispatch && "${REF}" == "refs/heads/master" && "${ACTOR}" == "arnaudroques" ]]; then
             echo "::notice title=::This run will release a snapshot"
             echo "do_snapshot_release=true" >> $GITHUB_OUTPUT
             V=$(perl -ne 'if (/return (\d{6,7});/) {$v=$1} if (/final int beta = (\d+);/) {$b=$1} END{print(substr($v, 0, 1),".", substr($v, 1, 4),"."); if ($b) {print(int(substr($v+1, 5)), "beta", $b);} else {print(int(substr($v, 5)))}}' src/net/sourceforge/plantuml/version/Version.java)
+            echo "pom_version=$V-SNAPSHOT"
             echo "pom_version=$V-SNAPSHOT" >> $GITHUB_OUTPUT # pom_version is taken from Version.java
 
           else
             echo "This run will NOT make a release"
           fi
+          echo "do_test_linux=true" >> $GITHUB_OUTPUT
+          echo "do_test_windows=false" >> $GITHUB_OUTPUT
 
   # We run the tests on many OS / Java combinations but also the Compile step because some users build
   # their own jars from source, so it is good for CI to check that is working on all combinations.
-  test:
+  # We split windows and ubuntu because windows is so slow...
+  test_linux:
     needs: workflow_config
     strategy:
       fail-fast: false
       matrix:
-        java_version: [ 8, 11, 17 ]
-        os: [ ubuntu-20.04, ubuntu-22.04, windows-2019, windows-2022 ]
+        java_version: [ 8, 17 ]
+        os: [ ubuntu-latest ]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout the repository
+        if: needs.workflow_config.outputs.do_test_linux == 'true'
         uses: actions/checkout@v3
 
       - name: Set up java
+        if: needs.workflow_config.outputs.do_test_linux == 'true'
         uses: actions/setup-java@v3.11.0
         with:
           java-version: ${{ matrix.java_version }}
@@ -92,21 +101,61 @@ jobs:
 
       # Compile / Test / Package are separate steps so the reason for any failure is more obvious in GitHub UI
       - name: Compile
+        if: needs.workflow_config.outputs.do_test_linux == 'true'
         run: gradle -q compileJava --no-daemon
 
       - name: Test
+        if: needs.workflow_config.outputs.do_test_linux == 'true'
         run: gradle test --no-daemon -i
 
       - name: Upload test reports
         uses: actions/upload-artifact@v3
-        if: ${{ always() }}
+        if: needs.workflow_config.outputs.do_test_linux == 'true'
+        with:
+          # Using github.run_number here to reduce confusion when downloading & comparing from several builds
+          name: ${{ github.run_number }}-${{ matrix.os }}-java-${{ matrix.java_version }}-test-reports
+          path: build/reports/tests/
+
+  test_windows:
+    needs: workflow_config
+    strategy:
+      fail-fast: false
+      matrix:
+        java_version: [ 8 ]
+        os: [ windows-latest ]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout the repository
+        if: needs.workflow_config.outputs.do_test_windows == 'true'
+        uses: actions/checkout@v3
+
+      - name: Set up java
+        if: needs.workflow_config.outputs.do_test_windows == 'true'
+        uses: actions/setup-java@v3
+        with:
+          java-version: ${{ matrix.java_version }}
+          distribution: temurin
+          cache: gradle
+
+      # Compile / Test / Package are separate steps so the reason for any failure is more obvious in GitHub UI
+      - name: Compile
+        if: needs.workflow_config.outputs.do_test_windows == 'true'
+        run: gradle -q compileJava --no-daemon
+
+      - name: Test
+        if: needs.workflow_config.outputs.do_test_windows == 'true'
+        run: gradle test --no-daemon -i
+
+      - name: Upload test reports
+        uses: actions/upload-artifact@v3
+        if: needs.workflow_config.outputs.do_test_windows == 'true'
         with:
           # Using github.run_number here to reduce confusion when downloading & comparing from several builds
           name: ${{ github.run_number }}-${{ matrix.os }}-java-${{ matrix.java_version }}-test-reports
           path: build/reports/tests/
 
   build_artifacts:
-    needs: [ workflow_config, test ]
+    needs: [ workflow_config ]
     runs-on: ubuntu-latest
     outputs:
       release_version: ${{ steps.version.outputs.release_version }}
@@ -120,17 +169,22 @@ jobs:
           java-version: 17
           distribution: temurin
           cache: gradle
-      - name: Set version from tag
-        if: env.POM_VERSION
-        env:
-          POM_VERSION: ${{ needs.workflow_config.outputs.pom_version }}
-        run: sed -i "s/version = .*/version = $POM_VERSION/" gradle.properties
-      - name: Build artifacts
+#      - name: Set version in gradle.properties
+#        if: env.POM_VERSION
+#        env:
+#          POM_VERSION: ${{ needs.workflow_config.outputs.pom_version }}
+#        run: |
+#          sed -i "s/version = .*/version = $POM_VERSION/" gradle.properties
+#          cat gradle.properties
+      - name: Generate artifacts
         run: |
-          gradle -q clean build \
+          echo "print gradle.properties"
+          cat gradle.properties
+          gradle clean build \
             pdfJar \
             generateMetadataFileForMavenPublication generatePomFileForMavenPublication \
             -x test
+          find . -name "*.jar"
       - name: Sign artifacts
         if: env.ORG_GRADLE_PROJECT_signingKey
         env:
@@ -138,6 +192,8 @@ jobs:
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.ARTIFACT_SIGNING_PASSPHRASE }}
         run: |
           gradle -i signMavenPublication signPdfJar
+          ls -l build/libs
+          ls -l plantuml-mit/build/libs
       - name: Get release version
         id: version
         run: |
@@ -148,17 +204,15 @@ jobs:
           path: |
             build/libs
             build/publications
+            plantuml-mit/build/libs
           key: "libs-${{ github.run_id }}"
           enableCrossOsArchive: true
 
-  native_images:
-    needs: build_artifacts
-    uses: ./.github/workflows/native-image.yml
-    with:
-      release-version: ${{ needs.build_artifacts.outputs.release_version }}
-
   upload:
-    needs: [ workflow_config, build_artifacts, native_images]
+    if: |
+      needs.workflow_config.outputs.do_release == 'true' ||
+      needs.workflow_config.outputs.do_snapshot_release == 'true'
+    needs: [ workflow_config, build_artifacts, test_linux ]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the repository
@@ -171,33 +225,14 @@ jobs:
           distribution: temurin
           cache: gradle
 
-      - uses: actions/cache/restore@v3
+      - name: Restore Libs cache
+        uses: actions/cache/restore@v3
         with:
           path: |
             build/libs
             build/publications
+            plantuml-mit/build/libs
           key: "libs-${{ github.run_id }}"
-          fail-on-cache-miss: true
-          enableCrossOsArchive: true
-
-      - uses: actions/cache/restore@v3
-        with:
-          path: "build/libs/plantuml-darwin-amd64-*"
-          key: "native-image-darwin-amd64-${{ github.run_id }}"
-          fail-on-cache-miss: true
-          enableCrossOsArchive: true
-
-      - uses: actions/cache/restore@v3
-        with:
-          path: "build/libs/plantuml-win-amd64-*"
-          key: "native-image-win-amd64-${{ github.run_id }}"
-          fail-on-cache-miss: true
-          enableCrossOsArchive: true
-
-      - uses: actions/cache/restore@v3
-        with:
-          path: "build/libs/plantuml-linux-amd64-*"
-          key: "native-image-linux-amd64-${{ github.run_id }}"
           fail-on-cache-miss: true
           enableCrossOsArchive: true
 
@@ -209,8 +244,9 @@ jobs:
           path: |
             build/libs/*
             build/publications/maven/*
+            plantuml-mit/build/libs
 
-      - name: Create snapshot release
+      - name: Create snapshot
         if: needs.workflow_config.outputs.do_snapshot_release == 'true'
         env:
           RELEASE_VERSION: ${{ needs.build_artifacts.outputs.RELEASE_VERSION }}
@@ -221,10 +257,12 @@ jobs:
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ARTIFACT_SIGNING_KEY }}
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.ARTIFACT_SIGNING_PASSPHRASE }}
         run: |
+          echo "print gradle.properties"
+          cat gradle.properties
+          echo "RELEASE_VERSION=$RELEASE_VERSION"
           .github/scripts/release-snapshot.sh
-          gradle publish
 
-      - name: Create release in GitHub
+      - name: Create release in GitHub and OSSRH
         if: needs.workflow_config.outputs.do_release == 'true'
         env:
           RELEASE_VERSION: ${{ needs.build_artifacts.outputs.RELEASE_VERSION }}
@@ -236,11 +274,14 @@ jobs:
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ARTIFACT_SIGNING_KEY }}
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.ARTIFACT_SIGNING_PASSPHRASE }}
         run: |
+          echo "print gradle.properties"
+          cat gradle.properties
+          echo "RELEASE_VERSION=$RELEASE_VERSION"
           .github/scripts/release.sh
-          gradle publish
+          gradle --debug publish
 
-  push_to_registry:
-    needs: [ workflow_config, upload ]
+  push_to_docker_registry:
+    needs: [ workflow_config, upload, test_linux, test_windows ]
     if: needs.workflow_config.outputs.do_release == 'true'
     runs-on: ubuntu-latest
     steps:

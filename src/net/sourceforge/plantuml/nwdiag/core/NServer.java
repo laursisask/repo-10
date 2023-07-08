@@ -79,11 +79,15 @@ public class NServer {
 	}
 
 	public void connectMeIfAlone(Network network) {
-		if (connections.size() == 0) {
+		if (isAlone()) {
 			connectTo(network, "");
 			if (network.isVisible() == false)
 				this.doNotPrintFirstLink();
 		}
+	}
+
+	public boolean isAlone() {
+		return connections.size() == 0;
 	}
 
 	public String someAddress() {
@@ -108,6 +112,8 @@ public class NServer {
 	}
 
 	public void learnThisAddress(String address) {
+		if (address == null)
+			address = "";
 		for (Entry<Network, String> ent : connections.entrySet()) {
 			if (ent.getValue().length() == 0) {
 				connections.put(ent.getKey(), address);

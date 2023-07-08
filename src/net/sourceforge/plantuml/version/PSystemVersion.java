@@ -165,9 +165,8 @@ public class PSystemVersion extends PlainStringsDiagram {
 
 		// :: comment when __CORE__
 		GraphvizCrash.checkOldVersionWarning(strings);
-		if (OptionFlags.ALLOW_INCLUDE) {
-			if (SecurityUtils.getSecurityProfile() == SecurityProfile.UNSECURE)
-				strings.add("Loaded from " + Version.getJarPath());
+		if (SecurityUtils.getSecurityProfile() == SecurityProfile.UNSECURE) {
+			strings.add("Loaded from " + Version.getJarPath());
 
 			if (OptionFlags.getInstance().isWord()) {
 				strings.add("Word Mode");

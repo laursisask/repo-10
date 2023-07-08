@@ -41,6 +41,7 @@ import net.sourceforge.plantuml.klimt.UStroke;
 import net.sourceforge.plantuml.klimt.UTranslate;
 import net.sourceforge.plantuml.klimt.color.ColorType;
 import net.sourceforge.plantuml.klimt.color.HColor;
+import net.sourceforge.plantuml.klimt.color.HColors;
 import net.sourceforge.plantuml.klimt.drawing.UGraphic;
 import net.sourceforge.plantuml.klimt.font.FontParam;
 import net.sourceforge.plantuml.klimt.font.StringBounder;
@@ -58,17 +59,14 @@ import net.sourceforge.plantuml.svek.SvekNode;
 
 public class EntityImageStateBorder extends AbstractEntityImageBorder {
 
-	private final SName sname;
-
 	public EntityImageStateBorder(Entity leaf, ISkinParam skinParam, Cluster stateParent, final Bibliotekon bibliotekon,
 			SName sname) {
 		super(leaf, skinParam, stateParent, bibliotekon, FontParam.STATE);
-		this.sname = sname;
 	}
 
 	@Override
 	protected StyleSignatureBasic getSignature() {
-		return StyleSignatureBasic.of(SName.root, SName.element, sname);
+		return StyleSignatureBasic.of(SName.root, SName.element, SName.stateDiagram, SName.state);
 	}
 
 	private boolean upPosition() {
@@ -98,6 +96,8 @@ public class EntityImageStateBorder extends AbstractEntityImageBorder {
 		HColor backcolor = getEntity().getColors().getColor(ColorType.BACK);
 		if (backcolor == null)
 			backcolor = style.value(PName.BackGroundColor).asColor(getSkinParam().getIHtmlColorSet());
+		if (backcolor.isTransparent())
+			backcolor = getSkinParam().getBackgroundColor();
 
 		ug = ug.apply(getUStroke()).apply(borderColor);
 		ug = ug.apply(backcolor.bg());
