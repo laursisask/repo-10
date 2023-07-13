@@ -15,7 +15,7 @@ jobs:
           ref: develop
           fetch-depth: 0 
       - name: Merge Upstream
-        uses: rovast/sync-upstream-repo@v0.0.1
+        uses: Andrey1994/sync-upstream-repo@0.0.2
         with:
           upstream_repo: https://github.com/spack/spack
           upstream_branch: develop
@@ -30,7 +30,7 @@ jobs:
           ref: intel-develop
           fetch-depth: 0 
       - name: Merge Upstream
-        uses: rovast/sync-upstream-repo@v0.0.1
+        uses: Andrey1994/sync-upstream-repo@0.0.2
         with:
           upstream_repo: https://github.com/spack/spack
           upstream_branch: develop
