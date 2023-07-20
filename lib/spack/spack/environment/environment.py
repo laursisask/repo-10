@@ -29,6 +29,7 @@ import spack.compilers
 import spack.concretize
 import spack.config
 import spack.error
+import spack.fetch_strategy
 import spack.hash_types as ht
 import spack.hooks
 import spack.main
@@ -153,7 +154,7 @@ def installed_specs():
     """
     env = spack.environment.active_environment()
     hashes = env.all_hashes() if env else None
-    return spack.store.db.query(hashes=hashes)
+    return spack.store.STORE.db.query(hashes=hashes)
 
 
 def valid_env_name(name):
@@ -421,7 +422,7 @@ def _is_dev_spec_and_has_changed(spec):
         # Not installed -> nothing to compare against
         return False
 
-    _, record = spack.store.db.query_by_spec_hash(spec.dag_hash())
+    _, record = spack.store.STORE.db.query_by_spec_hash(spec.dag_hash())
     mtime = fs.last_modification_time_recursive(dev_path_var.value)
     return mtime > record.installation_time
 
@@ -582,7 +583,7 @@ class ViewDescriptor:
             raise SpackEnvironmentViewError(msg)
         return SimpleFilesystemView(
             root,
-            spack.store.layout,
+            spack.store.STORE.layout,
             ignore_conflicts=True,
             projections=self.projections,
             link=self.link_type,
@@ -622,7 +623,7 @@ class ViewDescriptor:
             specs = list(dedupe(concretized_root_specs, key=traverse.by_dag_hash))
 
         # Filter selected, installed specs
-        with spack.store.db.read_transaction():
+        with spack.store.STORE.db.read_transaction():
             specs = [s for s in specs if s in self and s.installed]
 
         return specs
@@ -1265,12 +1266,12 @@ class Environment:
             # We construct a package class ourselves, rather than asking for
             # Spec.package, since Spec only allows this when it is concrete
             package = pkg_cls(spec)
-            if isinstance(package.fetcher[0], spack.fetch_strategy.GitFetchStrategy):
-                package.fetcher[0].get_full_repo = True
+            if isinstance(package.fetcher, spack.fetch_strategy.GitFetchStrategy):
+                package.fetcher.get_full_repo = True
                 # If we retrieved this version before and cached it, we may have
                 # done so without cloning the full git repo; likewise, any
                 # mirror might store an instance with truncated history.
-                package.stage[0].disable_mirrors()
+                package.stage.disable_mirrors()
 
             package.stage.steal_source(abspath)
 
@@ -1840,7 +1841,7 @@ class Environment:
         specs. This is done in a single read transaction per environment instead
         of per spec."""
         installed, uninstalled = [], []
-        with spack.store.db.read_transaction():
+        with spack.store.STORE.db.read_transaction():
             for concretized_hash in self.concretized_order:
                 spec = self.specs_by_hash[concretized_hash]
                 if not spec.installed or (
@@ -1885,9 +1886,9 @@ class Environment:
         # Already installed root specs should be marked explicitly installed in the
         # database.
         if specs_dropped:
-            with spack.store.db.write_transaction():  # do all in one transaction
+            with spack.store.STORE.db.write_transaction():  # do all in one transaction
                 for spec in specs_dropped:
-                    spack.store.db.update_explicit(spec, True)
+                    spack.store.STORE.db.update_explicit(spec, True)
 
         if not specs_to_install:
             tty.msg("All of the packages are already installed")
@@ -1950,7 +1951,7 @@ class Environment:
         """
         # use a transaction to avoid overhead of repeated calls
         # to `package.spec.installed`
-        with spack.store.db.read_transaction():
+        with spack.store.STORE.db.read_transaction():
             concretized = dict(self.concretized_specs())
             for spec in self.user_specs:
                 concrete = concretized.get(spec)
