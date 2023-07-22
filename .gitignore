@@ -21,6 +21,9 @@ vagrant/.vagrant/rgloader/loader.rb
 *.iml
 out
 
+#vscode files
+/bin
+
 # Ant result file
 plantuml.jar
 
