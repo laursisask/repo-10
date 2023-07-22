@@ -2,19 +2,16 @@ name: Build & Release
 
 on:
   push:
-    tags:
-      - 'v*'
 
 jobs:
   container:
     runs-on: ubuntu-latest
     container:
-      image: 'jgraph/drawio-builder:latest'
+      image: 'jgraph/drawio-plant-builder:latest'
+      options: --privileged -e container=docker -v /sys/fs/cgroup:/sys/fs/cgroup
     steps:
     - name: Checkout reposistory
       uses: actions/checkout@v3
-      with:
-        ref: 'release'
     - name: Build
       run: |
         sed -i "s/USERNAME_HERE/${{secrets.GH_PKG_USERNAME}}/g" /root/.m2/settings.xml
