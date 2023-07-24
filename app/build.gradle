@@ -87,7 +87,7 @@ dependencies {
     releaseImplementation "com.github.chuckerteam.chucker:library-no-op:3.5.2"
 
     testImplementation "androidx.arch.core:core-testing:2.2.0"
-    testImplementation "app.cash.turbine:turbine:0.12.3"
+    testImplementation "app.cash.turbine:turbine:1.0.0"
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4"
     testImplementation "io.mockk:mockk:1.13.5"
 
