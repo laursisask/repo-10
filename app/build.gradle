@@ -84,7 +84,7 @@ dependencies {
     kapt "com.google.dagger:hilt-compiler:2.47"
 
     debugImplementation "com.github.chuckerteam.chucker:library:3.5.2"
-    releaseImplementation "com.github.chuckerteam.chucker:library-no-op:3.5.2"
+    releaseImplementation "com.github.chuckerteam.chucker:library-no-op:4.0.0"
 
     testImplementation "androidx.arch.core:core-testing:2.2.0"
     testImplementation "app.cash.turbine:turbine:1.0.0"
