@@ -83,7 +83,7 @@ dependencies {
     implementation 'androidx.hilt:hilt-navigation-compose:1.0.0'
     kapt "com.google.dagger:hilt-compiler:2.47"
 
-    debugImplementation "com.github.chuckerteam.chucker:library:3.5.2"
+    debugImplementation "com.github.chuckerteam.chucker:library:4.0.0"
     releaseImplementation "com.github.chuckerteam.chucker:library-no-op:4.0.0"
 
     testImplementation "androidx.arch.core:core-testing:2.2.0"
