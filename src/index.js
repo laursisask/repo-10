@@ -42,6 +42,10 @@ try {
         required: false
     });
 
+    const issueNr = core.getInput('issue-number', {
+        required: false
+    });
+
     // Get octokit
     const octokit = github.getOctokit(gitHubToken);
 
@@ -50,6 +54,7 @@ try {
 
     // Run action
     runAction(octokit, contextPayload, {
+        issueNr,
         assignees,
         unassignees,
         teams,

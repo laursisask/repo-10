@@ -16,6 +16,9 @@ inputs:
     numOfAssignee:
         description: 'Number of random assignee'
         required: false
+    issue-number:
+        description: 'Issue number to assign'
+        required: false
     abortIfPreviousAssignees:
         description: 'Flag that aborts the action if there were assignees previously.'
         required: false

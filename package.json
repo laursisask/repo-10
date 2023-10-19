@@ -10,8 +10,7 @@
         "prettier:verify": "prettier --check \"**/*.{html,js,json,md,yaml,yml}\"",
         "test": "jest",
         "test:coverage": "jest --coverage",
-        "postinstall": "husky install",
-        "precommit": "lint-staged"
+        "postinstall": "husky install"
     },
     "lint-staged": {
         "!(node_modules/**/*)*.{html,js,json,md,yaml,yml}": [
@@ -24,7 +23,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/pozil/auto-assign-issue.git"
+        "url": "git+https://github.com/AlexanderWert/auto-assign-issue.git"
     },
     "keywords": [
         "github",
@@ -35,9 +34,9 @@
     "author": "Philippe Ozil (pozil)",
     "license": "CC0-1.0",
     "bugs": {
-        "url": "https://github.com/pozil/auto-assign-issue/issues"
+        "url": "https://github.com/AlexanderWert/auto-assign-issue/issues"
     },
-    "homepage": "https://github.com/pozil/auto-assign-issue#readme",
+    "homepage": "https://github.com/AlexanderWert/auto-assign-issue#readme",
     "dependencies": {
         "@actions/core": "^1.10.0",
         "@actions/github": "^5.1.1"

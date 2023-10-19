@@ -22,6 +22,7 @@ const {
  */
 const runAction = async (octokit, context, parameters) => {
     const {
+        issueNr = undefined,
         assignees = [],
         unassignees = [],
         teams = [],
@@ -35,14 +36,16 @@ const runAction = async (octokit, context, parameters) => {
 
 
     // Get context info
-    let issueNumber =
+    let issueNumber = 
+        (issueNr ? parseInt(issueNr, 10) : undefined) ||
         context.issue?.number ||
         context.pull_request?.number ||
         context.workflow_run?.pull_requests[0]?.number;
-    let isIssue =
-        typeof context.issue !== 'undefined' &&
+    let isIssue = 
+        !!issueNr || 
+        (typeof context.issue !== 'undefined' &&
         typeof context.pull_request === 'undefined' &&
-        context.workflow_run?.pull_requests?.length === undefined;
+        context.workflow_run?.pull_requests?.length === undefined);
     const author =
         context.issue?.user.login ||
         context.pull_request?.user.login ||
