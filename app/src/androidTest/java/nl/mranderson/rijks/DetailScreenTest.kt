@@ -1,7 +1,6 @@
 package nl.mranderson.rijks
 
 import androidx.activity.compose.setContent
-import androidx.compose.material.Surface
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -40,13 +39,11 @@ class DetailScreenTest {
     fun checkIfLoadingStateIsDisplayed() {
         composeTestRule.activity.setContent {
             RijksTheme {
-                Surface {
-                    DetailScreen(
-                        viewData = Loading,
-                        onBackClicked = {},
-                        onRetryClicked = {}
-                    )
-                }
+                DetailScreen(
+                    viewData = Loading,
+                    onBackClicked = {},
+                    onRetryClicked = {}
+                )
             }
         }
 
@@ -57,13 +54,11 @@ class DetailScreenTest {
     fun checkIfErrorStateIsDisplayed() {
         composeTestRule.activity.setContent {
             RijksTheme {
-                Surface {
-                    DetailScreen(
-                        viewData = Error,
-                        onBackClicked = {},
-                        onRetryClicked = {}
-                    )
-                }
+                DetailScreen(
+                    viewData = Error,
+                    onBackClicked = {},
+                    onRetryClicked = {}
+                )
             }
         }
 
@@ -77,13 +72,11 @@ class DetailScreenTest {
     fun checkIfDataStateIsDisplayed() {
         composeTestRule.activity.setContent {
             RijksTheme {
-                Surface {
-                    DetailScreen(
-                        viewData = Data(artDetails),
-                        onBackClicked = {},
-                        onRetryClicked = {}
-                    )
-                }
+                DetailScreen(
+                    viewData = Data(artDetails),
+                    onBackClicked = {},
+                    onRetryClicked = {}
+                )
             }
         }
 
