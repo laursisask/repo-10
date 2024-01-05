@@ -2,9 +2,10 @@ package nl.mranderson.rijks.ui.list
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -14,15 +15,17 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.MaterialTheme.typography
-import androidx.compose.material.Text
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.MaterialTheme.typography
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
@@ -36,28 +39,36 @@ import nl.mranderson.rijks.ui.list.ListViewModel.ArtUIModel
 import nl.mranderson.rijks.ui.list.ListViewModel.ArtUIModel.ArtData
 import nl.mranderson.rijks.ui.list.ListViewModel.ArtUIModel.AuthorSeparator
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ListScreen(
     artCollection: LazyPagingItems<ArtUIModel>,
     onArtClicked: (String) -> Unit
 ) {
-    LazyColumn(contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)) {
-        items(artCollection.itemCount) { index ->
-            artCollection[index]?.let { art ->
-                when (art) {
-                    is AuthorSeparator -> Separator(
-                        author = art.author
-                    )
-                    is ArtData -> ArtListItem(
-                        art = art,
-                        onArtClicked = { id ->
-                            onArtClicked(id)
-                        })
+    Scaffold { innerPadding ->
+        LazyColumn(
+            modifier = Modifier
+                .consumeWindowInsets(innerPadding)
+                .padding(horizontal = 16.dp),
+            contentPadding = innerPadding
+        ) {
+            items(artCollection.itemCount) { index ->
+                artCollection[index]?.let { art ->
+                    when (art) {
+                        is AuthorSeparator -> Separator(
+                            author = art.author
+                        )
+                        is ArtData -> ArtListItem(
+                            art = art,
+                            onArtClicked = { id ->
+                                onArtClicked(id)
+                            })
+                    }
                 }
             }
+            renderLoading(artCollection)
+            renderError(artCollection)
         }
-        renderLoading(artCollection)
-        renderError(artCollection)
     }
 }
 
@@ -103,13 +114,12 @@ fun ArtListItem(
     art: ArtData,
     onArtClicked: (String) -> Unit
 ) {
-    Card(
+    ElevatedCard(
         modifier = Modifier
             .padding(vertical = 8.dp)
             .fillMaxWidth()
             .clickable { onArtClicked(art.id) }
             .then(modifier),
-        elevation = 2.dp,
         shape = RoundedCornerShape(corner = CornerSize(16.dp)),
     ) {
         Row {
@@ -127,9 +137,12 @@ fun ArtListItem(
                     .fillMaxWidth()
                     .align(Alignment.CenterVertically)
             ) {
-                Text(text = art.title, style = typography.h6)
+                Text(text = art.title, style = typography.titleMedium, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(text = stringResource(id = R.string.view_details), style = typography.caption)
+                Text(
+                    text = stringResource(id = R.string.view_details),
+                    style = typography.bodySmall
+                )
             }
         }
     }
