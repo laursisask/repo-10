@@ -132,9 +132,7 @@ fun ArtProperty(label: String, value: String) {
         )
         Text(
             text = value,
-            modifier = Modifier.height(24.dp),
             style = MaterialTheme.typography.body1,
-            overflow = TextOverflow.Visible
         )
     }
 }
