@@ -1,9 +1,10 @@
 package nl.mranderson.rijks.ui
 
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.material.Surface
+import androidx.core.view.WindowCompat
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import nl.mranderson.rijks.ui.navigation.NavGraph
@@ -14,12 +15,14 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // This will lay out our app behind the system bars
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+
         setContent {
             RijksTheme {
-                Surface {
-                    val navController = rememberNavController()
-                    NavGraph(navController = navController)
-                }
+                val navController = rememberNavController()
+                NavGraph(navController = navController)
             }
         }
     }

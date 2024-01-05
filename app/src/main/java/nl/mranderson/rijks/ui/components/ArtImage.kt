@@ -1,7 +1,7 @@
 package nl.mranderson.rijks.ui.components
 
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.Icon
+import androidx.compose.material3.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.runtime.Composable
