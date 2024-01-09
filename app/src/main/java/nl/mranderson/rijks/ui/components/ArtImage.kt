@@ -10,7 +10,7 @@ import androidx.compose.ui.layout.ContentScale
 import coil.compose.SubcomposeAsyncImage
 
 @Composable
-fun ArtImage(modifier: Modifier, imageUrl: String) {
+fun ArtImage(modifier: Modifier, imageUrl: String, contentScale: ContentScale = ContentScale.Crop) {
     SubcomposeAsyncImage(
         modifier = modifier,
         loading = {
@@ -22,7 +22,7 @@ fun ArtImage(modifier: Modifier, imageUrl: String) {
                 contentDescription = null
             )
         },
-        contentScale = ContentScale.Crop,
+        contentScale = contentScale,
         model = imageUrl,
         contentDescription = null,
     )

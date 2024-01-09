@@ -42,7 +42,8 @@ class DetailScreenTest {
                 DetailScreen(
                     viewData = Loading,
                     onBackClicked = {},
-                    onRetryClicked = {}
+                    onRetryClicked = {},
+                    onImageClicked = {},
                 )
             }
         }
@@ -57,7 +58,8 @@ class DetailScreenTest {
                 DetailScreen(
                     viewData = Error,
                     onBackClicked = {},
-                    onRetryClicked = {}
+                    onRetryClicked = {},
+                    onImageClicked = {},
                 )
             }
         }
@@ -75,7 +77,8 @@ class DetailScreenTest {
                 DetailScreen(
                     viewData = Data(artDetails),
                     onBackClicked = {},
-                    onRetryClicked = {}
+                    onRetryClicked = {},
+                    onImageClicked = {},
                 )
             }
         }

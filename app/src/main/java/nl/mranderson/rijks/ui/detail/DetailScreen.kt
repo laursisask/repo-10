@@ -1,8 +1,10 @@
 package nl.mranderson.rijks.ui.detail
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,20 +16,23 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowBack
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 import nl.mranderson.rijks.R
 import nl.mranderson.rijks.domain.model.ArtDetails
 import nl.mranderson.rijks.ui.components.ArtImage
@@ -42,13 +47,12 @@ import nl.mranderson.rijks.ui.detail.DetailViewModel.ScreenState.Loading
 fun DetailScreen(
     viewData: DetailViewModel.ScreenState,
     onRetryClicked: () -> Unit,
-    onBackClicked: () -> Unit
+    onBackClicked: () -> Unit,
+    onImageClicked: (String) -> Unit,
 ) {
     when (viewData) {
         is Data -> {
-            ArtDetail(viewData.artDetail) {
-                onBackClicked()
-            }
+            ArtDetail(viewData.artDetail, onBackClicked, onImageClicked)
         }
         is Error -> {
             ErrorView(message = stringResource(id = R.string.global_error_message)) {
@@ -62,7 +66,7 @@ fun DetailScreen(
 }
 
 @Composable
-fun ArtDetail(artDetail: ArtDetails, onBackClicked: () -> Unit) {
+fun ArtDetail(artDetail: ArtDetails, onBackClicked: () -> Unit, onImageClicked: (String) -> Unit) {
     val scrollState = rememberScrollState()
 
     Scaffold {
@@ -77,20 +81,42 @@ fun ArtDetail(artDetail: ArtDetails, onBackClicked: () -> Unit) {
                         Box {
                             ArtImage(
                                 modifier = Modifier
-                                    .heightIn(max = this@BoxWithConstraints.maxHeight / 2)
-                                    .fillMaxWidth(),
+                                    .heightIn(max = this@BoxWithConstraints.maxHeight / 3),
                                 imageUrl = artDetail.imageUrl
                             )
-                            Button(
-                                onClick = onBackClicked,
-                                modifier = Modifier
-                                    .windowInsetsPadding(WindowInsets.statusBars)
-                                    .padding(horizontal = 16.dp),
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                Icon(
-                                    imageVector = Icons.Rounded.ArrowBack,
-                                    contentDescription = null,
-                                )
+                                Button(
+                                    onClick = onBackClicked,
+                                    modifier = Modifier
+                                        .windowInsetsPadding(WindowInsets.statusBars)
+                                        .padding(horizontal = 16.dp),
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Rounded.ArrowBack,
+                                        contentDescription = null,
+                                    )
+                                }
+                                Button(
+                                    onClick = {
+                                        onImageClicked(
+                                            URLEncoder.encode(
+                                                artDetail.imageUrl,
+                                                StandardCharsets.UTF_8.toString()
+                                            )
+                                        )
+                                    },
+                                    modifier = Modifier
+                                        .windowInsetsPadding(WindowInsets.statusBars)
+                                        .padding(horizontal = 16.dp),
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Rounded.Search,
+                                        contentDescription = null,
+                                    )
+                                }
                             }
                         }
                         Column(modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBars)) {
