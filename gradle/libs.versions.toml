@@ -1,0 +1,56 @@
+[versions]
+androidGradlePlugin = "7.4.1"
+androidLib = "7.4.2"
+chucker = "4.0.0"
+coil = "2.4.0"
+composeBom = "2023.10.01"
+hilt = "2.46.1"
+hiltWork = "1.1.0"
+kotlin = "1.9.21"
+ktx = "1.10.0"
+lifecycle = "2.6.2"
+secrets = "2.0.1"
+
+[libraries]
+androidx-activity = { group = "androidx.activity", name = "activity-compose", version = "1.7.0" }
+androidx-arch-core = { group = "androidx.arch.core", name = "core-testing", version = "2.2.0" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version = "1.6.1" }
+androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version = "2.1.4" }
+androidx-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "ktx" }
+androidx-lifecycle = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version = "2.6.1" }
+androidx-paging = { group = "androidx.paging", name = "paging-runtime-ktx", version = "3.1.1" }
+androidx-paging-compose = { group = "androidx.paging", name = "paging-compose", version = "1.0.0-alpha14" }
+androidx-test = { group = "androidx.test.ext", name = "junit", version = "1.1.5" }
+androidx-test-compose-ui = { group = "androidx.compose.ui", name = "ui-test-junit4", version = "1.4.1" }
+androidx-test-espresso = { group = "androidx.test.espresso", name = "espresso-core", version = "3.5.1" }
+chucker = { module = "com.github.chuckerteam.chucker:library", version.ref = "chucker" }
+chucker-noop = { module = "com.github.chuckerteam.chucker:library-no-op", version.ref = "chucker" }
+coilCompose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
+compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBom" }
+compose-foundation = { module = "androidx.compose.foundation:foundation" }
+compose-material3 = { module = "androidx.compose.material3:material3", version = "1.1.2" }
+compose-navigation = { module = "androidx.navigation:navigation-compose", version = "2.7.6" }
+compose-ui = { module = "androidx.compose.ui:ui" }
+compose-uiTooling = { module = "androidx.compose.ui:ui-tooling" }
+coroutinesTest = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version = "1.7.3" }
+hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
+hilt-navigation = { module = "androidx.hilt:hilt-navigation-compose", version = "1.1.0" }
+hilt-workCompiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hiltWork" }
+jupiter = { group = "org.junit.jupiter", name = "junit-jupiter-api", version = "5.9.3" }
+jupiter-engine = { group = "org.junit.jupiter", name = "junit-jupiter-engine", version = "5.10.0" }
+kotlinSerialization = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version = "1.5.1" }
+lifecycle-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
+material = { group = "com.google.android.material", name = "material", version = "1.8.0" }
+mockk = { group = "io.mockk", name = "mockk", version = "1.13.5" }
+retrofit2 = { group = "com.squareup.retrofit2", name = "retrofit", version = "2.9.0" }
+retrofitSerialization = { group = "com.jakewharton.retrofit", name = "retrofit2-kotlinx-serialization-converter", version = "1.0.0" }
+turbine = { group = "app.cash.turbine", name = "turbine", version = "1.0.0" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
+android-library = { id = "com.android.library", version.ref = "androidLib" }
+hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
+kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
+kotlin = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+secrets = { id = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin", version.ref = "secrets" }
