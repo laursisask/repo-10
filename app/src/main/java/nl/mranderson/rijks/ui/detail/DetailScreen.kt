@@ -1,5 +1,6 @@
 package nl.mranderson.rijks.ui.detail
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -63,15 +64,15 @@ fun DetailScreen(
     }
 }
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun ArtDetail(artDetail: ArtDetails, onBackClicked: () -> Unit) {
     val scrollState = rememberScrollState()
 
-    Scaffold { innerPadding ->
+    Scaffold { _ ->
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
+                .fillMaxSize(),
         ) {
             BoxWithConstraints {
                 Surface {
