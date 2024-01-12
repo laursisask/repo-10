@@ -10,6 +10,7 @@ import androidx.navigation.compose.composable
 import androidx.paging.compose.collectAsLazyPagingItems
 import nl.mranderson.rijks.ui.detail.DetailScreen
 import nl.mranderson.rijks.ui.detail.DetailViewModel
+import nl.mranderson.rijks.ui.image.ImageScreen
 import nl.mranderson.rijks.ui.list.ListScreen
 import nl.mranderson.rijks.ui.list.ListViewModel
 
@@ -44,6 +45,21 @@ fun NavGraph(navController: NavHostController) {
                     onRetryClicked = {
                         viewModel.onRetryClicked()
                     },
+                    onBackClicked = {
+                        navController.popBackStack()
+                    },
+                    onImageClicked = { url ->
+                        navController.navigate(Screens.Image.route.plus("/$url"))
+                    }
+                )
+            }
+        }
+
+        composable(route = "${Screens.Image.route}/{${Screens.Image.argArtImageUrl}}") { backStackEntry ->
+
+            backStackEntry.arguments?.getString(Screens.Image.argArtImageUrl)?.let {
+                ImageScreen(
+                    imageUrl = it,
                     onBackClicked = {
                         navController.popBackStack()
                     }
