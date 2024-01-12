@@ -1,6 +1,5 @@
 package nl.mranderson.rijks.ui
 
-import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity

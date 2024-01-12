@@ -50,11 +50,13 @@ fun DetailScreen(
                 onBackClicked()
             }
         }
+
         is Error -> {
             ErrorView(message = stringResource(id = R.string.global_error_message)) {
                 onRetryClicked()
             }
         }
+
         is Loading -> {
             LoadingView()
         }
@@ -65,8 +67,12 @@ fun DetailScreen(
 fun ArtDetail(artDetail: ArtDetails, onBackClicked: () -> Unit) {
     val scrollState = rememberScrollState()
 
-    Scaffold {
-        Column(modifier = Modifier.fillMaxSize()) {
+    Scaffold { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding),
+        ) {
             BoxWithConstraints {
                 Surface {
                     Column(

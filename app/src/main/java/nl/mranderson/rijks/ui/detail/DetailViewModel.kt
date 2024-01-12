@@ -50,9 +50,9 @@ class DetailViewModel @Inject constructor(
     }
 
     sealed class ScreenState {
-        object Loading : ScreenState()
+        data object Loading : ScreenState()
         data class Data(val artDetail: ArtDetails) : ScreenState()
-        object Error : ScreenState()
+        data object Error : ScreenState()
     }
 
 }

@@ -5,7 +5,6 @@ import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.unmockkAll
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import nl.mranderson.rijks.data.api.CollectionApiService
 import nl.mranderson.rijks.data.mapper.CollectionMapper
@@ -16,7 +15,6 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class CollectionPagingSourceTest {
 
     private lateinit var collectionPagingSource: CollectionPagingSource

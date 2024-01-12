@@ -1,56 +1,82 @@
 [versions]
-androidGradlePlugin = "7.4.1"
-androidLib = "7.4.2"
+androidGradlePlugin = "8.2.1"
+androidLib = "8.2.1"
+androidxActivity = "1.8.2"
+androidxArchCore = "2.2.0"
+androidxAppcompat = "1.6.1"
+androidxConstraintLayout = "2.1.4"
+androidxCoreKtx = "1.12.0"
+androidxLifecycle = "2.7.0"
+androidxPaging = "3.2.1"
+androidxPagingCompose = "3.2.1"
+androidxTest = "1.1.5"
+androidxTestComposeUi = "1.5.4"
+androidxTestEspresso = "3.5.1"
 chucker = "4.0.0"
-coil = "2.4.0"
-composeBom = "2023.10.01"
-hilt = "2.46.1"
-hiltWork = "1.1.0"
+coilCompose = "2.4.0"
+composeCompiler = "1.5.7"
+composeFoundation = "1.5.4"
+composeMaterial3 = "1.1.2"
+composeNavigation = "2.7.6"
+composeLifecycle = "2.7.0"
+composeUi = "1.5.4"
+composeUiTooling = "1.5.4"
+coroutinesTest = "1.7.3"
+hiltAndroid = "2.48"
+hiltNavigation = "1.1.0"
+hiltPlugin = "2.46.1"
+hiltWorkCompiler = "2.47"
+junitJupiterApi = "5.10.0"
+junitJupiterEngine = "5.10.0"
 kotlin = "1.9.21"
-ktx = "1.10.0"
-lifecycle = "2.6.2"
+kotlinSerialization = "1.9.21"
+kotlinSerializationJson = "1.5.1"
+material = "1.11.0"
+mockk = "1.13.5"
+retrofit2 = "2.9.0"
+retrofitSerialization = "1.0.0"
 secrets = "2.0.1"
+turbine = "1.0.0"
 
 [libraries]
-androidx-activity = { group = "androidx.activity", name = "activity-compose", version = "1.7.0" }
-androidx-arch-core = { group = "androidx.arch.core", name = "core-testing", version = "2.2.0" }
-androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version = "1.6.1" }
-androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version = "2.1.4" }
-androidx-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "ktx" }
-androidx-lifecycle = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version = "2.6.1" }
-androidx-paging = { group = "androidx.paging", name = "paging-runtime-ktx", version = "3.1.1" }
-androidx-paging-compose = { group = "androidx.paging", name = "paging-compose", version = "1.0.0-alpha14" }
-androidx-test = { group = "androidx.test.ext", name = "junit", version = "1.1.5" }
-androidx-test-compose-ui = { group = "androidx.compose.ui", name = "ui-test-junit4", version = "1.4.1" }
-androidx-test-espresso = { group = "androidx.test.espresso", name = "espresso-core", version = "3.5.1" }
+androidx-activity = { group = "androidx.activity", name = "activity-compose", version.ref = "androidxActivity" }
+androidx-arch-core = { group = "androidx.arch.core", name = "core-testing", version.ref = "androidxArchCore" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "androidxAppcompat" }
+androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "androidxConstraintLayout" }
+androidx-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "androidxCoreKtx" }
+androidx-lifecycle = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "androidxLifecycle" }
+androidx-paging = { group = "androidx.paging", name = "paging-runtime-ktx", version.ref = "androidxPaging" }
+androidx-paging-compose = { group = "androidx.paging", name = "paging-compose", version.ref = "androidxPagingCompose" }
+androidx-test = { group = "androidx.test.ext", name = "junit", version.ref = "androidxTest" }
+androidx-test-compose-ui = { group = "androidx.compose.ui", name = "ui-test-junit4", version.ref = "androidxTestComposeUi" }
+androidx-test-espresso = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "androidxTestEspresso" }
 chucker = { module = "com.github.chuckerteam.chucker:library", version.ref = "chucker" }
 chucker-noop = { module = "com.github.chuckerteam.chucker:library-no-op", version.ref = "chucker" }
-coilCompose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
-compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBom" }
-compose-foundation = { module = "androidx.compose.foundation:foundation" }
-compose-material3 = { module = "androidx.compose.material3:material3", version = "1.1.2" }
-compose-navigation = { module = "androidx.navigation:navigation-compose", version = "2.7.6" }
-compose-ui = { module = "androidx.compose.ui:ui" }
-compose-uiTooling = { module = "androidx.compose.ui:ui-tooling" }
-coroutinesTest = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version = "1.7.3" }
-hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
-hilt-navigation = { module = "androidx.hilt:hilt-navigation-compose", version = "1.1.0" }
-hilt-workCompiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hiltWork" }
-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter-api", version = "5.9.3" }
-jupiter-engine = { group = "org.junit.jupiter", name = "junit-jupiter-engine", version = "5.10.0" }
-kotlinSerialization = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version = "1.5.1" }
-lifecycle-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
-material = { group = "com.google.android.material", name = "material", version = "1.8.0" }
-mockk = { group = "io.mockk", name = "mockk", version = "1.13.5" }
-retrofit2 = { group = "com.squareup.retrofit2", name = "retrofit", version = "2.9.0" }
-retrofitSerialization = { group = "com.jakewharton.retrofit", name = "retrofit2-kotlinx-serialization-converter", version = "1.0.0" }
-turbine = { group = "app.cash.turbine", name = "turbine", version = "1.0.0" }
+coilCompose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
+compose-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "composeFoundation" }
+compose-material3 = { module = "androidx.compose.material3:material3", version.ref = "composeMaterial3" }
+compose-navigation = { module = "androidx.navigation:navigation-compose", version.ref = "composeNavigation" }
+compose-ui = { module = "androidx.compose.ui:ui", version.ref = "composeUi" }
+compose-uiTooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "composeUiTooling" }
+coroutinesTest = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutinesTest" }
+hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
+hilt-navigation = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigation" }
+hilt-workCompiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hiltWorkCompiler" }
+jupiter = { group = "org.junit.jupiter", name = "junit-jupiter-api", version.ref = "junitJupiterApi" }
+jupiter-engine = { group = "org.junit.jupiter", name = "junit-jupiter-engine", version.ref = "junitJupiterEngine" }
+kotlinSerialization = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinSerializationJson" }
+lifecycle-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "composeLifecycle" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
+retrofit2 = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit2" }
+retrofitSerialization = { group = "com.jakewharton.retrofit", name = "retrofit2-kotlinx-serialization-converter", version.ref = "retrofitSerialization" }
+turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
 android-library = { id = "com.android.library", version.ref = "androidLib" }
-hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
+hilt = { id = "com.google.dagger.hilt.android", version.ref = "hiltPlugin" }
 kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 kotlin = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinSerialization" }
 secrets = { id = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin", version.ref = "secrets" }

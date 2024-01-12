@@ -8,6 +8,7 @@ plugins {
 }
 
 android {
+    namespace = "nl.mranderson.rijks"
     compileSdk = 34
 
     defaultConfig {
@@ -38,9 +39,10 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.2.0"
+        kotlinCompilerExtensionVersion = libs.versions.composeCompiler.get()
     }
 }
 
@@ -54,6 +56,7 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.ktx)
+    implementation(libs.androidx.paging.compose)
     implementation(libs.androidx.lifecycle)
     implementation(libs.androidx.paging)
     implementation(libs.compose.foundation)
