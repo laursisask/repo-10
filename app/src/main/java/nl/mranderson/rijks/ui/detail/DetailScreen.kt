@@ -1,5 +1,6 @@
 package nl.mranderson.rijks.ui.detail
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -54,23 +55,29 @@ fun DetailScreen(
         is Data -> {
             ArtDetail(viewData.artDetail, onBackClicked, onImageClicked)
         }
+
         is Error -> {
             ErrorView(message = stringResource(id = R.string.global_error_message)) {
                 onRetryClicked()
             }
         }
+
         is Loading -> {
             LoadingView()
         }
     }
 }
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun ArtDetail(artDetail: ArtDetails, onBackClicked: () -> Unit, onImageClicked: (String) -> Unit) {
     val scrollState = rememberScrollState()
 
-    Scaffold {
-        Column(modifier = Modifier.fillMaxSize()) {
+    Scaffold { _ ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize(),
+        ) {
             BoxWithConstraints {
                 Surface {
                     Column(

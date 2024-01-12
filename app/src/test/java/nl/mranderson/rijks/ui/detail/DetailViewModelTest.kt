@@ -6,7 +6,6 @@ import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.unmockkAll
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import nl.mranderson.rijks.TestCoroutineExtension
 import nl.mranderson.rijks.domain.model.ArtDetails
@@ -20,7 +19,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class DetailViewModelTest {
 
     @JvmField

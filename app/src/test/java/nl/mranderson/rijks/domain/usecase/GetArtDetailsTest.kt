@@ -3,17 +3,15 @@ package nl.mranderson.rijks.domain.usecase
 import io.mockk.coEvery
 import io.mockk.mockk
 import io.mockk.unmockkAll
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import nl.mranderson.rijks.domain.CollectionRepository
 import nl.mranderson.rijks.domain.model.ArtDetails
-import org.junit.Test
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class GetArtDetailsTest {
 
     private lateinit var getArtDetails: GetArtDetails
