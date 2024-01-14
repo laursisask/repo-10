@@ -1,6 +1,6 @@
 [versions]
 androidGradlePlugin = "8.2.1"
-androidLib = "8.2.1"
+androidJUnit = "1.10.0.0"
 androidxActivity = "1.8.2"
 androidxArchCore = "2.2.0"
 androidxAppcompat = "1.6.1"
@@ -74,7 +74,7 @@ turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
-android-library = { id = "com.android.library", version.ref = "androidLib" }
+android-junit5 = { id = "de.mannodermaus.android-junit5", version.ref = "androidJUnit" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hiltPlugin" }
 kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 kotlin = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }

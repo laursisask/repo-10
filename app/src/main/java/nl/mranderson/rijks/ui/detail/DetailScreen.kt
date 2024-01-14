@@ -25,7 +25,6 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -44,6 +43,7 @@ import nl.mranderson.rijks.ui.detail.DetailViewModel.ScreenState.Data
 import nl.mranderson.rijks.ui.detail.DetailViewModel.ScreenState.Error
 import nl.mranderson.rijks.ui.detail.DetailViewModel.ScreenState.Loading
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun DetailScreen(
     viewData: DetailViewModel.ScreenState,
@@ -51,105 +51,98 @@ fun DetailScreen(
     onBackClicked: () -> Unit,
     onImageClicked: (String) -> Unit,
 ) {
-    when (viewData) {
-        is Data -> {
-            ArtDetail(viewData.artDetail, onBackClicked, onImageClicked)
-        }
-
-        is Error -> {
-            ErrorView(message = stringResource(id = R.string.global_error_message)) {
-                onRetryClicked()
+    Scaffold { _ ->
+        when (viewData) {
+            is Data -> {
+                ArtDetail(viewData.artDetail, onBackClicked, onImageClicked)
             }
-        }
 
-        is Loading -> {
-            LoadingView()
+            is Error -> {
+                ErrorView(message = stringResource(id = R.string.global_error_message)) {
+                    onRetryClicked()
+                }
+            }
+
+            is Loading -> {
+                LoadingView()
+            }
         }
     }
 }
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+
 @Composable
 fun ArtDetail(artDetail: ArtDetails, onBackClicked: () -> Unit, onImageClicked: (String) -> Unit) {
     val scrollState = rememberScrollState()
 
-    Scaffold { _ ->
+    BoxWithConstraints {
         Column(
             modifier = Modifier
-                .fillMaxSize(),
+                .fillMaxSize()
+                .verticalScroll(scrollState),
         ) {
-            BoxWithConstraints {
-                Surface {
-                    Column(
+            Box {
+                ArtImage(
+                    modifier = Modifier
+                        .heightIn(max = this@BoxWithConstraints.maxHeight / 3),
+                    imageUrl = artDetail.imageUrl
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Button(
+                        onClick = onBackClicked,
                         modifier = Modifier
-                            .fillMaxSize()
-                            .verticalScroll(scrollState),
+                            .windowInsetsPadding(WindowInsets.statusBars)
+                            .padding(horizontal = 16.dp),
                     ) {
-                        Box {
-                            ArtImage(
-                                modifier = Modifier
-                                    .heightIn(max = this@BoxWithConstraints.maxHeight / 3),
-                                imageUrl = artDetail.imageUrl
+                        Icon(
+                            imageVector = Icons.Rounded.ArrowBack,
+                            contentDescription = null,
+                        )
+                    }
+                    Button(
+                        onClick = {
+                            onImageClicked(
+                                URLEncoder.encode(
+                                    artDetail.imageUrl,
+                                    StandardCharsets.UTF_8.toString()
+                                )
                             )
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Button(
-                                    onClick = onBackClicked,
-                                    modifier = Modifier
-                                        .windowInsetsPadding(WindowInsets.statusBars)
-                                        .padding(horizontal = 16.dp),
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Rounded.ArrowBack,
-                                        contentDescription = null,
-                                    )
-                                }
-                                Button(
-                                    onClick = {
-                                        onImageClicked(
-                                            URLEncoder.encode(
-                                                artDetail.imageUrl,
-                                                StandardCharsets.UTF_8.toString()
-                                            )
-                                        )
-                                    },
-                                    modifier = Modifier
-                                        .windowInsetsPadding(WindowInsets.statusBars)
-                                        .padding(horizontal = 16.dp),
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Rounded.Search,
-                                        contentDescription = null,
-                                    )
-                                }
-                            }
-                        }
-                        Column(modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBars)) {
-                            ArtTitle(text = artDetail.title)
-                            Chips(
-                                modifier = Modifier.padding(horizontal = 16.dp),
-                                titles = artDetail.types
-                            )
-                            ArtProperty(
-                                stringResource(
-                                    id = R.string.description
-                                ), artDetail.description ?: stringResource(id = R.string.dash)
-                            )
-                            ArtProperty(
-                                stringResource(
-                                    id = R.string.author
-                                ), artDetail.author
-                            )
-                            ArtProperty(
-                                stringResource(
-                                    id = R.string.object_name
-                                ), artDetail.objectNumber
-                            )
-                        }
+                        },
+                        modifier = Modifier
+                            .windowInsetsPadding(WindowInsets.statusBars)
+                            .padding(horizontal = 16.dp),
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.Search,
+                            contentDescription = null,
+                        )
                     }
                 }
+            }
+            Column(modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBars)) {
+                ArtTitle(text = artDetail.title)
+                Chips(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    titles = artDetail.types
+                )
+                ArtProperty(
+                    stringResource(
+                        id = R.string.description
+                    ), artDetail.description ?: stringResource(id = R.string.dash)
+                )
+                ArtProperty(
+                    stringResource(
+                        id = R.string.author
+                    ), artDetail.author
+                )
+                ArtProperty(
+                    stringResource(
+                        id = R.string.object_name
+                    ), artDetail.objectNumber
+                )
             }
         }
     }
