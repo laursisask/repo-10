@@ -36,5 +36,5 @@ fun ErrorView(
 @Preview
 @Composable
 private fun Preview() {
-    ErrorView(message = "Oops",onClickRetry = {})
+    ErrorView(message = "Oops", onClickRetry = {})
 }

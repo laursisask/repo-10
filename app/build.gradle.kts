@@ -1,10 +1,11 @@
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.android.junit5)
     alias(libs.plugins.hilt)
     alias(libs.plugins.kotlin)
     alias(libs.plugins.secrets)
-    alias(libs.plugins.kapt)
     alias(libs.plugins.kotlinSerialization)
+    alias(libs.plugins.kapt)
 }
 
 android {
@@ -31,11 +32,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
     buildFeatures {
         compose = true
@@ -43,6 +44,11 @@ android {
     }
     composeOptions {
         kotlinCompilerExtensionVersion = libs.versions.composeCompiler.get()
+    }
+    testOptions {
+        unitTests{
+            isReturnDefaultValues = true
+        }
     }
 }
 

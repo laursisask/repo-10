@@ -90,10 +90,9 @@ private fun LazyListScope.renderError(lazyArtCollection: LazyPagingItems<ArtUIMo
     lazyArtCollection.apply {
         when {
             loadState.refresh is LoadState.Error -> {
-                val e = lazyArtCollection.loadState.refresh as LoadState.Error
                 item {
                     ErrorView(
-                        message = e.error.localizedMessage ?: "",
+                        message = stringResource(id = R.string.global_error_message),
                         modifier = Modifier.fillParentMaxSize()
                     ) { retry() }
                 }
