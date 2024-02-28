@@ -116,7 +116,7 @@ class CollectionPagingSourceTest {
 
             val expectedResult = PagingSource.LoadResult.Page(
                 data = listOf(art),
-                prevKey = 1,
+                prevKey = null,
                 nextKey = 2
             )
 

@@ -28,7 +28,7 @@ class CollectionPagingSource @Inject constructor(
             }
             LoadResult.Page(
                 data = list,
-                prevKey = if (position == RIJKS_STARTING_PAGE_INDEX) null else position - 1,
+                prevKey = null, //Only paging forward
                 nextKey = nextKey
             )
         } catch (exception: Exception) {
