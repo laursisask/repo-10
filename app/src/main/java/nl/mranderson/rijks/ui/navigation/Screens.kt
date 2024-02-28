@@ -5,7 +5,7 @@ sealed class Screens(val route: String) {
     data object Detail : Screens("detail_screen") {
         const val argArtId = "artId"
     }
-    object Image : Screens("image_screen") {
+    data object Image : Screens("image_screen") {
         const val argArtImageUrl = "artImageUrl"
     }
 }
