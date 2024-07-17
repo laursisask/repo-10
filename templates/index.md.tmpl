@@ -1,0 +1,33 @@
+---
+layout: ""
+page_title: "JFrog MyJFrog Provider"
+description: |-
+  The JFrog MyJFrog provider provides resources to interact with features from MyJFrog portal.
+---
+
+# JFrog MyJFrog Provider
+
+The [JFrog](https://jfrog.com/) MyJFrog provider is used to interact with the features from [MyJFrog portal](https://my.jfrog.com/). The provider needs to be configured with the proper credentials before it can be used.
+
+Links to documentation for specific resources can be found in the table of contents to the left.
+
+## Example Usage
+
+{{tffile "examples/example.tf"}}
+
+## Authentication
+
+The JFrog MyJFrog provider supports API token for authentication.
+
+### API Token
+
+MyJFrog API tokens may be used via the HTTP Authorization header by providing the `api_token` field to the provider block. Getting this value from the environment is supported with the `JFROG_MYJFROG_API_TOKEN` environment variable.
+
+Usage:
+```terraform
+provider "myjfrog" {
+  api_token = "abc...xy"
+}
+```
+
+{{ .SchemaMarkdown | trimspace }}

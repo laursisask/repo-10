@@ -1,0 +1,1 @@
+terraform import myjfrog_ip_allowlist.myjfrog-ip-allowlist jpd-server-name
