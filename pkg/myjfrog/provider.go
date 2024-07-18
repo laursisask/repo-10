@@ -75,7 +75,8 @@ func (p *MyJFrogProvider) Configure(ctx context.Context, req provider.ConfigureR
 	}
 
 	meta := util.ProviderMetadata{
-		Client: myJFrogClient,
+		Client:    myJFrogClient,
+		ProductId: productId,
 	}
 
 	p.Meta = meta
