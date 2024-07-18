@@ -129,8 +129,8 @@ func (r *customDomainNameResource) Schema(ctx context.Context, req resource.Sche
 								stringvalidator.OneOf("platform_base_url", "docker_sub_domain"),
 							},
 							MarkdownDescription: "This attribute offers two valid options:\n" +
-								"* `platform_base_url`: Use this option when configuring the base URL for accessing the JPD (JFrog Platform Distribution) User Interface. You can also employ this URL as the base for API calls.\n" +
-								"* `docker_sub_domain`: Use this option when configuring the base URL for Docker-related operations, such as login, pull, and push actions, within the JPD. Please note that this parameter is exclusively available for JPD instances that have the Docker Subdomain method configured.\n" +
+								"  * `platform_base_url`: Use this option when configuring the base URL for accessing the JPD (JFrog Platform Distribution) User Interface. You can also employ this URL as the base for API calls.\n" +
+								"  * `docker_sub_domain`: Use this option when configuring the base URL for Docker-related operations, such as login, pull, and push actions, within the JPD. Please note that this parameter is exclusively available for JPD instances that have the Docker Subdomain method configured.\n" +
 								"For more detailed information on the various Docker methods available in Artifactory, please refer to [Get Started With Artifactory as a Docker Registry](https://jfrog.com/help/r/jfrog-artifactory-documentation/get-started-with-artifactory-as-a-docker-registry).",
 						},
 						"docker_repository_name_override": schema.StringAttribute{
