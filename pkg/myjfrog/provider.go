@@ -96,6 +96,7 @@ func (p *MyJFrogProvider) DataSources(ctx context.Context) []func() datasource.D
 func (p *MyJFrogProvider) Resources(ctx context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
 		NewIPAllowListResource,
+		NewCustomDomainNameResource,
 	}
 }
 
@@ -103,7 +104,7 @@ func (p *MyJFrogProvider) Schema(ctx context.Context, req provider.SchemaRequest
 	resp.Schema = schema.Schema{
 		Attributes: map[string]schema.Attribute{
 			"api_token": schema.StringAttribute{
-				Required:  true,
+				Optional:  true,
 				Sensitive: true,
 				Validators: []validator.String{
 					stringvalidator.LengthAtLeast(1),
