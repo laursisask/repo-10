@@ -11,7 +11,12 @@ endif
 PKG_NAME=pkg/${PRODUCT}
 # if this path ever changes, you need to also update the 'ldflags' value in .goreleaser.yml
 PKG_VERSION_PATH=github.com/jfrog/terraform-provider-${PRODUCT}/${PKG_NAME}
-VERSION := $(shell git tag --sort=-creatordate | head -1 | sed  -n 's/v\([0-9]*\).\([0-9]*\).\([0-9]*\)/\1.\2.\3/p')
+VERSION := $(shell git tag --sort=-creatordate | head -1 | sed -n 's/v\([0-9]*\).\([0-9]*\).\([0-9]*\)/\1.\2.\3/p')
+
+ifeq ($(VERSION),)
+VERSION := "0.0.0"
+endif
+
 NEXT_VERSION?=$(shell echo ${VERSION}| awk -F '.' '{print $$1 "." $$2 "." $$3 +1 }')
 
 TERRAFORM_CLI?=terraform
