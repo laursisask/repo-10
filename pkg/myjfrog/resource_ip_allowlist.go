@@ -271,6 +271,8 @@ func (r *ipAllowListResource) mutateIPs(ctx context.Context, serverName string, 
 }
 
 func (r *ipAllowListResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
+	go util.SendUsageResourceCreate(ctx, r.ProviderData.Client.R(), r.ProviderData.ProductId, r.TypeName)
+
 	var plan ipAllowListResourceModel
 
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
@@ -301,6 +303,8 @@ func (r *ipAllowListResource) Create(ctx context.Context, req resource.CreateReq
 }
 
 func (r *ipAllowListResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
+	go util.SendUsageResourceRead(ctx, r.ProviderData.Client.R(), r.ProviderData.ProductId, r.TypeName)
+
 	var state ipAllowListResourceModel
 
 	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
@@ -326,6 +330,8 @@ func (r *ipAllowListResource) Read(ctx context.Context, req resource.ReadRequest
 }
 
 func (r *ipAllowListResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
+	go util.SendUsageResourceUpdate(ctx, r.ProviderData.Client.R(), r.ProviderData.ProductId, r.TypeName)
+
 	var plan ipAllowListResourceModel
 
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
@@ -394,6 +400,8 @@ func (r *ipAllowListResource) Update(ctx context.Context, req resource.UpdateReq
 }
 
 func (r *ipAllowListResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
+	go util.SendUsageResourceDelete(ctx, r.ProviderData.Client.R(), r.ProviderData.ProductId, r.TypeName)
+
 	var state ipAllowListResourceModel
 
 	diags := req.State.Get(ctx, &state)
