@@ -23,7 +23,7 @@ terraform {
   }
 }
 
-provider "myfrog" {
+provider "myjfrog" {
   // supply JFROG_MYJFROG_API_TOKEN as env var
 }
 
