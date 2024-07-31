@@ -12,7 +12,7 @@ require (
 	github.com/hashicorp/terraform-plugin-testing v1.9.0
 	github.com/jfrog/terraform-provider-shared v1.25.5
 	github.com/samber/lo v1.46.0
-	github.com/sethvargo/go-retry v0.2.4
+	github.com/sethvargo/go-retry v0.3.0
 )
 
 require (
