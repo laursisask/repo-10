@@ -1,6 +1,6 @@
 package config
 
-import "github.com/StephanHCB/go-backend-service-common/acorns/repository"
+import "github.com/Interhyp/go-backend-service-common/acorns/repository"
 
 func (c *ConfigImpl) Custom() repository.CustomConfiguration {
 	return c.CustomConfiguration

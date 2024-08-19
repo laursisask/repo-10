@@ -4,10 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/Interhyp/go-backend-service-common/acorns/repository"
+	"github.com/Interhyp/go-backend-service-common/repository/config"
 	auconfigapi "github.com/StephanHCB/go-autumn-config-api"
 	auconfigenv "github.com/StephanHCB/go-autumn-config-env"
-	"github.com/StephanHCB/go-backend-service-common/acorns/repository"
-	"github.com/StephanHCB/go-backend-service-common/repository/config"
 	"strconv"
 )
 

@@ -2,11 +2,11 @@ package config
 
 import (
 	"context"
+	"github.com/Interhyp/go-backend-service-common/acorns/repository"
 	"github.com/StephanHCB/go-autumn-acorn-registry/api"
 	auconfigenv "github.com/StephanHCB/go-autumn-config-env"
 	aulogging "github.com/StephanHCB/go-autumn-logging"
 	auzerolog "github.com/StephanHCB/go-autumn-logging-zerolog"
-	"github.com/StephanHCB/go-backend-service-common/acorns/repository"
 )
 
 // --- implementing Acorn ---

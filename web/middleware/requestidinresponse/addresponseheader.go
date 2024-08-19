@@ -1,7 +1,7 @@
 package requestidinresponse
 
 import (
-	"github.com/StephanHCB/go-backend-service-common/web/middleware/requestid"
+	"github.com/Interhyp/go-backend-service-common/web/middleware/requestid"
 	"net/http"
 )
 

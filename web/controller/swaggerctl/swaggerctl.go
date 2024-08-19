@@ -3,10 +3,10 @@ package swaggerctl
 import (
 	"context"
 	"fmt"
+	"github.com/Interhyp/go-backend-service-common/acorns/controller"
+	"github.com/Interhyp/go-backend-service-common/web/util/media"
 	aulogging "github.com/StephanHCB/go-autumn-logging"
 	auwebswaggerui "github.com/StephanHCB/go-autumn-web-swagger-ui"
-	"github.com/StephanHCB/go-backend-service-common/acorns/controller"
-	"github.com/StephanHCB/go-backend-service-common/web/util/media"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-http-utils/headers"
 	"net/http"

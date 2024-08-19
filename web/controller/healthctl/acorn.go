@@ -1,8 +1,8 @@
 package healthctl
 
 import (
+	"github.com/Interhyp/go-backend-service-common/acorns/controller"
 	"github.com/StephanHCB/go-autumn-acorn-registry/api"
-	"github.com/StephanHCB/go-backend-service-common/acorns/controller"
 )
 
 // --- implementing Acorn ---

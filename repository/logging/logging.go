@@ -2,12 +2,12 @@ package logging
 
 import (
 	"context"
+	"github.com/Interhyp/go-backend-service-common/acorns/repository"
+	"github.com/Interhyp/go-backend-service-common/web/middleware/requestid"
 	aulogging "github.com/StephanHCB/go-autumn-logging"
 	auzerolog "github.com/StephanHCB/go-autumn-logging-zerolog"
 	"github.com/StephanHCB/go-autumn-logging-zerolog/loggermiddleware"
 	auloggingapi "github.com/StephanHCB/go-autumn-logging/api"
-	"github.com/StephanHCB/go-backend-service-common/acorns/repository"
-	"github.com/StephanHCB/go-backend-service-common/web/middleware/requestid"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"

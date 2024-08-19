@@ -1,7 +1,7 @@
 package apierrors
 
 import (
-	"github.com/StephanHCB/go-backend-service-common/api"
+	"github.com/Interhyp/go-backend-service-common/api"
 	"net/http"
 	"time"
 )
