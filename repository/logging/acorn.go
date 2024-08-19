@@ -1,8 +1,8 @@
 package logging
 
 import (
+	"github.com/Interhyp/go-backend-service-common/acorns/repository"
 	"github.com/StephanHCB/go-autumn-acorn-registry/api"
-	"github.com/StephanHCB/go-backend-service-common/acorns/repository"
 )
 
 // --- implementing Acorn ---

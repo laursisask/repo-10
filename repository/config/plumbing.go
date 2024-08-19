@@ -4,12 +4,12 @@ package config
 
 import (
 	"context"
+	"github.com/Interhyp/go-backend-service-common/acorns/repository"
 	auacornapi "github.com/StephanHCB/go-autumn-acorn-registry/api"
 	auconfigapi "github.com/StephanHCB/go-autumn-config-api"
 	auconfigenv "github.com/StephanHCB/go-autumn-config-env"
 	aulogging "github.com/StephanHCB/go-autumn-logging"
 	auzerolog "github.com/StephanHCB/go-autumn-logging-zerolog"
-	"github.com/StephanHCB/go-backend-service-common/acorns/repository"
 )
 
 type ConfigImpl struct {

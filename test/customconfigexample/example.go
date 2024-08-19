@@ -1,9 +1,9 @@
 package customconfigexample
 
 import (
+	"github.com/Interhyp/go-backend-service-common/repository/config"
 	auacornapi "github.com/StephanHCB/go-autumn-acorn-registry/api"
 	auconfigapi "github.com/StephanHCB/go-autumn-config-api"
-	"github.com/StephanHCB/go-backend-service-common/repository/config"
 )
 
 type CustomConfigurationWithOneField interface {

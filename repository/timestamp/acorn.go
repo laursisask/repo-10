@@ -1,8 +1,8 @@
 package timestamp
 
 import (
+	"github.com/Interhyp/go-backend-service-common/acorns/repository"
 	auacornapi "github.com/StephanHCB/go-autumn-acorn-registry/api"
-	"github.com/StephanHCB/go-backend-service-common/acorns/repository"
 	"time"
 )
 

@@ -3,10 +3,10 @@ package security
 import (
 	"context"
 	"encoding/json"
+	"github.com/Interhyp/go-backend-service-common/api"
+	"github.com/Interhyp/go-backend-service-common/api/apierrors"
+	"github.com/Interhyp/go-backend-service-common/web/util/media"
 	aulogging "github.com/StephanHCB/go-autumn-logging"
-	"github.com/StephanHCB/go-backend-service-common/api"
-	"github.com/StephanHCB/go-backend-service-common/api/apierrors"
-	"github.com/StephanHCB/go-backend-service-common/web/util/media"
 	"github.com/go-http-utils/headers"
 	"github.com/golang-jwt/jwt/v4"
 	"net/http"

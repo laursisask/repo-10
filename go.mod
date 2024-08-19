@@ -1,4 +1,4 @@
-module github.com/StephanHCB/go-backend-service-common
+module github.com/Interhyp/go-backend-service-common
 
 go 1.21
 

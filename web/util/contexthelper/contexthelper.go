@@ -2,11 +2,11 @@ package contexthelper
 
 import (
 	"context"
+	"github.com/Interhyp/go-backend-service-common/web/middleware/apmtracing"
+	"github.com/Interhyp/go-backend-service-common/web/middleware/requestid"
 	aulogging "github.com/StephanHCB/go-autumn-logging"
 	auzerolog "github.com/StephanHCB/go-autumn-logging-zerolog"
 	auapmlogging "github.com/StephanHCB/go-autumn-restclient-apm/implementation/logging"
-	"github.com/StephanHCB/go-backend-service-common/web/middleware/apmtracing"
-	"github.com/StephanHCB/go-backend-service-common/web/middleware/requestid"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"go.elastic.co/apm/v2"

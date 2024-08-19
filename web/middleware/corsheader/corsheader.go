@@ -1,8 +1,8 @@
 package corsheader
 
 import (
-	"github.com/StephanHCB/go-backend-service-common/acorns/repository"
-	"github.com/StephanHCB/go-backend-service-common/web/middleware/requestid"
+	"github.com/Interhyp/go-backend-service-common/acorns/repository"
+	"github.com/Interhyp/go-backend-service-common/web/middleware/requestid"
 	"github.com/go-http-utils/headers"
 	"net/http"
 	"strings"

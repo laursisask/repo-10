@@ -3,9 +3,9 @@ package vault
 import (
 	"context"
 	"errors"
+	"github.com/Interhyp/go-backend-service-common/acorns/repository"
 	"github.com/StephanHCB/go-autumn-acorn-registry/api"
 	auzerolog "github.com/StephanHCB/go-autumn-logging-zerolog"
-	"github.com/StephanHCB/go-backend-service-common/acorns/repository"
 )
 
 // --- implementing Acorn ---
