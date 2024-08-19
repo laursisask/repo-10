@@ -51,7 +51,7 @@ Edit Configuration - Edit Configuration Templates, so it will be set on all new 
 
 ### Goland terminal configuration
 
-Goland has the annoying habit of limiting line width on the output terminal to 80 characters no matter how wide the window is.
+Goland has the habit of limiting line width on the output terminal to 80 characters no matter how wide the window is.
 You can fix this. Menu: Help -> Find Action... -> search for "Registry"
 
 Uncheck `go.run.processes.with.pty`.
