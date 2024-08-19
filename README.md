@@ -27,25 +27,6 @@ It aims to be compatible with a typical Spring microservice:
   [Spring Boot Default Metrics](https://tomgregory.com/spring-boot-default-metrics/)
 - JSON logging format has been adapted to match ECS logging schema
 
-## It's not Beans it's ... Acorns
-
-Our ready-made singleton components implement the 
-[Acorn interface](https://github.com/StephanHCB/go-autumn-acorn-registry/blob/main/api/interface.go#L102)
-from [StephanHCB/go-autumn-acorn-registry](https://github.com/StephanHCB/go-autumn-acorn-registry).
-
-You **can** wire up your application manually instead, but if you decide to play along, and build the rest of your
-application from Acorns (=singleton classes that implement 
-[Acorn](https://github.com/StephanHCB/go-autumn-acorn-registry/blob/main/api/interface.go#L102)),
-it will give you **dependency injection** and automatic **setup in the correct order**, but without the usual 
-drawbacks:
-- zero additional dependencies
-- no reflection
-- no hidden auto magic
-- you are in full control of the entire component lifecycle
-
-_Note: the use of Acorns is completely optional. If you don't want them, there are `...NoAcorn` variants of all
-component constructors._
-
 ## Development
 
 ### initial setup
