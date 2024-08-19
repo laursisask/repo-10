@@ -20,13 +20,13 @@ const basedir = "../resources/"
 func TestRead_EnvWins(t *testing.T) {
 	docs.Description("when reading config, environment supersedes yaml values")
 
-	os.Setenv("APPLICATION_NAME", "room-service")
+	_ = os.Setenv("APPLICATION_NAME", "room-service")
 	cut := New().(repository.Configuration)
 	auconfigenv.LocalConfigFileName = basedir + "valid-config.yaml"
 	err := cut.Read()
 	cut.(*config.ConfigImpl).ObtainPredefinedValues()
 
-	os.Unsetenv("APPLICATION_NAME")
+	_ = os.Unsetenv("APPLICATION_NAME")
 
 	require.Nil(t, err)
 	require.Equal(t, "room-service", cut.ApplicationName())
