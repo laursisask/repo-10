@@ -1,0 +1,162 @@
+{{ if eq .Values.global.clc "prysm" -}}
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "ethnode-clc.fullname" . }}-{{ .Values.global.network }}-{{ .Values.global.env }}
+  labels:
+    {{- include "ethnode-clc.labels" . | nindent 4 }}
+  namespace: {{ include "ethnode.namespace" . }}
+spec:
+  replicas: 1
+  podManagementPolicy: OrderedReady
+  updateStrategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      {{- include "ethnode-clc.labels" . | nindent 6 }}
+      app.kubernetes.io/component: "{{ .Values.global.clc }}"
+  serviceName: {{ include "ethnode-clc.fullname" . }}-{{ .Values.global.network }}-{{ .Values.global.env }}
+  template:
+    metadata:
+      labels:
+        {{- include "ethnode-clc.labels" . | nindent 8 }}
+        app.kubernetes.io/component: "{{ .Values.global.clc }}"
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: {{ .Values.settings.metrics.port | quote}}
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: {{ include "ethnode-clc.fullname" . }}-{{ .Values.global.network }}-{{ .Values.global.env }}
+      automountServiceAccountToken: {{ .Values.serviceAccount.autoMount }}
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      {{- with .Values.affinity }}
+      affinity: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+      {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+      {{- if or .Values.image.pullSecrets .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- include "ethnode-clc.imagePullSecrets" . | nindent 8 }}
+      {{- end }}
+
+      initContainers:
+      - name: init
+        image: {{ .Values.image.hooks.repository }}:{{ .Values.image.hooks.tag }}
+        volumeMounts:
+          - name: clc-pip
+            mountPath: /pip
+          - name: clc-data
+            mountPath: {{ .Values.settings.dataPath }}
+        securityContext:
+          runAsUser: 0                        
+        command:
+        - /bin/bash
+        - -xec
+        - |
+          # get the existing public ip to associate with
+          PUBLIC_IP_TO_ASSOCIATE=$(curl ifconfig.io)
+          echo "PUBLIC_IP_TO_ASSOCIATE: $PUBLIC_IP_TO_ASSOCIATE"
+          echo -ne "$PUBLIC_IP_TO_ASSOCIATE" > /pip/ip
+
+          # update permissions on the data volume
+          chown -R 1000:1000 {{ .Values.settings.dataPath }}
+
+      containers:
+      - name: prysm
+        image: {{ .Values.image.clc.repository }}:{{ .Values.image.clc.tag }}
+        imagePullPolicy: {{ .Values.image.clc.imagePullPolicy }}
+        resources:
+          requests:
+            cpu: "{{ .Values.resources.cpuRequest }}"
+            memory: "{{ .Values.resources.memRequest }}"
+          limits:
+            cpu: "{{ .Values.resources.cpuLimit }}"
+            memory: "{{ .Values.resources.memLimit }}"
+        env:
+          - name: POD_IP
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          {{- if or (eq .Values.global.provider "aws") (eq .Values.global.provider "azure") }}
+          # just makes this easier to read locally
+          - name: LOG4J_CONFIGURATION_FILE
+            value: /etc/teku/log4j.xml
+          {{- end }}
+        volumeMounts:
+          - name: clc-pip
+            mountPath: /pip
+            readOnly: true
+          - name: clc-data
+            mountPath: {{ .Values.settings.dataPath }}
+          - name: clc-jwt
+            mountPath: {{ .Values.global.jwt.secretPath }}
+            readOnly: true            
+        ports:
+          - name: clc-rest
+            containerPort: {{ .Values.settings.restApi.port }}
+            protocol: TCP
+          - name: clc-libp2p
+            containerPort: {{ .Values.settings.p2p.port }}
+            protocol: TCP
+          - name: clc-discovery
+            containerPort: {{ .Values.settings.p2p.port }}
+            protocol: UDP
+          - name: clc-metrics
+            containerPort: {{ .Values.settings.metrics.port }}
+            protocol: TCP
+        command:
+          - /bin/bash
+          - -c
+        args:
+          - |
+            exec
+
+            pip=$(cat /pip/ip)
+            /app/cmd/beacon-chain/beacon-chain \
+              --accept-terms-of-use=true \
+              --{{ .Values.global.network }} \
+              --datadir={{ .Values.settings.dataPath | quote }} \
+              --verbosity={{ .Values.settings.logging | quote }} \
+              --log-format=json \
+              --execution-endpoint="http://{{ .Release.Name }}-{{ .Values.global.elc }}-{{ .Values.global.network }}-{{ .Values.global.env }}.{{ include "ethnode.namespace" . }}.svc.cluster.local:8551" \
+              --jwt-secret="{{ .Values.global.jwt.secretPath }}/jwtSecret.hex" \
+              --checkpoint-sync-url="https://beaconstate-{{ .Values.global.network }}.chainsafe.io" \
+              --genesis-beacon-api-url="https://beaconstate-{{ .Values.global.network }}.chainsafe.io" \
+              --p2p-tcp-port={{ .Values.settings.p2p.port }} \
+              --p2p-udp-port={{ .Values.settings.p2p.port }} \
+              --p2p-host-ip=${pip} \
+              --suggested-fee-recipient=="0x0000000000000000000000000000000000000000" \
+              --rpc-host={{ .Values.settings.restApi.host | quote }} \
+              --rpc-port={{ .Values.settings.restApi.port }} \
+              --grpc-gateway-corsdomain={{ join "," .Values.settings.restApi.corsOrigins }} \
+              --grpc-gateway-host={{ .Values.settings.restApi.host | quote }} \
+              --grpc-gateway-port={{ .Values.settings.grpc.port }} \
+              --monitoring-host={{ .Values.settings.metrics.host | quote }} \
+              --monitoring-port={{ .Values.settings.metrics.port }}
+
+      
+      volumes:
+      - name: clc-jwt
+        secret:
+          secretName: {{ .Release.Name }}-ethnode-{{ .Values.global.network }}-{{ .Values.global.env }}-jwt         
+      - name: clc-pip
+        emptyDir: {}
+      - name: clc-data
+        persistentVolumeClaim:
+          claimName: {{ include "ethnode-clc.fullname" . }}-{{ .Values.global.network }}-{{ .Values.global.env }}-pvc
+
+{{- end }}
+

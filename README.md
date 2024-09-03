@@ -2,6 +2,8 @@
 
 Ethereum Helm charts for Kubernetes - select your choice of `elc` and `clc` client and you can deploy it to K8S. This also supports `aws` and `azure` so you can pick the appropriate provider. If you are running this locally, please make sure you have a lot of resources avialable ie. disk space, cpu and RAM
 
+This currently **only** supports beacon nodes, not validators
+
 ## Values
 
 | Key      | Type   | Default     | Description |
@@ -31,11 +33,18 @@ helm template jfgt ./ --namespace ethereum --create-namespace --values ./example
 
 helm template jfnt ./ --namespace ethereum --create-namespace --values ./examples/mainnet/nethermind-teku-azure.yaml > ./artifacts/nethermind-teku-mainnet-azure.yml
 
+helm template jfbp ./ --namespace ethereum --create-namespace --values ./examples/mainnet/besu-prysm-azure.yaml > ./artifacts/besu-prysm-mainnet-azure.yml
+
+helm template jfbld ./ --namespace ethereum --create-namespace --values ./examples/mainnet/besu-lodestar-azure.yaml > ./artifacts/besu-lodestar-mainnet-azure.yml
+
+helm template jfbn ./ --namespace ethereum --create-namespace --values ./examples/mainnet/besu-nimbus-azure.yaml > ./artifacts/besu-nimbus-mainnet-azure.yml
+
+KUBECONFIG=~/.kube/besu-azure kubectl -n ethereum apply -f ./artifacts/besu-lodestar-mainnet-azure.yml
 ```
 
 ## TODO
 - fixme: storage class for local deployment?
-- support for validators + w3s
-- add on other clients
+- support for validators 
+- support w3s
 
 

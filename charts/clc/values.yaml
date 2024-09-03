@@ -106,6 +106,7 @@ settings:
     port: 5051
     corsOrigins: ["*"]
     allowlist: ["*"]
+    api: ["beacon","config","debug","events","node","validator","lightclient"]
   metrics:
     enabled: true
     host: "0.0.0.0"
