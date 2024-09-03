@@ -59,7 +59,7 @@ spec:
         securityContext:
           runAsUser: 0                        
         command:
-        - /bin/sh
+        - /bin/bash
         - -xec
         - |
           # get the existing public ip to associate with
@@ -138,6 +138,7 @@ spec:
               --port={{ .Values.settings.p2p.port }} \
               --discovery-port={{ .Values.settings.p2p.port }} \
               --listen-address="0.0.0.0" \
+              --enr-address="${pip}" \              
               --validator-monitor-auto \
               --disable-deposit-contract-sync \
               --http \

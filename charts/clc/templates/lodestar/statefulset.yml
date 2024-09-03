@@ -59,7 +59,7 @@ spec:
         securityContext:
           runAsUser: 0                        
         command:
-        - /bin/sh
+        - /bin/bash
         - -xec
         - |
           # get the existing public ip to associate with
@@ -137,7 +137,7 @@ spec:
               --suggestedFeeRecipient="0x0000000000000000000000000000000000000000" \
               --port={{ .Values.settings.p2p.port }} \
               --listenAddress="0.0.0.0" \
-              --enr.ip='${pip}' \
+              --enr.ip=${pip} \
               --rest=true \
               --rest.address={{ .Values.settings.restApi.host | quote }} \
               --rest.port={{ .Values.settings.restApi.port }} \
