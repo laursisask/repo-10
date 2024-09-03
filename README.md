@@ -35,14 +35,14 @@ helm template jfnt ./ --namespace ethereum --create-namespace --values ./example
 
 helm template jfbp ./ --namespace ethereum --create-namespace --values ./examples/mainnet/besu-prysm-azure.yaml > ./artifacts/besu-prysm-mainnet-azure.yml
 
-helm template jfbl ./ --namespace ethereum --create-namespace --values ./examples/mainnet/besu-lighthouse-azure.yaml > ./artifacts/besu-lighthouse-mainnet-azure.yml
+helm template jfbld ./ --namespace ethereum --create-namespace --values ./examples/mainnet/besu-lodestar-azure.yaml > ./artifacts/besu-lodestar-mainnet-azure.yml
 
-KUBECONFIG=~/.kube/besu-azure kubectl -n ethereum apply -f ./artifacts/besu-lighthouse-mainnet-azure.yml
+KUBECONFIG=~/.kube/besu-azure kubectl -n ethereum apply -f ./artifacts/besu-lodestar-mainnet-azure.yml
 ```
 
 ## TODO
 - fixme: storage class for local deployment?
 - support for validators + w3s
 
-
+- lighthouse public up --enr-address=....
 
