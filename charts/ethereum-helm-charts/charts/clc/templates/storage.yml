@@ -37,7 +37,8 @@ metadata:
   labels:
     type: local
 spec:
-  storageClassName: {{ include "ethnode-clc.fullname" . }}-{{ .Values.global.network }}-{{ .Values.global.env }}-storage
+  claimRef:
+    name: {{ include "ethnode-clc.fullname" . }}-{{ .Values.global.network }}-{{ .Values.global.env }}-pvc
   capacity:
     storage: {{ .Values.storage.size | quote }}
   accessModes:
@@ -56,7 +57,7 @@ metadata:
   labels:
     name: {{ include "ethnode-clc.fullname" . }}-{{ .Values.global.network }}-{{ .Values.global.env }}
     {{- if or (eq .Values.global.provider "aws") (eq .Values.global.provider "azure") }}
-    {{ if .Values.global.snapshot.sot  -}}
+    {{ if .Values.global.snapshot.enabled -}}
     "schedule/{{ .Values.global.snapshot.schedule | replace "@" ""}}": "enabled"
     {{- end }}
     {{- include "ethnode-clc.labels" . | nindent 4 }}  
@@ -65,7 +66,11 @@ metadata:
 spec: 
   accessModes:
     - ReadWriteOnce
+  {{- if or (eq .Values.global.provider "aws") (eq .Values.global.provider "azure") }}  
   storageClassName: {{ include "ethnode-clc.fullname" . }}-{{ .Values.global.network }}-{{ .Values.global.env }}-storage
+  {{- else if eq .Values.global.provider "local" }}
+  volumeName: {{ include "ethnode-clc.fullname" . }}-{{ .Values.global.network }}-{{ .Values.global.env }}-storage
+  {{- end }}
   resources: 
     requests:
       storage: {{ .Values.storage.size | quote }}
@@ -82,7 +87,7 @@ spec:
 
 {{- if or (eq .Values.global.provider "aws") (eq .Values.global.provider "azure") }}
 
-{{ if .Values.global.snapshot.sot  -}}
+{{ if .Values.global.snapshot.enabled -}}
 
 ---
 apiVersion: snapshot.storage.k8s.io/v1

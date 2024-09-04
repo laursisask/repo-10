@@ -7,7 +7,7 @@ global:
   clc: teku
   snapshot:
     # sot (source of truth) node, ie this is what we will create snapshots of
-    sot: true
+    enabled: false
     # use the defaults of hourly, daily, weekly
     schedule: "@hourly"
 
@@ -16,9 +16,6 @@ elc:
     elc:
       repository: hyperledger/besu
       tag: latest
-  restore:
-    enabled: false
-    snapshot: ""
   storage:
     allowVolumeExpansion: true
     volumeBindingMode: WaitForFirstConsumer
@@ -54,9 +51,6 @@ clc:
     clc:
       repository: consensys/teku
       tag: latest
-  restore:
-    enabled: false
-    snapshot: ""
   storage:
     allowVolumeExpansion: true
     volumeBindingMode: WaitForFirstConsumer

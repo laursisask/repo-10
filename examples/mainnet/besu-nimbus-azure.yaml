@@ -4,10 +4,10 @@ global:
   env: dev
   network: mainnet
   elc: besu
-  clc: lighthouse
+  clc: nimbus
   snapshot:
     # sot (source of truth) node, ie this is what we will create snapshots of
-    sot: true
+    enabled: false
     # use the defaults of hourly, daily, weekly
     schedule: "@hourly"
 
@@ -16,9 +16,6 @@ elc:
     elc:
       repository: hyperledger/besu
       tag: latest
-  restore:
-    enabled: false
-    snapshot: ""
   storage:
     allowVolumeExpansion: true
     volumeBindingMode: WaitForFirstConsumer
@@ -52,15 +49,8 @@ elc:
 clc:
   image:
     clc:
-      repository: sigp/lighthouse
-      tag: latest
-  settings:
-    grpc:
-      port: 5052
-  restore:
-    enabled: false
-    snapshot: ""
-  
+      repository: statusim/nimbus-eth2
+      tag: multiarch-latest
   storage:
     allowVolumeExpansion: true
     volumeBindingMode: WaitForFirstConsumer

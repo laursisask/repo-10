@@ -3,19 +3,21 @@ global:
   provider: azure
   env: dev
   network: mainnet
-  elc: besu
-  clc: nimbus
+  elc: nethermind
+  clc: teku
   snapshot:
     # sot (source of truth) node, ie this is what we will create snapshots of
-    sot: true
+    enabled: false
     # use the defaults of hourly, daily, weekly
     schedule: "@hourly"
 
 elc:
   image:
     elc:
-      repository: hyperledger/besu
+      repository: nethermind/nethermind
       tag: latest
+  settings:
+    chainspecPath: chainspec/foundation.json
   restore:
     enabled: false
     snapshot: ""
@@ -52,12 +54,11 @@ elc:
 clc:
   image:
     clc:
-      repository: statusim/nimbus-eth2
-      tag: multiarch-latest
+      repository: consensys/teku
+      tag: latest
   restore:
     enabled: false
     snapshot: ""
-  
   storage:
     allowVolumeExpansion: true
     volumeBindingMode: WaitForFirstConsumer
