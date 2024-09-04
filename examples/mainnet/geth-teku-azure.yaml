@@ -3,22 +3,22 @@ global:
   provider: azure
   env: dev
   network: mainnet
-  elc: besu
-  clc: prysm
+  elc: geth
+  clc: teku
   snapshot:
     # sot (source of truth) node, ie this is what we will create snapshots of
-    sot: true
+    enabled: false
     # use the defaults of hourly, daily, weekly
     schedule: "@hourly"
 
 elc:
   image:
     elc:
-      repository: hyperledger/besu
+      repository: ethereum/client-go
       tag: latest
-  restore:
-    enabled: false
-    snapshot: ""
+  settings:
+    logging: 3
+    syncMode: snap
   storage:
     allowVolumeExpansion: true
     volumeBindingMode: WaitForFirstConsumer
@@ -52,15 +52,8 @@ elc:
 clc:
   image:
     clc:
-      repository: gcr.io/prysmaticlabs/prysm/beacon-chain
+      repository: consensys/teku
       tag: latest
-  settings:
-    grpc:
-      port: 5052
-  restore:
-    enabled: false
-    snapshot: ""
-  
   storage:
     allowVolumeExpansion: true
     volumeBindingMode: WaitForFirstConsumer

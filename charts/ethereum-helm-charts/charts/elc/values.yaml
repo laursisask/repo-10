@@ -4,9 +4,8 @@ provider: local
 network: test
 env: test
 snapshot:
-  # sot (source of truth) node, ie this is what we will create snapshots of
-  sot: false
-  # use the defaults of hourly, daily, weekly
+  enabled: false
+  # use the defaults of @hourly, @daily, @weekly
   schedule: "@weekly"
 restore:
   enabled: false

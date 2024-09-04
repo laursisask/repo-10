@@ -1,40 +1,36 @@
 ---
 global:
-  provider: azure
+  provider: aws
   env: dev
   network: mainnet
-  elc: nethermind
+  elc: besu
   clc: teku
   snapshot:
     # sot (source of truth) node, ie this is what we will create snapshots of
-    sot: true
+    enabled: false
     # use the defaults of hourly, daily, weekly
     schedule: "@hourly"
 
 elc:
   image:
     elc:
-      repository: nethermind/nethermind
+      repository: hyperledger/besu
       tag: latest
-  settings:
-    chainspecPath: chainspec/foundation.json
-  restore:
-    enabled: false
-    snapshot: ""
   storage:
     allowVolumeExpansion: true
     volumeBindingMode: WaitForFirstConsumer
     reclaimPolicy: Delete
     size: "1000Gi"
     parameters:
-      skuName: Premium_LRS
+      type: gp3
+      csi.storage.k8s.io/fstype: xfs
   tolerations:
     - key: ethereum
       value: "true"
       effect: NoExecute
     - key: ethereum
       value: "true"
-      effect: NoSchedule
+      effect: NoSchedule      
   affinity:
     podAntiAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
@@ -50,22 +46,19 @@ elc:
             operator: In
             values:
             - ethereum
-
 clc:
   image:
     clc:
       repository: consensys/teku
       tag: latest
-  restore:
-    enabled: false
-    snapshot: ""
   storage:
     allowVolumeExpansion: true
     volumeBindingMode: WaitForFirstConsumer
     reclaimPolicy: Delete
     size: "250Gi"
     parameters:
-      skuName: Premium_LRS
+      type: gp3
+      csi.storage.k8s.io/fstype: xfs
   tolerations:
     - key: ethereum
       value: "true"

@@ -7,6 +7,7 @@ global:
   clc: teku
 
 besu:
+  # this is individual to each client coz each has a different volume snapshot
   restore:
     enabled: false
     snapshot: ""
@@ -16,6 +17,7 @@ besu:
     size: "5Gi"
 
 teku:
+  # this is individual to each client coz each has a different volume snapshot
   restore:
     enabled: false
     snapshot: ""

@@ -3,25 +3,19 @@ global:
   provider: azure
   env: dev
   network: mainnet
-  elc: geth
-  clc: teku
+  elc: besu
+  clc: lodestar
   snapshot:
     # sot (source of truth) node, ie this is what we will create snapshots of
-    sot: true
+    enabled: false
     # use the defaults of hourly, daily, weekly
     schedule: "@hourly"
 
 elc:
   image:
     elc:
-      repository: ethereum/client-go
+      repository: hyperledger/besu
       tag: latest
-  settings:
-    logging: 3
-    syncMode: snap
-  restore:
-    enabled: false
-    snapshot: ""
   storage:
     allowVolumeExpansion: true
     volumeBindingMode: WaitForFirstConsumer
@@ -55,11 +49,8 @@ elc:
 clc:
   image:
     clc:
-      repository: consensys/teku
+      repository: chainsafe/lodestar
       tag: latest
-  restore:
-    enabled: false
-    snapshot: ""
   storage:
     allowVolumeExpansion: true
     volumeBindingMode: WaitForFirstConsumer

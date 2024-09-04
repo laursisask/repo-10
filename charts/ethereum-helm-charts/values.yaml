@@ -17,61 +17,14 @@ global:
     # use the defaults of hourly, daily, weekly
     schedule: "@weekly"
 
-
-
-
 besu:
   restore:
     enabled: false
     # restore from a particular volumesnapshot
     snapshot: ""
 
-  affinity:
-    podAntiAffinity:
-      requiredDuringSchedulingIgnoredDuringExecution:
-        - labelSelector:
-            matchLabels:
-              workloadType: ethereum
-          topologyKey: kubernetes.io/hostname
-    nodeAffinity:
-      requiredDuringSchedulingIgnoredDuringExecution:
-        nodeSelectorTerms:
-        - matchExpressions:
-          - key: ng
-            operator: In
-            values:
-            - ethereum
-
-  tolerations:
-    - key: ethereum
-      operator: Equal
-      value: "true"
-      effect: NoExecute
-
 teku:
   restore:
     enabled: false
     # restore from a particular volumesnapshot
     snapshot: ""
-
-  affinity:
-    podAntiAffinity:
-      requiredDuringSchedulingIgnoredDuringExecution:
-        - labelSelector:
-            matchLabels:
-              workloadType: ethereum
-          topologyKey: kubernetes.io/hostname
-    nodeAffinity:
-      requiredDuringSchedulingIgnoredDuringExecution:
-        nodeSelectorTerms:
-        - matchExpressions:
-          - key: ng
-            operator: In
-            values:
-            - ethereum
-
-  tolerations:
-    - key: ethereum
-      operator: Equal
-      value: "true"
-      effect: NoExecute
