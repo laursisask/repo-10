@@ -56,6 +56,9 @@ service:
       port: 8551
       targetPort: elc-engine
       protocol: TCP
+ # Configure pods labels that need to be added as Prometheus labels
+ # monitor:
+ #   podTargetLabels: []
 
 resources:
   cpuLimit: 4

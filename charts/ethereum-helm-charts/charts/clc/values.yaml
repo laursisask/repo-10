@@ -49,6 +49,9 @@ service:
       port: 8008
       targetPort: clc-metrics
       protocol: TCP
+ # Configure pods labels that need to be added as Prometheus labels
+ # monitor:
+ #   podTargetLabels: []
 
 resources:
   cpuLimit: 4
