@@ -50,3 +50,8 @@ spec:
     path: /metrics
     scheme: http
     honorLabels: true
+  {{- with .Values.service.monitor }}
+  {{- if and (.podTargetLabels) (eq (kindOf .podTargetLabels) "slice" ) }}
+  podTargetLabels: {{ .podTargetLabels }}
+  {{- end }}
+  {{- end }}
