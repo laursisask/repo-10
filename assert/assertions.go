@@ -1,5 +1,6 @@
 package assert
 
+
 import (
 	"bufio"
 	"bytes"
@@ -20,7 +21,6 @@ import (
 	"github.com/davecgh/go-spew/spew"
 	"github.com/pmezard/go-difflib/difflib"
 	"google.golang.org/protobuf/proto"
-	"gopkg.in/yaml.v3"
 	yaml "gopkg.in/yaml.v3"
 )
 
