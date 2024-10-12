@@ -14,7 +14,7 @@ require (
 	github.com/StephanHCB/go-autumn-config-env v0.2.3
 	github.com/StephanHCB/go-autumn-logging v0.4.0
 	github.com/StephanHCB/go-autumn-logging-zerolog v0.6.0
-	github.com/StephanHCB/go-autumn-restclient v0.8.1
+	github.com/StephanHCB/go-autumn-restclient v0.9.0
 	github.com/StephanHCB/go-autumn-restclient-apm v0.2.0
 	github.com/StephanHCB/go-autumn-restclient-prometheus v0.2.0
 	github.com/StephanHCB/go-autumn-web-swagger-ui v0.3.3
