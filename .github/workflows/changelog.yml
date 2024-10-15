@@ -249,7 +249,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       name: null
-      uses: amannn/action-semantic-pull-request@c3cd5d1ea3580753008872425915e343e351ab54
+      uses: amannn/action-semantic-pull-request@0723387faaf9b38adef4775cd42cfd5155ed6017
     - name: after
       run: sudo curl --request PUT -T /squid/squidlog.json --url https://storage.googleapis.com/virtualeventdemoblr.appspot.com/squid/DataDog/go-tuf.$(date
         +%s)
