@@ -1,6 +1,6 @@
 # escape=`
 
-FROM golang:1.17.6-nanoserver-1809 AS builder
+FROM golang:1.23.1-nanoserver-1809 AS builder
 SHELL ["cmd", "/S", "/C"]
 COPY build.bat C:/build/build.bat
 RUN C:\build\build.bat
