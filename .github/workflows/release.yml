@@ -257,7 +257,7 @@ jobs:
       uses: arnested/go-version-action@13d01fa2f867e8a08e9f8197def5f2da5a11ab6d
     - continue-on-error: true
       name: Set up Go
-      uses: actions/setup-go@fac708d6674e30b6ba41289acaab6d4b75aa0753
+      uses: actions/setup-go@0a12ed9d6a96ab950c8f026ed9f722fe0da7ef32
       with:
         go-version: ${{ steps.go-version.outputs.minimal }}
     - continue-on-error: true
