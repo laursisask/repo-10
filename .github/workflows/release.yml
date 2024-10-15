@@ -254,7 +254,7 @@ jobs:
     - continue-on-error: true
       id: go-version
       name: Get Go version
-      uses: arnested/go-version-action@13d01fa2f867e8a08e9f8197def5f2da5a11ab6d
+      uses: arnested/go-version-action@0a5fcb7e223e96f0c307375b6cabb184eac1cc79
     - continue-on-error: true
       name: Set up Go
       uses: actions/setup-go@fac708d6674e30b6ba41289acaab6d4b75aa0753
