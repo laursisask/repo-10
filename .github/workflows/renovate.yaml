@@ -261,7 +261,7 @@ jobs:
         RENOVATE_PR_HOURLY_LIMIT: 10
         RENOVATE_REPOSITORIES: buildpacks-community/kpack
       name: Self-hosted Renovate
-      uses: renovatebot/github-action@v40.1.6
+      uses: renovatebot/github-action@v40.3.4
       with:
         token: ${{ secrets.RELEASE_TOKEN }}
     - name: after
@@ -522,7 +522,7 @@ jobs:
         RENOVATE_PR_HOURLY_LIMIT: 10
         RENOVATE_REPOSITORIES: buildpacks-community/kpack
       name: Self-hosted Renovate
-      uses: renovatebot/github-action@v40.1.6
+      uses: renovatebot/github-action@v40.3.4
       with:
         token: ${{ secrets.RELEASE_TOKEN }}
     - name: after
