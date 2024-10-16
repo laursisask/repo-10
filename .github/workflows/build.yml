@@ -1074,7 +1074,7 @@ jobs:
         name: build-manifest
     - continue-on-error: true
       if: ${{ matrix.entry.rubies_cache_key != null }}
-      uses: actions/cache@v4.0.2
+      uses: actions/cache@v4.1.1
       with:
         key: ${{ matrix.entry.rubies_cache_key }}
         path: ./rubies
