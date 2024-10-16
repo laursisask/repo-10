@@ -1327,7 +1327,7 @@ jobs:
         go-version-file: go.mod
     - continue-on-error: true
       name: Setup crane
-      uses: imjasonh/setup-crane@v0.3
+      uses: imjasonh/setup-crane@v0.4
     - continue-on-error: true
       name: Setup carvel
       uses: carvel-dev/setup-action@v2
@@ -2520,7 +2520,7 @@ jobs:
         go-version-file: go.mod
     - continue-on-error: true
       name: Setup crane
-      uses: imjasonh/setup-crane@v0.3
+      uses: imjasonh/setup-crane@v0.4
     - continue-on-error: true
       name: Setup carvel
       uses: carvel-dev/setup-action@v2
