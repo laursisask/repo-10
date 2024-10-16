@@ -183,7 +183,7 @@ require (
 	go.opentelemetry.io/collector/config/configopaque v1.3.0
 	go.opentelemetry.io/collector/config/configtelemetry v0.96.0
 	go.opentelemetry.io/collector/config/configtls v0.96.0
-	go.opentelemetry.io/collector/confmap v0.96.0
+	go.opentelemetry.io/collector/confmap v1.17.0
 	go.opentelemetry.io/collector/connector v0.96.0
 	go.opentelemetry.io/collector/consumer v0.96.0
 	go.opentelemetry.io/collector/exporter v0.96.0
@@ -611,7 +611,7 @@ require (
 	github.com/open-telemetry/opentelemetry-collector-contrib/receiver/vcenterreceiver v0.96.0
 	go.opentelemetry.io/collector/config/configretry v0.96.0
 	go.opentelemetry.io/collector/confmap/converter/expandconverter v0.96.0
-	go.opentelemetry.io/collector/confmap/provider/fileprovider v0.96.0
+	go.opentelemetry.io/collector/confmap/provider/fileprovider v1.17.0
 	go.opentelemetry.io/collector/confmap/provider/yamlprovider v0.96.0
 	go.opentelemetry.io/collector/exporter/debugexporter v0.96.0
 	go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetrichttp v1.24.0
@@ -651,7 +651,7 @@ require (
 	github.com/drone/envsubst v1.0.3 // indirect
 	github.com/expr-lang/expr v1.16.1 // indirect
 	github.com/go-jose/go-jose/v3 v3.0.3 // indirect
-	github.com/go-viper/mapstructure/v2 v2.0.0-alpha.1 // indirect
+	github.com/go-viper/mapstructure/v2 v2.1.0 // indirect
 	github.com/golang-jwt/jwt/v5 v5.2.1 // indirect
 	github.com/google/gnostic-models v0.6.8 // indirect
 	github.com/grafana/jfr-parser v0.8.0 // indirect
@@ -659,7 +659,7 @@ require (
 	github.com/hetznercloud/hcloud-go/v2 v2.4.0 // indirect
 	github.com/influxdata/tdigest v0.0.2-0.20210216194612-fc98d27c9e8b // indirect
 	github.com/julienschmidt/httprouter v1.3.0 // indirect
-	github.com/knadh/koanf/v2 v2.1.0 // indirect
+	github.com/knadh/koanf/v2 v2.1.1 // indirect
 	github.com/lightstep/go-expohisto v1.0.0 // indirect
 	github.com/metalmatze/signal v0.0.0-20210307161603-1c9aa721a97a // indirect
 	github.com/minio/asm2plan9s v0.0.0-20200509001527-cdd76441f9d8 // indirect
