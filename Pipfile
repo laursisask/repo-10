@@ -20,7 +20,7 @@ colorama = "~=0.4"
 packaging = "~=21.0"
 requirementslib = "~=1.5"
 typing = {version = "~=3.7"}
-vistir = "< 0.7.0"
+vistir = "<0.9.0"
 plette = "< 1.0.0"
 
 [scripts]
