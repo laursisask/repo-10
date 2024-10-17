@@ -275,7 +275,7 @@ jobs:
     - continue-on-error: true
       run: echo "${{ matrix.fuzz_target }}" >executed_${{ matrix.fuzz_target }}
     - continue-on-error: true
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: executed_${{ matrix.fuzz_target }}
         path: executed_${{ matrix.fuzz_target }}
