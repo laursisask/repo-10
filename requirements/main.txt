@@ -75,7 +75,9 @@ bleach==4.1.0 \
 boto3==1.21.19 \
     --hash=sha256:76d5b90400c54b25278150768e946edf166acce2c1597c0ecfbebb1dbe9acf2c \
     --hash=sha256:7bb2e6506a6ad44d111dd20a5d510374b6958fe989b4ef887109c79d812f926f
-    # via -r requirements/main.in
+    # via
+    #   -r requirements/main.in
+    #   kombu
 botocore==1.24.19 \
     --hash=sha256:5ed2be0e413961134f4c17eab16396d41a5b4b73a637588260c04d20806d52ea \
     --hash=sha256:d0d77bce152ca51f3c2cd0f9bf05cb3b623e719406ad58b4c20444e237fe82eb
@@ -596,7 +598,7 @@ jmespath==0.10.0 \
     # via
     #   boto3
     #   botocore
-kombu==5.2.4 \
+kombu[sqs]==5.2.4 \
     --hash=sha256:37cee3ee725f94ea8bb173eaab7c1760203ea53bbebae226328600f9d2799610 \
     --hash=sha256:8b213b24293d3417bcf0d2f5537b7f756079e3ea232a8386dcc89a59fd2361a4
     # via celery
@@ -893,9 +895,11 @@ pycparser==2.21 \
     --hash=sha256:8ee45429555515e1f6b185e78100aea234072576aa43ab53aefcae078162fca9 \
     --hash=sha256:e644fdec12f7872f86c58ff790da456218b10f863970249516d60a5eaca77206
     # via cffi
-pycurl==7.45.1 \
-    --hash=sha256:a863ad18ff478f5545924057887cdae422e1b2746e41674615f687498ea5b88a
-    # via -r requirements/main.in
+pycurl==7.44.1 \
+    --hash=sha256:5bcef4d988b74b99653602101e17d8401338d596b9234d263c728a0c3df003e8
+    # via
+    #   -r requirements/main.in
+    #   kombu
 pydantic==1.9.0 \
     --hash=sha256:085ca1de245782e9b46cefcf99deecc67d418737a1fd3f6a4f511344b613a5b3 \
     --hash=sha256:086254884d10d3ba16da0588604ffdc5aab3f7f09557b998373e885c690dd398 \
@@ -940,7 +944,9 @@ pygments==2.11.2 \
 pyjwt[crypto]==2.3.0 \
     --hash=sha256:b888b4d56f06f6dcd777210c334e69c737be74755d3e5e9ee3fe67dc18a0ee41 \
     --hash=sha256:e0c4bb8d9f0af0c7f5b1ec4c5036309617d03d56932877f2f7a0beeb5318322f
-    # via -r requirements/main.in
+    # via
+    #   -r requirements/main.in
+    #   pyjwt
 pymacaroons==0.13.0 \
     --hash=sha256:1e6bba42a5f66c245adf38a5a4006a99dcc06a0703786ea636098667d42903b8 \
     --hash=sha256:3e14dff6a262fdbf1a15e769ce635a8aea72e6f8f91e408f9a97166c53b91907
@@ -1146,9 +1152,9 @@ structlog==21.5.0 \
     --hash=sha256:68c4c29c003714fe86834f347cb107452847ba52414390a7ee583472bde00fc9 \
     --hash=sha256:fd7922e195262b337da85c2a91c84be94ccab1f8fd1957bd6986f6904e3761c8
     # via -r requirements/main.in
-tenacity==8.0.1 \
-    --hash=sha256:43242a20e3e73291a28bcbcacfd6e000b02d3857a9a9fff56b297a27afdc932f \
-    --hash=sha256:f78f4ea81b0fabc06728c11dc2a8c01277bfc5181b321a4770471902e3eb844a
+tenacity==9.0.0 \
+    --hash=sha256:807f37ca97d62aa361264d497b0e31e92b8027044942bfa756160d908320d73b \
+    --hash=sha256:93de0c98785b27fcf659856aa9f54bfbd399e29969b0621bc7f762bd441b4539
     # via celery-redbeat
 text-unidecode==1.3 \
     --hash=sha256:1311f10e8b895935241623731c2ba64f4c455287888b18189350b67134a822e8 \
@@ -1185,6 +1191,7 @@ urllib3==1.26.8 \
     # via
     #   botocore
     #   elasticsearch
+    #   kombu
     #   requests
     #   sentry-sdk
 venusian==3.0.0 \
@@ -1295,7 +1302,9 @@ wrapt==1.14.0 \
 wtforms[email]==3.0.1 \
     --hash=sha256:6b351bbb12dd58af57ffef05bc78425d08d1914e0fd68ee14143b7ade023c5bc \
     --hash=sha256:837f2f0e0ca79481b92884962b914eba4e72b7a2daaf1f939c890ed0124b834b
-    # via -r requirements/main.in
+    # via
+    #   -r requirements/main.in
+    #   wtforms
 yara-python==4.2.0 \
     --hash=sha256:0de9d9482a6def6ef719ac9024dceae89809fa05d02656518a146374df93eb94 \
     --hash=sha256:1faec6480be87964056ac19cddae052da4c88755426c81c83bce53ed7d57ebfe \
