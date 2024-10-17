@@ -1,6 +1,6 @@
 [versions]
 androidGradlePlugin = "8.2.1"
-androidJUnit = "1.10.0.0"
+androidJUnit = "1.11.2.0"
 androidxActivity = "1.8.2"
 androidxArchCore = "2.2.0"
 androidxAppcompat = "1.6.1"
