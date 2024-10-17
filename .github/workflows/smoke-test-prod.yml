@@ -265,7 +265,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       name: Cypress run
       timeout-minutes: 7
-      uses: cypress-io/github-action@v5.8.3
+      uses: cypress-io/github-action@v6.7.6
       with:
         build: yarn build-nav-data
         command: yarn dlx cypress@11 run --headless --record --tag production,smoke
