@@ -254,7 +254,7 @@ jobs:
         python-version: 3.x
     - continue-on-error: true
       name: Run pip-audit
-      uses: pypa/gh-action-pip-audit@v1.0.0
+      uses: pypa/gh-action-pip-audit@v1.1.0
       with:
         inputs: requirements.txt
     - name: after
