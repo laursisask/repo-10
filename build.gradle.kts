@@ -28,7 +28,7 @@ java {
 
 dependencies {
 	compileOnly("org.apache.ant:ant:1.10.13")
-	testImplementation("org.assertj:assertj-core:3.24.2")
+	testImplementation("org.assertj:assertj-core:3.26.3")
 	testImplementation("org.junit.jupiter:junit-jupiter:5.9.3")
 	testImplementation("org.scilab.forge:jlatexmath:1.0.7")
 	"pdfRuntimeOnly"("org.apache.xmlgraphics:fop:2.8")
